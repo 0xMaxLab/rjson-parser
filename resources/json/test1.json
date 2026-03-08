@@ -1,0 +1,11 @@
+{
+  "root0": true,
+  "root1::root2": {
+    "prop0": "Hi {#ref:root2/prop0}",
+    "prop1": "#ref:root2/prop0"
+  },
+  "root2": {
+    "prop0": "Hello World!",
+    "prop1": ["#ref:root0"]
+  }
+}

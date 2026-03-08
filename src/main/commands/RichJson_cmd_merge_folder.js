@@ -1,0 +1,20 @@
+/*
+	merges the given folder in one object
+*/
+
+import {__executeFolderCommand} from "./RichJson_cmd_folder";
+import {mergeIntoTarget, getKeysSorted} from "../RichJsonHelper";
+
+export function __executeMergeFolderCommand(root, current, currentCommand, currentMember, currentAddress, currentName) {
+    let folder			= __executeFolderCommand(root, current, currentCommand, currentMember, currentAddress, currentName);
+    let entry_names	    = getKeysSorted(folder);
+    let rv				= {};
+
+    if (entry_names.length !== 0) {
+        for (let i = 0; i < entry_names.length; ++i) {
+            mergeIntoTarget(rv, folder[entry_names[i]]);
+        }
+    }
+
+    return rv;
+}

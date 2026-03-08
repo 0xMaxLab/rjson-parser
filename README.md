@@ -1,2 +1,2 @@
-# rjson-parser
-RJSON -- JSON with multiple inheritances, references and commands
+# rjson-parser (RichJson)
+RichJSON -- JSON with multiple inheritances, references and commands
