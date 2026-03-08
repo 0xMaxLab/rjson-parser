@@ -13,8 +13,9 @@ import {__executeInvokeCommand} from "./RichJson_cmd_invoke";
 import {__executeArrayCommand} from "./RichJson_cmd_array";
 
 class RichJsonCommandHolder {
-    void        = function() {}
-    available	= {
+    void = function () {
+    }
+    available = {
         ref: __executeRefCommand,
         env: __executeEnvCommand,
         this: __executeThisCommand,
@@ -30,9 +31,9 @@ class RichJsonCommandHolder {
 
         a: __executeArrayCommand,
     };
-    enabled		    = {};
-    built_in		= {};
-    kcmd_ignored	= {};
+    enabled = {};
+    built_in = {};
+    kcmd_ignored = {};
 
     constructor() {
         mergeIntoWithoutRebind(this.enabled, this.available);
@@ -40,8 +41,8 @@ class RichJsonCommandHolder {
     }
 }
 
-export let __RICH_JSON_COMMANDS         = new RichJsonCommandHolder();
-export let __RICH_JSON_LATE_APPLIES     = ["this", "clone", "invoke"];
+export let __RICH_JSON_COMMANDS = new RichJsonCommandHolder();
+export let __RICH_JSON_LATE_APPLIES = ["this", "clone", "invoke"];
 
 export function __setRichJsonCommandEnabled(command, enabled) {
     if (!Object.hasOwn(__RICH_JSON_COMMANDS.available, command)) {
@@ -60,7 +61,7 @@ export function __setRichJsonCommandEnabled(command, enabled) {
 }
 
 export function __throwCommandNotFound(command) {
-    throw(`RichJson Command '${command}' not found`);
+    throw (`RichJson Command '${command}' not found`);
 }
 
 

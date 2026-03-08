@@ -10,7 +10,7 @@ export let __RICH_JSON_CLONE_ADDRESS = undefined
 
 export function __executeCloneCommand(root, current, currentCommand, currentMember, currentAddress, currentName) {
     if (RICH_JSON_CRASH_ON_NESTED_CLONE && __RICH_JSON_CLONE_IS_APPLYING()) {
-        throw(`RichJson nested clone detected in '${currentAddress}'.`);
+        throw (`RichJson nested clone detected in '${currentAddress}'.`);
     }
     __RICH_JSON_CLONE_ADDRESS = currentAddress;
     currentMember = cloneObject(currentMember);

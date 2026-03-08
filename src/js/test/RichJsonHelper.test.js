@@ -1,5 +1,5 @@
-import { expect, test } from 'vitest'
-import {cloneObject, mergeObjects, mergeObjectsWithoutRebind, resolveAddress} from "../main/RichJsonHelper";
+import {expect, test} from 'vitest'
+import {cloneObject, mergeObjects, mergeObjectsWithoutRebind} from "../main/RichJsonHelper";
 
 test('mergeObjects', () => {
     let obj3 = {

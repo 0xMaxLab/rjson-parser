@@ -1,12 +1,7 @@
 import {parseRichJson} from "@/RichJson/RichJson_parse";
 import {__resetAddressCache, isJsonObject} from "@/RichJson/RichJsonHelper";
 import {__RICH_JSON_COMPRESS_ADDRESSES} from "@/RichJson/RichJson_compress";
-import {
-    getArrayElement,
-    getObjectField,
-    setArrayElement,
-    setObjectField
-} from "@/RichJson/RichJson_GetterAndSetter";
+import {getArrayElement, getObjectField, setArrayElement, setObjectField} from "@/RichJson/RichJson_GetterAndSetter";
 import {DEBUG_LOG_RICH_JSON} from "@/RichJson/RichJsonConfiguration";
 import {__RICH_JSON_INHERITANCE_SIGN} from "@/RichJson/RichJson";
 
@@ -25,7 +20,7 @@ export function decompress(object) {
         object = __decompress(object);
         return parseRichJson(object)["_"];
     } else {
-        throw("RichJson the given object is not a compressed object")
+        throw ("RichJson the given object is not a compressed object")
     }
 }
 
@@ -42,18 +37,18 @@ function __decompress(current) {
     let inheritance;
 
     if (isJsonObj) {
-        get     = getObjectField;
-        set     = setObjectField;
-        names   = Object.keys(current);
+        get = getObjectField;
+        set = setObjectField;
+        names = Object.keys(current);
     } else {
-        get     = getArrayElement;
-        set     = setArrayElement;
-        names   = current;
+        get = getArrayElement;
+        set = setArrayElement;
+        names = current;
     }
 
     for (let i = 0; i < names.length; ++i) {
-        name	= names[i];
-        member	= get(current, name, i);
+        name = names[i];
+        member = get(current, name, i);
 
         if (isJsonObject(member) || Array.isArray(member)) {
             member = __decompress(member);

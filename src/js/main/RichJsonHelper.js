@@ -44,9 +44,9 @@ export function mergeIntoTarget(target, ...others) {
 }
 
 export function __mergeIntoTarget(target, other, force = false) {
-    let names	= Object.keys(other);
-    let name	= undefined;
-    let member	= undefined;
+    let names = Object.keys(other);
+    let name = undefined;
+    let member = undefined;
 
     for (let j = 0; j < names.length; j++) {
         name = names[j];
@@ -58,8 +58,8 @@ export function __mergeIntoTarget(target, other, force = false) {
             if (member !== undefined &&
                 isJsonObject(member) && isJsonObject(target[name]) &&
                 !MERGE_OBJECTS_CIRCULAR_CACHE.includes(member)) {
-                    MERGE_OBJECTS_CIRCULAR_CACHE.push(member);
-                    mergeIntoTarget(target[name], member);
+                MERGE_OBJECTS_CIRCULAR_CACHE.push(member);
+                mergeIntoTarget(target[name], member);
             } else {
                 if (!force && !Object.hasOwn(target, name)) target[name] = member;
             }
@@ -107,9 +107,9 @@ export function mergeIntoWithoutRebind(target, ...others) {
 }
 
 export function __mergeIntoWithoutRebind(target, other, force = false) {
-    let names	= Object.keys(other);
-    let name	= undefined;
-    let member	= undefined;
+    let names = Object.keys(other);
+    let name = undefined;
+    let member = undefined;
 
     for (let j = 0; j < names.length; j++) {
         name = names[j];
@@ -120,8 +120,8 @@ export function __mergeIntoWithoutRebind(target, other, force = false) {
             if (member !== undefined &&
                 isJsonObject(member) && isJsonObject(target[name]) &&
                 !MERGE_OBJECTS_CIRCULAR_CACHE.includes(member)) {
-                    MERGE_OBJECTS_CIRCULAR_CACHE.push(member);
-                    mergeIntoWithoutRebind(target[name], member);
+                MERGE_OBJECTS_CIRCULAR_CACHE.push(member);
+                mergeIntoWithoutRebind(target[name], member);
             } else {
                 if (!force && !Object.hasOwn(target, name)) target[name] = member;
             }
@@ -238,7 +238,7 @@ export function __resetAddressCache() {
  */
 export function getKeysSorted(object) {
     let rv = Object.keys(object);
-    rv.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+    rv.sort((a, b) => a.localeCompare(b, undefined, {sensitivity: "base"}));
     return rv;
 }
 

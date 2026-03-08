@@ -16,11 +16,11 @@ const __RICH_JSON_MODULES = {};
  * Use this class in order to write your own RichJson modules.
  */
 export class RichJsonModule {
-    name            = "";
-    lateApplies	    = [];
-    commands        = {};
-    kcmdIgnores     = {};
-    isIncluded      = false;
+    name = "";
+    lateApplies = [];
+    commands = {};
+    kcmdIgnores = {};
+    isIncluded = false;
 
     constructor(name) {
         this.name = name;
@@ -46,10 +46,10 @@ export class RichJsonModule {
         this.isIncluded = true;
         Object.entries(this.commands).forEach(([name, func]) => {
             if (Object.hasOwn(__RICH_JSON_COMMANDS.built_in, name)) {
-                throw(`RichJson you can not override built in commands. Affected command is '#${name}'`);
+                throw (`RichJson you can not override built in commands. Affected command is '#${name}'`);
             }
-            __RICH_JSON_COMMANDS.available[name]   = func;
-            __RICH_JSON_COMMANDS.enabled[name]	   = func;
+            __RICH_JSON_COMMANDS.available[name] = func;
+            __RICH_JSON_COMMANDS.enabled[name] = func;
         });
         this.lateApplies.forEach((name) => {
             if (!__RICH_JSON_LATE_APPLIES.includes(name)) {
@@ -89,9 +89,9 @@ export function registerRichJsonModule(module) {
  * @param _name
  */
 export function unregisterRichJsonModule(_name) {
-    if(isRichJsonModuleRegistered(_name)) {
+    if (isRichJsonModuleRegistered(_name)) {
         if (__RICH_JSON_MODULES[_name].isIncluded)
-            throw(`RichJson can not unregister module '${_name}' due to it is currently included`);
+            throw (`RichJson can not unregister module '${_name}' due to it is currently included`);
         console.log(`RichJson unregistering module '${_name}'`);
         delete __RICH_JSON_MODULES[_name];
     }

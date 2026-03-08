@@ -1,7 +1,12 @@
-import { expect, test } from 'vitest'
-import {RichJsonModule} from "../main/RichJsonModule";
-import {excludeRichJsonModule, includeRichJsonModule, registerRichJsonModule, unregisterRichJsonModule} from "../main/RichJsonModule"
-import {resolveAddress, concatArrays, concatStrings, mergeObjects, __resetAddressCache} from "../main/RichJsonHelper";
+import {expect, test} from 'vitest'
+import {
+    excludeRichJsonModule,
+    includeRichJsonModule,
+    registerRichJsonModule,
+    RichJsonModule,
+    unregisterRichJsonModule
+} from "../main/RichJsonModule";
+import {concatArrays, concatStrings, mergeObjects, resolveAddress} from "../main/RichJsonHelper";
 import {parseRichJson} from "../main/RichJson_parse";
 import stringify from "json-stable-stringify";
 import {addRichJsonEnv} from "../main/commands/RichJson_cmd_env";
@@ -15,7 +20,7 @@ test('Module', () => {
 
     registerRichJsonModule(
         new RichJsonModule("test")
-            .addCommand("ilog", function(_cryptkey, _add_to_cache, _root, _command, _message, _address, _name) {
+            .addCommand("ilog", function (_cryptkey, _add_to_cache, _root, _command, _message, _address, _name) {
                 console.log(concatStrings("file_struct_plain_rich_json_module_ok: ", _message));
                 return "success";
             })
@@ -286,7 +291,7 @@ test('#copy', () => {
 
 test('#clone', () => {
     let content = {
-        "#clone:first": { "second": "second" }
+        "#clone:first": {"second": "second"}
     };
     let clone = {
         "#clone:first": content["#clone:first"]

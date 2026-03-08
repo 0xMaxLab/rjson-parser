@@ -12,7 +12,7 @@ const FILE_CACHE = {};
  * @returns {{}}
  */
 export function readRichJsonDirectory(path) {
-    let entries = fs.readdirSync(path, { withFileTypes: true });
+    let entries = fs.readdirSync(path, {withFileTypes: true});
     let rv = {};
 
     entries.forEach(entry => {

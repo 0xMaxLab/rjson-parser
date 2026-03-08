@@ -1,51 +1,53 @@
-
 import "./RichJsonHelper"
 import {
-    resolveAddress, concatArrays, cloneObject,
-    isJsonObject, concatStrings, matchesWildcard,
-    getKeysSorted, mergeIntoTarget,
-    getFieldByKey, __mergeIntoTarget, __resetAddressCache
+    __mergeIntoTarget,
+    __resetAddressCache,
+    cloneObject,
+    concatArrays,
+    concatStrings,
+    getFieldByKey,
+    getKeysSorted,
+    isJsonObject,
+    matchesWildcard,
+    mergeIntoTarget,
+    resolveAddress
 } from "./RichJsonHelper";
-import {
-    __setRichJsonCommandEnabled,
-    __RICH_JSON_COMMANDS,
-    __throwCommandNotFound
-} from "./commands/RichJson_cmd";
+import {__RICH_JSON_COMMANDS, __setRichJsonCommandEnabled, __throwCommandNotFound} from "./commands/RichJson_cmd";
 import {DEBUG_LOG_RICH_JSON, RICH_JSON_LATE_CONSTRUCT_ENABLED} from "./RichJsonConfiguration";
 import {getArrayElement, getObjectField, setArrayElement, setObjectField} from "./RichJson_GetterAndSetter";
 import {__mapClassByName} from "./RichJsonClassMapping";
 
-export const __RICH_JSON_COMMAND_PREFIX				        = "#"
-export const __RICH_JSON_COMMAND_SUFFIX				        = ":"
-export const __RICH_JSON_COMMAND_WILDCARD				    = "#*:*"
-export const __RICH_JSON_COMMAND_DELIMITER			        = ","
-export const __RICH_JSON_COMMAND_PATH_DELIMITER		        = "/"
-export const __RICH_JSON_COMMAND_PIPE_SIGN			        = "|"
-export const __RICH_JSON_COMMAND_REF					    = "#ref"
-export const __RICH_JSON_COMMAND_CLONE					    = "clone"
-export const __RICH_JSON_KEY_COMMAND_MEMBER			        = "__#_rich_json_key_commands_#__"
+export const __RICH_JSON_COMMAND_PREFIX = "#"
+export const __RICH_JSON_COMMAND_SUFFIX = ":"
+export const __RICH_JSON_COMMAND_WILDCARD = "#*:*"
+export const __RICH_JSON_COMMAND_DELIMITER = ","
+export const __RICH_JSON_COMMAND_PATH_DELIMITER = "/"
+export const __RICH_JSON_COMMAND_PIPE_SIGN = "|"
+export const __RICH_JSON_COMMAND_REF = "#ref"
+export const __RICH_JSON_COMMAND_CLONE = "clone"
+export const __RICH_JSON_KEY_COMMAND_MEMBER = "__#_rich_json_key_commands_#__"
 
-export const __RICH_JSON_ARRAY_WILDCARD				        = "*[*]*"
-export const __RICH_JSON_ARRAY_DELIMITERS			        = /[\[\]]/
-export const __RICH_JSON_ARRAY_REPLACE_SUBSTRING		    = "]["
-export const __RICH_JSON_ARRAY_REPLACE_NEWSTRING		    = "]|["
+export const __RICH_JSON_ARRAY_WILDCARD = "*[*]*"
+export const __RICH_JSON_ARRAY_DELIMITERS = /[\[\]]/
+export const __RICH_JSON_ARRAY_REPLACE_SUBSTRING = "]["
+export const __RICH_JSON_ARRAY_REPLACE_NEWSTRING = "]|["
 
-export let __RICH_JSON_CLONE_ADDRESS				        = undefined
-export const __RICH_JSON_CLONE_IS_APPLYING			        = () => __RICH_JSON_CLONE_ADDRESS !== undefined
+export let __RICH_JSON_CLONE_ADDRESS = undefined
+export const __RICH_JSON_CLONE_IS_APPLYING = () => __RICH_JSON_CLONE_ADDRESS !== undefined
 
-export const __RICH_JSON_CONSTRUCTOR_SIGN				    = "="
-export const __RICH_JSON_LATE_CONSTRUCTOR_SIGN		        = "=="
-export const __RICH_JSON_LATE_CONSTRUCTOR_MEMBER		    = "__#_rich_json_construct_#__"
-export const __RICH_JSON_INHERITANCE_SIGN				    = "::"
+export const __RICH_JSON_CONSTRUCTOR_SIGN = "="
+export const __RICH_JSON_LATE_CONSTRUCTOR_SIGN = "=="
+export const __RICH_JSON_LATE_CONSTRUCTOR_MEMBER = "__#_rich_json_construct_#__"
+export const __RICH_JSON_INHERITANCE_SIGN = "::"
 
-export const __RICH_JSON_NAME_IS_COMMAND			        = (name) => (name.charAt(0) === __RICH_JSON_COMMAND_PREFIX && name.indexOf(__RICH_JSON_COMMAND_SUFFIX) >= 0)
-export const __RICH_JSON_NAME_IS_CONSTRUCTOR		        = (name) => (name.indexOf(__RICH_JSON_CONSTRUCTOR_SIGN) >= 0)
-export const __RICH_JSON_NAME_IS_LATE_CONSTRUCTOR	        = (name) => (name.indexOf(__RICH_JSON_LATE_CONSTRUCTOR_SIGN) >= 0)
-export const __RICH_JSON_NAME_IS_INHERITANCE		        = (name) => (name.indexOf(__RICH_JSON_INHERITANCE_SIGN) >= 0)
+export const __RICH_JSON_NAME_IS_COMMAND = (name) => (name.charAt(0) === __RICH_JSON_COMMAND_PREFIX && name.indexOf(__RICH_JSON_COMMAND_SUFFIX) >= 0)
+export const __RICH_JSON_NAME_IS_CONSTRUCTOR = (name) => (name.indexOf(__RICH_JSON_CONSTRUCTOR_SIGN) >= 0)
+export const __RICH_JSON_NAME_IS_LATE_CONSTRUCTOR = (name) => (name.indexOf(__RICH_JSON_LATE_CONSTRUCTOR_SIGN) >= 0)
+export const __RICH_JSON_NAME_IS_INHERITANCE = (name) => (name.indexOf(__RICH_JSON_INHERITANCE_SIGN) >= 0)
 
-export const __RICH_JSON_INTERPOLATION_WILDCARD		        = "*{*}*"
-export const __RICH_JSON_INTERPOLATION_OPENING_SIGN	        = "{"
-export const __RICH_JSON_INTERPOLATION_CLOSING_SIGN	        = "}"
+export const __RICH_JSON_INTERPOLATION_WILDCARD = "*{*}*"
+export const __RICH_JSON_INTERPOLATION_OPENING_SIGN = "{"
+export const __RICH_JSON_INTERPOLATION_CLOSING_SIGN = "}"
 
 export let __RICH_JSON_CIRCULAR_LEVEL = 0
 export let __RICH_JSON_CIRCULAR_CACHE = {
@@ -67,7 +69,7 @@ export function __parseRichJson(current, root, currentAddress, currentName) {
         return current;
     }
 
-    let isJsonObj   = isJsonObject(current);
+    let isJsonObj = isJsonObject(current);
     let get;
     let set;
     let names;
@@ -87,8 +89,8 @@ export function __parseRichJson(current, root, currentAddress, currentName) {
     }
 
     for (let i = 0; i < names.length; ++i) {
-        name	= names[i];
-        member	= get(current, name, i);
+        name = names[i];
+        member = get(current, name, i);
         address = isJsonObject(member) || Array.isArray(member)
             ? resolveAddress(member)
             : concatStrings(currentAddress, isJsonObj ? `_${name}` : `_${i}`)
@@ -113,10 +115,10 @@ function __preprocess_kcommands_constructors_inheritances(currentMember) {
     let member;
 
     for (let i = 0; i < names.length; ++i) {
-        name	= names[i];
-        iscmd	= __RICH_JSON_NAME_IS_COMMAND(name);
-        isctr	= __RICH_JSON_NAME_IS_CONSTRUCTOR(name);
-        isite	= __RICH_JSON_NAME_IS_INHERITANCE(name);
+        name = names[i];
+        iscmd = __RICH_JSON_NAME_IS_COMMAND(name);
+        isctr = __RICH_JSON_NAME_IS_CONSTRUCTOR(name);
+        isite = __RICH_JSON_NAME_IS_INHERITANCE(name);
         if (iscmd || isctr || isite) {
             member = currentMember[name];
             delete currentMember[name];
@@ -129,20 +131,20 @@ function __preprocess_kcommands_constructors_inheritances(currentMember) {
             }
             // split inheritances before constructor (<name>=<class>::<inheritances>)
             if (isite) {
-                name	= name.split(__RICH_JSON_INHERITANCE_SIGN, 2);
-                ite		= name[1].trim();
-                name	= name[0];
+                name = name.split(__RICH_JSON_INHERITANCE_SIGN, 2);
+                ite = name[1].trim();
+                name = name[0];
             }
             if (isctr) {
                 if (__RICH_JSON_NAME_IS_LATE_CONSTRUCTOR(name)) {
-                    name	= name.split(__RICH_JSON_LATE_CONSTRUCTOR_SIGN, 2);
+                    name = name.split(__RICH_JSON_LATE_CONSTRUCTOR_SIGN, 2);
                     member[__RICH_JSON_LATE_CONSTRUCTOR_MEMBER] = __mapClassByName(name[1].trim());
-                    name	= name[0];
+                    name = name[0];
                 } else {
-                    name	= name.split(__RICH_JSON_CONSTRUCTOR_SIGN, 2);
-                    ctr		= __mapClassByName(name[1].trim());
-                    member	= __mergeIntoTarget(new ctr(), member, true);
-                    name	= name[0];
+                    name = name.split(__RICH_JSON_CONSTRUCTOR_SIGN, 2);
+                    ctr = __mapClassByName(name[1].trim());
+                    member = __mergeIntoTarget(new ctr(), member, true);
+                    name = name[0];
                 }
             }
             if (isite) { // new object reference after constructor call
@@ -150,7 +152,7 @@ function __preprocess_kcommands_constructors_inheritances(currentMember) {
             }
             currentMember[name.trim()] = member;
             if (!isJsonObject(member)) {
-                throw(`Inheritance on member '${name}' is not possible, because it is not a object.`);
+                throw (`Inheritance on member '${name}' is not possible, because it is not a object.`);
             }
         }
     }
@@ -195,7 +197,7 @@ export function __parseRichJsonInMember(root, current, currentMember, currentAdd
             currentMember = __callConstructor(currentMember);
             __RICH_JSON_CIRCULAR_CACHE.stack[currentAddress] = currentMember;
             kcmd_ignored = __getIgnoresForKeyCommands(currentMember);
-            kcmd_ignored.forEach(function(_ignored) {
+            kcmd_ignored.forEach(function (_ignored) {
                 __setRichJsonCommandEnabled(_ignored, false);
             });
             __resolveInheritances(root, current, currentMember, currentAddress, currentName);
@@ -205,7 +207,7 @@ export function __parseRichJsonInMember(root, current, currentMember, currentAdd
 
         if (isJsonObj) {
             __resetCloneIfPossible(currentAddress);
-            kcmd_ignored.forEach(function(_ignored) {
+            kcmd_ignored.forEach(function (_ignored) {
                 __setRichJsonCommandEnabled(_ignored, true);
             });
             currentMember = __executeKeyCommands(root, current, currentMember, currentAddress, currentName);
@@ -231,9 +233,9 @@ function __getIgnoresForKeyCommands(currentMember) {
 }
 
 function __parseInterpolations(root, current, currentMember, currentAddress, currentName) {
-    let rv				= "";
-    let ipnLevel		= -1;
-    let ipns			= [];
+    let rv = "";
+    let ipnLevel = -1;
+    let ipns = [];
     let ipnParsed;
     let ipnResult;
     let c;
@@ -273,7 +275,7 @@ function __parseInterpolations(root, current, currentMember, currentAddress, cur
             }
         } else if (ipnLevel > -1) { // must be a ipn char
             if (ipns.length < ipnLevel + 1) {
-                ipns.push({ rv: "", isParsed: true});
+                ipns.push({rv: "", isParsed: true});
             }
             ipns[ipnLevel].rv += c;
         } else { // must be a normal char
@@ -282,16 +284,16 @@ function __parseInterpolations(root, current, currentMember, currentAddress, cur
     }
 
     __RICH_JSON_CIRCULAR_CACHE.stack[currentAddress] = rv;
-    return { result: rv, isParsed: ipns.length === 0 ? true : ipns[0].isParsed };
+    return {result: rv, isParsed: ipns.length === 0 ? true : ipns[0].isParsed};
 }
 
 function __executeRichJsonCommandIfContainedInMember(root, current, currentMember, currentAddress, currentName) {
     if (matchesWildcard(currentMember, __RICH_JSON_COMMAND_WILDCARD)) {
         __RICH_JSON_CIRCULAR_CACHE.stack[currentAddress] = {};
-        currentMember	= currentMember.split(__RICH_JSON_COMMAND_SUFFIX, 2);
-        let command	    = currentMember[0];
-        currentMember	= currentMember[1].trim();
-        currentMember	= __tryRichJsonCommand(root, current, command, currentMember, currentAddress, currentName);
+        currentMember = currentMember.split(__RICH_JSON_COMMAND_SUFFIX, 2);
+        let command = currentMember[0];
+        currentMember = currentMember[1].trim();
+        currentMember = __tryRichJsonCommand(root, current, command, currentMember, currentAddress, currentName);
         __resetCloneIfPossible(currentAddress);
         if (typeof currentMember === "function" && isJsonObject(currentMember)) { // in order to keep reference
             mergeIntoTarget(__RICH_JSON_CIRCULAR_CACHE.stack[currentAddress], currentMember);
@@ -351,7 +353,7 @@ function __tryRichJsonCommand(root, current, currentCommand, currentMember, curr
     } catch (exception) {
         __resetRichJsonCache();
         console.error(exception.stack);
-        throw(`RichJson ${__RICH_JSON_COMMAND_PREFIX}${currentCommand} could not be resolved in ${currentName}.`);
+        throw (`RichJson ${__RICH_JSON_COMMAND_PREFIX}${currentCommand} could not be resolved in ${currentName}.`);
     }
 }
 
@@ -397,11 +399,11 @@ function __resolveInheritances(root, current, currentMember, currentAddress, cur
     for (let i = 0; i < inheritance_chain.length; ++i) {
         inheritance = inheritance_chain[i].trim();
         if (matchesWildcard(inheritance, __RICH_JSON_COMMAND_WILDCARD)) {
-            inheritance	= inheritance.split(__RICH_JSON_COMMAND_SUFFIX, 2);
-            command		= inheritance[0].trim();
-            inheritance	= inheritance[1].trim();
+            inheritance = inheritance.split(__RICH_JSON_COMMAND_SUFFIX, 2);
+            command = inheritance[0].trim();
+            inheritance = inheritance[1].trim();
         } else {
-            command		= __RICH_JSON_COMMAND_REF;
+            command = __RICH_JSON_COMMAND_REF;
         }
         mergeIntoTarget(currentMember, cloneObject(__tryRichJsonCommand(root, current, command, inheritance, currentAddress, currentName)));
     }

@@ -9,8 +9,8 @@ export const CLASS_MAPPING = {
  * @param classMappings
  */
 export function addClassMappings(classMappings) {
-    let names   = Object.keys(classMappings);
-    let name    = undefined;
+    let names = Object.keys(classMappings);
+    let name = undefined;
     for (let i = 0; i < names.length; ++i) {
         name = names[i];
         addClassMapping(name, classMappings[name])
@@ -24,13 +24,13 @@ export function addClassMappings(classMappings) {
  */
 export function addClassMapping(name, classType) {
     if (Object.hasOwn(CLASS_MAPPING, name))
-        throw(`RichJson has the class '${name}' already defined`);
+        throw (`RichJson has the class '${name}' already defined`);
     CLASS_MAPPING[name] = classType;
 }
 
 export function __mapClassByName(name) {
     if (!Object.hasOwn(CLASS_MAPPING, name)) {
-        throw(`RichJson could not find the class called '${name}'.\nMake sure its defined in RichJsonClassMapping.`);
+        throw (`RichJson could not find the class called '${name}'.\nMake sure its defined in RichJsonClassMapping.`);
     }
     return CLASS_MAPPING[name];
 }

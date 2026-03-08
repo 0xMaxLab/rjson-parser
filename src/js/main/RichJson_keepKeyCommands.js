@@ -1,5 +1,5 @@
-import {cloneObject} from "@/RichJson/RichJsonHelper";
-import {__RICH_JSON_KEY_COMMAND_MEMBER} from "@/RichJson/RichJson";
+import {cloneObject} from "./RichJsonHelper";
+import {__RICH_JSON_KEY_COMMAND_MEMBER} from "./RichJson";
 
 /**
  * Make key commands constant for given JSON object.

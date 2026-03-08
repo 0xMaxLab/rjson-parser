@@ -1,9 +1,4 @@
-import {
-    getKeysSorted,
-    isJsonObject,
-    __resetAddressCache,
-    resolveAddress
-} from "@/RichJson/RichJsonHelper";
+import {__resetAddressCache, getKeysSorted, isJsonObject, resolveAddress} from "@/RichJson/RichJsonHelper";
 import {DEBUG_LOG_RICH_JSON} from "@/RichJson/RichJsonConfiguration";
 import stringify from "json-stable-stringify";
 import {getArrayElement, getObjectField, setObjectField} from "@/RichJson/RichJson_GetterAndSetter";
@@ -53,8 +48,8 @@ function __evaluateMembers(current, currentAddress) {
     }
 
     for (let i = 0; i < names.length; ++i) {
-        name	= names[i];
-        member	= get(current, name, i);
+        name = names[i];
+        member = get(current, name, i);
 
         if (isJsonObj) {
             if (!__RICH_JSON_COMPRESS_CACHE.names.includes(name)) {
@@ -234,13 +229,13 @@ function __compress(current, ignoreExcludes = false) {
     let haveChildrenInheritances = false;
 
     if (isJsonObj) {
-        get     = getObjectField;
-        set     = setObjectField;
-        names   = Object.keys(current);
+        get = getObjectField;
+        set = setObjectField;
+        names = Object.keys(current);
     } else {
-        get     = getArrayElement;
-        set     = setObjectField;
-        names   = current;
+        get = getArrayElement;
+        set = setObjectField;
+        names = current;
     }
 
     address = resolveAddress(current);
@@ -298,9 +293,9 @@ function __compress(current, ignoreExcludes = false) {
     __RICH_JSON_COMPRESS_CIRCULAR_LEVEL--;
     if (__RICH_JSON_COMPRESS_CIRCULAR_LEVEL === 0) {
         if (isJsonObj) {
-            rv = { "_": rv, "a": __RICH_JSON_COMPRESS_CACHE.redundancyNames };
+            rv = {"_": rv, "a": __RICH_JSON_COMPRESS_CACHE.redundancyNames};
         } else {
-            rv = { "#a:_": rv, "a": __RICH_JSON_COMPRESS_CACHE.redundancyNames };
+            rv = {"#a:_": rv, "a": __RICH_JSON_COMPRESS_CACHE.redundancyNames};
         }
         names = Object.keys(__RICH_JSON_COMPRESS_CACHE.redundancy);
         for (let i = 0; i < names.length; ++i) {
@@ -315,7 +310,7 @@ function __compress(current, ignoreExcludes = false) {
     return rv;
 }
 
-function  __resetCompressCache() {
+function __resetCompressCache() {
     __RICH_JSON_COMPRESS_CACHE.records = {};
     __RICH_JSON_COMPRESS_CACHE.redundancy = {};
     __RICH_JSON_COMPRESS_CACHE.excludes = {};
