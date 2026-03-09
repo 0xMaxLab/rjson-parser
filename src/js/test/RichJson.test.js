@@ -15,7 +15,7 @@ import {RichJsonTestClass} from "./RichJsonTestClass";
 
 test('Module', () => {
     let content = {
-        "first": "#ilog:Hello World!",
+        "first": "$ilog:Hello World!",
     };
 
     registerRichJsonModule(
@@ -33,7 +33,7 @@ test('Module', () => {
     expect(content.first).toBe("success");
 
     content = {
-        "first": "#ilog:Hello World!",
+        "first": "$ilog:Hello World!",
     };
 
     excludeRichJsonModule("test");
@@ -44,7 +44,7 @@ test('Module', () => {
         // ignore
     }
 
-    expect(content.first).toBe("#ilog:Hello World!");
+    expect(content.first).toBe("$ilog:Hello World!");
 });
 
 test('Constructor', () => {
@@ -73,13 +73,13 @@ test('Inheritance', () => {
         "first::second, third": {
             "x": 10,
             "y": 5,
-            "other": "#ref:second"
+            "other": "$ref:second"
         },
         "second::third": {
             "x": 5
         },
         "third::first": {
-            "other": "#ref:first"
+            "other": "$ref:first"
         }
     };
 
@@ -105,13 +105,13 @@ test('Batch', () => {
     let content = {
         "first": {
             "second": "second",
-            "#clone:third": {
+            "$clone:third": {
                 "fourth": "fourth"
             }
         },
         "fourth": {
             "fifth": "fifth",
-            "sixth": "#ref#clone:first/third"
+            "sixth": "$ref$clone:first/third"
         }
     };
 
@@ -126,12 +126,12 @@ test('Pipe', () => {
         "first": {
             "second": "second",
             "third": {
-                "fourth": "#ref:fourth|fifth"
+                "fourth": "$ref:fourth|fifth"
             }
         },
         "fourth": {
             "fifth": "fifth",
-            "sixth": "#ref:first/third"
+            "sixth": "$ref:first/third"
         }
     };
 
@@ -147,7 +147,7 @@ test('Array', () => {
                 "second": "second",
             }
         ],
-        "third": "#ref:first[0]",
+        "third": "$ref:first[0]",
     };
 
     parseRichJson(content);
@@ -166,25 +166,25 @@ test('Interpolation', () => {
             }
 
         },
-        "fourth": "test_{#ref:    first/third  }_test",
-        "fifth": "test_{{} #ref:first/third {}}",
-        "sixth": "test_{{}#ref:first/{#ref:first/third   }/third{}}{#ref:first/second}",
-        "seventh": "test_{{}#ref:first/{#ref:{#ref:first/first}/{#ref:  first/third } }/third{}}",
-        "eigth": "#ref:first/{#ref:first/third}"
+        "fourth": "test_{$ref:    first/third  }_test",
+        "fifth": "test_{{} $ref:first/third {}}",
+        "sixth": "test_{{}$ref:first/{$ref:first/third   }/third{}}{$ref:first/second}",
+        "seventh": "test_{{}$ref:first/{$ref:{$ref:first/first}/{$ref:  first/third } }/third{}}",
+        "eigth": "$ref:first/{$ref:first/third}"
     };
 
     parseRichJson(content);
 
     expect(content.fourth).toBe("test_third_test");
-    expect(content.fifth).toBe("test_{ #ref:first/third }");
-    expect(content.sixth).toBe("test_{#ref:first/third/third}second");
-    expect(content.seventh).toBe("test_{#ref:first/third/third}");
+    expect(content.fifth).toBe("test_{ $ref:first/third }");
+    expect(content.sixth).toBe("test_{$ref:first/third/third}second");
+    expect(content.seventh).toBe("test_{$ref:first/third/third}");
     expect(content.eigth).toBe("third");
 });
 
 test('isResolved', () => {
     let content = {
-        "first": "#ref:second",
+        "first": "$ref:second",
         "second": "second"
     };
 
@@ -193,7 +193,7 @@ test('isResolved', () => {
     expect(res).toBeFalsy();
 
     content = {
-        "first": "{#ref:second}",
+        "first": "{$ref:second}",
         "second": "second"
     };
 
@@ -202,19 +202,19 @@ test('isResolved', () => {
     expect(res).toBeFalsy();
 });
 
-test('#ref', () => {
+test('$ref', () => {
     let content = {
         "first": {
             "second": "second",
             "third": {
-                "fourth": "#ref:fourth/fifth"
+                "fourth": "$ref:fourth/fifth"
             }
         },
         "fourth": {
-            "fifth": "#ref:first/third/fourth",
-            "sixth": "#ref:fourth/seventh",
+            "fifth": "$ref:first/third/fourth",
+            "sixth": "$ref:fourth/seventh",
             "seventh": {
-                "eigth": "#ref:fourth",
+                "eigth": "$ref:fourth",
             },
         }
     };
@@ -225,9 +225,9 @@ test('#ref', () => {
     expect(content.fourth.seventh.eigth).toBe(content.fourth);
 });
 
-test('#env', () => {
+test('$env', () => {
     let content = {
-        "env": "#env:RichJsonTestEnv"
+        "env": "$env:RichJsonTestEnv"
     };
 
     addRichJsonEnv("RichJsonTestEnv", "Hello World!");
@@ -236,9 +236,9 @@ test('#env', () => {
     expect(content.env).toBe("Hello World!");
 })
 
-test('#this', () => {
+test('$this', () => {
     let content = {
-        "this": "#this:"
+        "this": "$this:"
     }
 
     parseRichJson(content);
@@ -248,7 +248,7 @@ test('#this', () => {
     expect(content.this.this).toBe(content.this.this.this.this.this.this)
 })
 
-test('#merge', () => {
+test('$merge', () => {
     let content = {
         "first": {
             "second": {
@@ -259,13 +259,13 @@ test('#merge', () => {
             }
         },
         "fourth": {
-            "fifth": "#merge:first/second, first/third",
+            "fifth": "$merge:first/second, first/third",
         },
-        "sixth": "#merge:fourth/fifth, first",
+        "sixth": "$merge:fourth/fifth, first",
         "seventh": ["v1", "v2"],
         "eigth": ["v1", "v2"],
-        "ninth": "#merge:seventh, eigth",
-        "tenth": "#merge:ninth, eigth",
+        "ninth": "$merge:seventh, eigth",
+        "tenth": "$merge:ninth, eigth",
     };
 
     parseRichJson(content);
@@ -274,13 +274,13 @@ test('#merge', () => {
     expect(stringify(content.tenth)).toBe(stringify(concatArrays(concatArrays(content.seventh, content.eigth), content.eigth)));
 });
 
-test('#copy', () => {
+test('$copy', () => {
     let content = {
         "first": {
             "second": "second",
-            "test": "#copy:first",
+            "test": "$copy:first",
         },
-        "third": "#copy:first",
+        "third": "$copy:first",
     };
 
     parseRichJson(content);
@@ -289,24 +289,24 @@ test('#copy', () => {
     expect(stringify(content.first)).toBe(stringify(content.third));
 });
 
-test('#clone', () => {
+test('$clone', () => {
     let content = {
-        "#clone:first": {"second": "second"}
+        "$clone:first": {"second": "second"}
     };
     let clone = {
-        "#clone:first": content["#clone:first"]
+        "$clone:first": content["$clone:first"]
     };
-    resolveAddress(content["#clone:first"]);
+    resolveAddress(content["$clone:first"]);
 
     parseRichJson(clone);
 
-    expect(resolveAddress(content["#clone:first"]) === resolveAddress(clone.first)).toBeFalsy();
+    expect(resolveAddress(content["$clone:first"]) === resolveAddress(clone.first)).toBeFalsy();
 });
 
-test('#invoke', () => {
+test('$invoke', () => {
     let content = {
         "function": () => 4 + 2,
-        "function_result": "#ref#invoke:function",
+        "function_result": "$ref$invoke:function",
     };
 
     parseRichJson(content);
@@ -315,9 +315,9 @@ test('#invoke', () => {
     expect(content.function_result).toBe(6);
 })
 
-test('#file', () => {
+test('$file', () => {
     let content = {
-        "file": "#file:resources/json/test0"
+        "file": "$file:resources/json/test0"
     }
 
     parseRichJson(content);
@@ -325,9 +325,9 @@ test('#file', () => {
     expect(content.file["root0"]).toBe(true);
 });
 
-test('#folder', () => {
+test('$folder', () => {
     let content = {
-        "folder": "#folder:resources/json"
+        "folder": "$folder:resources/json"
     }
 
     parseRichJson(content);
@@ -336,9 +336,9 @@ test('#folder', () => {
     expect(content.folder["test1"]["root0"]).toBe(true);
 });
 
-test('#merge_folder', () => {
+test('$merge_folder', () => {
     let content = {
-        "folder": "#merge_folder:resources/json"
+        "folder": "$merge_folder:resources/json"
     }
 
     parseRichJson(content);

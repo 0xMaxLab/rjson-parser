@@ -17,13 +17,13 @@ import {DEBUG_LOG_RICH_JSON, RICH_JSON_LATE_CONSTRUCT_ENABLED} from "./RichJsonC
 import {getArrayElement, getObjectField, setArrayElement, setObjectField} from "./RichJson_GetterAndSetter";
 import {__mapClassByName} from "./RichJsonClassMapping";
 
-export const __RICH_JSON_COMMAND_PREFIX = "#"
+export const __RICH_JSON_COMMAND_PREFIX = "$"
 export const __RICH_JSON_COMMAND_SUFFIX = ":"
-export const __RICH_JSON_COMMAND_WILDCARD = "#*:*"
+export const __RICH_JSON_COMMAND_WILDCARD = "$*:*"
 export const __RICH_JSON_COMMAND_DELIMITER = ","
 export const __RICH_JSON_COMMAND_PATH_DELIMITER = "/"
 export const __RICH_JSON_COMMAND_PIPE_SIGN = "|"
-export const __RICH_JSON_COMMAND_REF = "#ref"
+export const __RICH_JSON_COMMAND_REF = "$ref"
 export const __RICH_JSON_COMMAND_CLONE = "clone"
 export const __RICH_JSON_KEY_COMMAND_MEMBER = "__#_rich_json_key_commands_#__"
 
