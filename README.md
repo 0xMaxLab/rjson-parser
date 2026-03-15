@@ -81,4 +81,3 @@ JSON
 
 Ready to shrink your footprints and modularize your workflow?
 
-**Yours,** **Maximilian**

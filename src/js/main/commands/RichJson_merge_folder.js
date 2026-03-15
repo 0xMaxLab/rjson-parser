@@ -2,7 +2,7 @@
 	merges the given folder in one object
 */
 
-import {__executeFolderCommand} from "./RichJson_cmd_folder";
+import {__executeFolderCommand} from "./RichJson_folder";
 import {getKeysSorted, mergeIntoTarget} from "../RichJsonHelper";
 
 export function __executeMergeFolderCommand(root, current, currentCommand, currentMember, currentAddress, currentName) {

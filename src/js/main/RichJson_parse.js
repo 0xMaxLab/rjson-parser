@@ -1,5 +1,5 @@
 import {__parseRichJson} from "./RichJson";
-import {DEBUG_LOG_RICH_JSON} from "./RichJsonConfiguration";
+import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration";
 
 /**
  * Parses RichJson expressions in JSON object.
@@ -7,13 +7,15 @@ import {DEBUG_LOG_RICH_JSON} from "./RichJsonConfiguration";
  * @returns {*|string}
  */
 export function parseRichJson(_struct) {
-    if (DEBUG_LOG_RICH_JSON)
+    if (__RICH_JSON_CONFIG.debugEnabled) {
         console.debug(`RichJson is going to be applied due to.`);
+    }
 
     let rv = __parseRichJson(_struct, _struct, undefined, undefined);
 
-    if (DEBUG_LOG_RICH_JSON)
+    if (__RICH_JSON_CONFIG.debugEnabled) {
         console.debug("RichJson was applied successfully.");
+    }
 
     return rv;
 }

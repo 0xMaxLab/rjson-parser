@@ -2,7 +2,7 @@ import fs from 'fs';
 import {concatStrings, mergeIntoTarget} from "./RichJsonHelper";
 import {parseRichJson} from "./RichJson_parse";
 import * as PATH from 'node:path';
-import {RICH_JSON_FILE_CACHE_ENABLED} from "./RichJsonConfiguration";
+import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration";
 
 const FILE_CACHE = {};
 
@@ -33,14 +33,14 @@ export function readRichJsonDirectory(path) {
  * @returns {*|string}
  */
 export function readRichJsonFile(path) {
-    if (RICH_JSON_FILE_CACHE_ENABLED && Object.hasOwn(FILE_CACHE, path)) {
+    if (__RICH_JSON_CONFIG.fileCacheEnabled && Object.hasOwn(FILE_CACHE, path)) {
         return FILE_CACHE[path];
     }
 
-    if (RICH_JSON_FILE_CACHE_ENABLED) FILE_CACHE[path] = {};
+    if (__RICH_JSON_CONFIG.fileCacheEnabled) FILE_CACHE[path] = {};
     let rv = JSON.parse(fs.readFileSync(path, 'utf-8'));
     rv = parseRichJson(rv);
-    if (RICH_JSON_FILE_CACHE_ENABLED) FILE_CACHE[path] = mergeIntoTarget(FILE_CACHE[path], rv);
+    if (__RICH_JSON_CONFIG.fileCacheEnabled) FILE_CACHE[path] = mergeIntoTarget(FILE_CACHE[path], rv);
 
     return rv;
 }

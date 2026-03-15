@@ -9,9 +9,9 @@ import {
 import {concatArrays, concatStrings, mergeObjects, resolveAddress} from "../main/RichJsonHelper";
 import {parseRichJson} from "../main/RichJson_parse";
 import stringify from "json-stable-stringify";
-import {addRichJsonEnv} from "../main/commands/RichJson_cmd_env";
 import {isResolved} from "../main/RichJson_isResolved";
 import {RichJsonTestClass} from "./RichJsonTestClass";
+import {addRichJsonEnv} from "../main/RichJsonEnvironment";
 
 test('Module', () => {
     let content = {

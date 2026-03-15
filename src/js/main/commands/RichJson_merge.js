@@ -3,7 +3,7 @@
 */
 
 import {concatArrays, getFieldByKey, isJsonObject, mergeIntoTarget} from "../RichJsonHelper";
-import {__executeRefCommand} from "./RichJson_cmd_ref";
+import {__executeRefCommand} from "./RichJson_ref";
 import {__RICH_JSON_CIRCULAR_CACHE, __RICH_JSON_COMMAND_DELIMITER} from "../RichJson";
 
 export function __executeMergeCommand(root, current, currentCommand, currentMember, currentAddress, currentName) {

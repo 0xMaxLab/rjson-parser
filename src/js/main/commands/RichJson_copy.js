@@ -3,7 +3,7 @@
 */
 
 import {cloneObject} from "../RichJsonHelper";
-import {__executeRefCommand} from "./RichJson_cmd_ref";
+import {__executeRefCommand} from "./RichJson_ref";
 
 export function __executeCopyCommand(root, current, currentCommand, currentMember, currentAddress, currentName) {
     return cloneObject(__executeRefCommand(root, current, currentCommand, currentMember, currentAddress, currentName));

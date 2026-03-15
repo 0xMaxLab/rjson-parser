@@ -1,4 +1,4 @@
-import {CLASS_MAPPING} from "./RichJsonClassMapping";
+import {__RICH_JSON_CLASS_MAPPING} from "./RichJsonClassMapping";
 
 let INSTANCE_ADDRESS_MAP = new WeakMap();
 let NEXT_ADDRESS = 0;
@@ -8,7 +8,7 @@ let MERGE_OBJECTS_CIRCULAR_CACHE = [];
 
 /**
  * Merges two or more objects together into a new object.
- * @param {object[]} objects Going to be merged
+ * @param {object} objects Going to be merged
  * @returns {object} The merged object
  */
 export function mergeObjects(...objects) {
@@ -22,7 +22,7 @@ export function mergeObjects(...objects) {
 /**
  * Merges objects into target object.
  * @param {object} target
- * @param {object[]} others Going to be merged
+ * @param {object} others Going to be merged
  * @returns {object} The merged target
  */
 export function mergeIntoTarget(target, ...others) {
@@ -71,7 +71,7 @@ export function __mergeIntoTarget(target, other, force = false) {
 
 /**
  * Merges two or more objects together into a new object, without rebinding functions.
- * @param {object[]} objects Going to be merged
+ * @param {object} objects Going to be merged
  * @returns {object} The merged object
  */
 export function mergeObjectsWithoutRebind(...objects) {
@@ -85,7 +85,7 @@ export function mergeObjectsWithoutRebind(...objects) {
 /**
  * Merges objects into target object, without rebinding functions.
  * @param {object} target
- * @param {object[]} others Going to be merged
+ * @param {object} others Going to be merged
  * @returns {object} The merged target
  */
 export function mergeIntoWithoutRebind(target, ...others) {
@@ -248,7 +248,7 @@ export function getKeysSorted(object) {
  * @returns {boolean}
  */
 export function isJsonObject(object) {
-    return typeof object === 'object' && !Array.isArray(object) && (object.constructor === Object || Object.hasOwn(CLASS_MAPPING, object.constructor.name));
+    return typeof object === 'object' && !Array.isArray(object) && (object.constructor === Object || Object.hasOwn(__RICH_JSON_CLASS_MAPPING, object.constructor.name));
 }
 
 /**

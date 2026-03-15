@@ -8,7 +8,7 @@
 	macro RICH_JSON_INCLUDED_MODULES contains it.
 */
 
-import {__RICH_JSON_COMMANDS, __RICH_JSON_LATE_APPLIES} from "./commands/RichJson_cmd";
+import {__RICH_JSON_COMMANDS, __RICH_JSON_LATE_APPLIES} from "./RichJsonCommandHolder";
 
 const __RICH_JSON_MODULES = {};
 

@@ -1,16 +1,14 @@
-import {mergeIntoWithoutRebind} from "../RichJsonHelper";
-import {DEBUG_LOG_RICH_JSON} from "../RichJsonConfiguration";
-import {__executeRefCommand} from "./RichJson_cmd_ref";
-import {__executeEnvCommand} from "./RichJson_cmd_env";
-import {__executeFileCommand} from "./RichJson_cmd_file";
-import {__executeFolderCommand} from "./RichJson_cmd_folder";
-import {__executeMergeCommand} from "./RichJson_cmd_merge";
-import {__executeMergeFolderCommand} from "./RichJson_cmd_merge_folder";
-import {__executeCopyCommand} from "./RichJson_cmd_copy";
-import {__executeCloneCommand} from "./RichJson_cmd_clone";
-import {__executeThisCommand} from "./RichJson_cmd_this";
-import {__executeInvokeCommand} from "./RichJson_cmd_invoke";
-import {__executeArrayCommand} from "./RichJson_cmd_array";
+import {mergeIntoWithoutRebind} from "./RichJsonHelper";
+import {__executeRefCommand} from "./commands/RichJson_ref";
+import {__executeEnvCommand} from "./commands/RichJson_env";
+import {__executeFileCommand} from "./commands/RichJson_file";
+import {__executeFolderCommand} from "./commands/RichJson_folder";
+import {__executeMergeCommand} from "./commands/RichJson_merge";
+import {__executeMergeFolderCommand} from "./commands/RichJson_merge_folder";
+import {__executeCopyCommand} from "./commands/RichJson_copy";
+import {__executeCloneCommand} from "./commands/RichJson_clone";
+import {__executeThisCommand} from "./commands/RichJson_this";
+import {__executeInvokeCommand} from "./commands/RichJson_invoke";
 
 class RichJsonCommandHolder {
     void = function () {
@@ -28,8 +26,6 @@ class RichJsonCommandHolder {
         file: __executeFileCommand,
         folder: __executeFolderCommand,
         merge_folder: __executeMergeFolderCommand,
-
-        a: __executeArrayCommand,
     };
     enabled = {};
     built_in = {};
@@ -55,7 +51,7 @@ export function __setRichJsonCommandEnabled(command, enabled) {
         __RICH_JSON_COMMANDS.enabled[command] = __RICH_JSON_COMMANDS.void;
     }
 
-    if (DEBUG_LOG_RICH_JSON) {
+    if (__RICH_JSON_CONFIG.debugEnabled) {
         console.debug(`RichJson command '${command}' was ${enabled ? "enabled" : "disabled"}.`);
     }
 }

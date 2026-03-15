@@ -1,6 +1,6 @@
 import {RichJsonTestClass} from "../test/RichJsonTestClass";
 
-export const CLASS_MAPPING = {
+export const __RICH_JSON_CLASS_MAPPING = {
     RichJsonTestClass: RichJsonTestClass
 }
 
@@ -23,14 +23,15 @@ export function addClassMappings(classMappings) {
  * @param classType
  */
 export function addClassMapping(name, classType) {
-    if (Object.hasOwn(CLASS_MAPPING, name))
+    if (Object.hasOwn(__RICH_JSON_CLASS_MAPPING, name)) {
         throw (`RichJson has the class '${name}' already defined`);
-    CLASS_MAPPING[name] = classType;
+    }
+    __RICH_JSON_CLASS_MAPPING[name] = classType;
 }
 
 export function __mapClassByName(name) {
-    if (!Object.hasOwn(CLASS_MAPPING, name)) {
+    if (!Object.hasOwn(__RICH_JSON_CLASS_MAPPING, name)) {
         throw (`RichJson could not find the class called '${name}'.\nMake sure its defined in RichJsonClassMapping.`);
     }
-    return CLASS_MAPPING[name];
+    return __RICH_JSON_CLASS_MAPPING[name];
 }

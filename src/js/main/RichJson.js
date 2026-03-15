@@ -12,10 +12,9 @@ import {
     mergeIntoTarget,
     resolveAddress
 } from "./RichJsonHelper";
-import {__RICH_JSON_COMMANDS, __setRichJsonCommandEnabled, __throwCommandNotFound} from "./commands/RichJson_cmd";
-import {DEBUG_LOG_RICH_JSON, RICH_JSON_LATE_CONSTRUCT_ENABLED} from "./RichJsonConfiguration";
-import {getArrayElement, getObjectField, setArrayElement, setObjectField} from "./RichJson_GetterAndSetter";
+import {__RICH_JSON_COMMANDS, __setRichJsonCommandEnabled, __throwCommandNotFound} from "./RichJsonCommandHolder";
 import {__mapClassByName} from "./RichJsonClassMapping";
+import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration";
 
 export const __RICH_JSON_COMMAND_PREFIX = "$"
 export const __RICH_JSON_COMMAND_SUFFIX = ":"
@@ -25,7 +24,7 @@ export const __RICH_JSON_COMMAND_PATH_DELIMITER = "/"
 export const __RICH_JSON_COMMAND_PIPE_SIGN = "|"
 export const __RICH_JSON_COMMAND_REF = "$ref"
 export const __RICH_JSON_COMMAND_CLONE = "clone"
-export const __RICH_JSON_KEY_COMMAND_MEMBER = "__#_rich_json_key_commands_#__"
+export const __RICH_JSON_KEY_COMMAND_MEMBER = "__$_rich_json_key_commands_$__"
 
 export const __RICH_JSON_ARRAY_WILDCARD = "*[*]*"
 export const __RICH_JSON_ARRAY_DELIMITERS = /[\[\]]/
@@ -33,7 +32,7 @@ export const __RICH_JSON_ARRAY_REPLACE_SUBSTRING = "]["
 export const __RICH_JSON_ARRAY_REPLACE_NEWSTRING = "]|["
 
 export let __RICH_JSON_CLONE_ADDRESS = undefined
-export const __RICH_JSON_CLONE_IS_APPLYING = () => __RICH_JSON_CLONE_ADDRESS !== undefined
+export const __RICH_JSON_IS_CLONE_APPLYING = () => __RICH_JSON_CLONE_ADDRESS !== undefined
 
 export const __RICH_JSON_CONSTRUCTOR_SIGN = "="
 export const __RICH_JSON_LATE_CONSTRUCTOR_SIGN = "=="
@@ -56,6 +55,11 @@ export let __RICH_JSON_CIRCULAR_CACHE = {
     inheritances: {},
     interfaces: {}
 };
+
+const getObjectField = (object, name) => object[name];
+const setObjectField = (object, name, i, value) => object[name] = value;
+const getArrayElement = (array, name, i) => array[i];
+const setArrayElement = (array, name, i, value) => array[i] = value;
 
 export function __parseRichJson(current, root, currentAddress, currentName) {
     __RICH_JSON_CIRCULAR_LEVEL++;
@@ -164,12 +168,12 @@ export function __isMemberRichJsonAble(member) {
 
 export function __parseRichJsonInMember(root, current, currentMember, currentAddress, currentName) {
     if (Object.hasOwn(__RICH_JSON_CIRCULAR_CACHE.stack, currentAddress)) {
-        if (DEBUG_LOG_RICH_JSON) {
+        if (__RICH_JSON_CONFIG.debugEnabled) {
             console.log(`RichJson cache <-- '${currentAddress}' ${__RICH_JSON_CIRCULAR_CACHE.stack[currentAddress]}`);
         }
         return __RICH_JSON_CIRCULAR_CACHE.stack[currentAddress];
     } else {
-        if (DEBUG_LOG_RICH_JSON) {
+        if (__RICH_JSON_CONFIG.debugEnabled) {
             console.debug(`RichJson cache --> '${currentAddress}' ${currentMember}`);
         }
         __RICH_JSON_CIRCULAR_CACHE.stack[currentAddress] = currentMember;
@@ -377,11 +381,11 @@ function __executeClone(root, current, currentMember, currentAddress, currentNam
 }
 
 function __callConstructor(currentMember) {
-    if (RICH_JSON_LATE_CONSTRUCT_ENABLED && Object.hasOwn(currentMember, __RICH_JSON_LATE_CONSTRUCTOR_MEMBER)) {
+    if (__RICH_JSON_CONFIG.lateConstructorEnabled && Object.hasOwn(currentMember, __RICH_JSON_LATE_CONSTRUCTOR_MEMBER)) {
         let cstr = currentMember[__RICH_JSON_LATE_CONSTRUCTOR_MEMBER];
         currentMember = __mergeIntoTarget(new cstr(), currentMember);
         delete currentMember[__RICH_JSON_LATE_CONSTRUCTOR_MEMBER];
-        if (DEBUG_LOG_RICH_JSON)
+        if (__RICH_JSON_CONFIG.debugEnabled)
             console.debug(`RichJson resolved construct for '${typeof cstr}' in '${_name}'.`);
     }
     return currentMember;
@@ -410,7 +414,7 @@ function __resolveInheritances(root, current, currentMember, currentAddress, cur
 }
 
 function __resetCloneIfPossible(_address) {
-    if (__RICH_JSON_CLONE_IS_APPLYING && __RICH_JSON_CLONE_ADDRESS === _address) {
+    if (__RICH_JSON_IS_CLONE_APPLYING && __RICH_JSON_CLONE_ADDRESS === _address) {
         __RICH_JSON_CLONE_ADDRESS = undefined;
     }
 }
@@ -450,7 +454,7 @@ function __resetRichJsonCache() {
     __RICH_JSON_CIRCULAR_CACHE.inheritances = {};
     __RICH_JSON_CIRCULAR_CACHE.interfaces = {};
     __resetAddressCache();
-    if (DEBUG_LOG_RICH_JSON) {
+    if (__RICH_JSON_CONFIG.debugEnabled) {
         console.debug("RichJson cache was reseted.");
     }
 }

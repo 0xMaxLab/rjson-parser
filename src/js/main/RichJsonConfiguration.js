@@ -1,23 +1,34 @@
-/**
- * Controls if RichJson should resolve in debug mode.
- * @type {boolean}
- */
-export let DEBUG_LOG_RICH_JSON = false;
+import {mergeIntoTarget} from "./RichJsonHelper";
+
+export let __RICH_JSON_CONFIG = {
+    debugEnabled: false,
+    fileCacheEnabled: true,
+    lateConstructorEnabled: true,
+    crashOnNestedCloneEnabled: false,
+}
 
 /**
- * Controls if late constructors are resolved.
- * @type {boolean}
+ * Updates the global configuration for the library.
+ * * @param {Object} config - The configuration object.
+ * @param {boolean} [config.debugEnabled=false] - When true, enables rich JSON logging for debugging purposes.
+ * @param {boolean} [config.fileCacheEnabled=true] - Toggles the internal file system caching mechanism.
+ * @param {boolean} [config.lateConstructorEnabled=true] - Enables delayed object construction to improve initial load performance.
+ * @param {boolean} [config.crashOnNestedCloneEnabled=false] - If true, the library will throw an error when attempting to clone inside a clone structure.
+ * * @example
+ * updateConfiguration({
+ *  debugEnabled: true,
+ *  fileCacheEnabled: false
+ * });
  */
-export let RICH_JSON_LATE_CONSTRUCT_ENABLED = true;
+export function updateConfiguration(config) {
+    if (!config || typeof config !== 'object') {
+        return;
+    }
 
-/**
- * Controls if RichJson should crash on nested twin during resolve process.
- * @type {boolean}
- */
-export let RICH_JSON_CRASH_ON_NESTED_CLONE = true;
-
-/**
- * Controls if JSON files should be cached during resolve process.
- * @type {boolean}
- */
-export let RICH_JSON_FILE_CACHE_ENABLED = true;
+    __RICH_JSON_CONFIG = mergeIntoTarget({
+        debugEnabled: false,
+        fileCacheEnabled: true,
+        lateConstructorEnabled: true,
+        crashOnNestedCloneEnabled: false,
+    }, config);
+}
