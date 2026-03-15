@@ -4,7 +4,7 @@
 
 ---
 
-## Why RichJSON?
+## 🌟 Why RichJSON?
 
 RichJSON is optimized to store JSON data in a space-efficient manner. While standard JSON often suffers from "data bloat" due to repeated objects, RichJSON allows you to define data once and reference it everywhere.
 
@@ -13,7 +13,7 @@ RichJSON is optimized to store JSON data in a space-efficient manner. While stan
 
 ---
 
-## Key Features
+## ✨ Key Features
 
 RichJSON maintains **100% compatibility** with standard JSON parsers while introducing a sophisticated layer of logic:
 - **Zero-Violation Format:** Valid JSON syntax that any standard editor can read.
@@ -72,8 +72,8 @@ The output is a fully resolved, standard JSON object where all references are hy
 
 ---
 
-## Get Started
+## 📦 Get Started
 
 Ready to shrink your footprints and modularize your workflow?
-
-* Checkout the [documentation](https://github.com/0xMaxLab/rjson-parser/wiki).
+👉 [RichJSON Wiki](https://github.com/0xMaxLab/rjson-parser/wiki)
+👉 [RichJSON npm](https://www.npmjs.com/package/@rjson/parser)
