@@ -2,6 +2,15 @@
 
 **RichJSON** is a powerful extension of the standard JSON format, meticulously designed to make your data highly modular, reusable, and significantly more compressed. By eliminating redundancy through intelligent referencing, it bridges the gap between human-readable configuration and machine-efficient data structures.
 
+## 📦 Get Started
+
+* 👉 [RichJSON Wiki](https://github.com/0xMaxLab/rjson-parser/wiki)
+* 👉 [RichJSON npm](https://www.npmjs.com/package/@rjson/parser)
+
+```
+npm install @rjson/parser
+```
+
 ---
 
 ## 🌟 Why RichJSON?
@@ -24,7 +33,7 @@ RichJSON maintains **100% compatibility** with standard JSON parsers while intro
 
 ---
 
-## How It Works
+## 🛠️ How It Works
 
 RichJSON transforms static files into dynamic structures. Here is the "magic" in action:
 
@@ -69,11 +78,3 @@ The output is a fully resolved, standard JSON object where all references are hy
   }
 }
 ```
-
----
-
-## 📦 Get Started
-
-Ready to shrink your footprints and modularize your workflow?
-* 👉 [RichJSON Wiki](https://github.com/0xMaxLab/rjson-parser/wiki)
-* 👉 [RichJSON npm](https://www.npmjs.com/package/@rjson/parser)
