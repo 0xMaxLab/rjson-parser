@@ -5,11 +5,16 @@
 ## 📦 Get Started
 
 * 👉 [RichJSON Wiki](https://github.com/0xMaxLab/rjson-parser/wiki)
-* 👉 [RichJSON npm](https://www.npmjs.com/package/@rjson/parser)
-
+* 👉 [RichJSON npm (javascript)](https://www.npmjs.com/package/@rjson/parser)
 ```
 npm install @rjson/parser
 ```
+
+**TODOs:**
+* 👉 [RichJSON maven (java)]()
+* 👉 [RichJSON gradle (java)]()
+* 👉 [RichJSON pip (python)]()
+* 👉 [RichJSON nuget (c#)]()
 
 ---
 
