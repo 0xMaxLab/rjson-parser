@@ -1,3 +1,7 @@
+[![npm Package Version](https://img.shields.io/npm/v/@rjson/parser.svg)](https://www.npmjs.com/package/@rjson/parser)
+[![Minified Package Size](https://img.shields.io/bundlephobia/min/@rjson/parser)](https://bundlephobia.com/package/@rjson/parser)
+[![npm Package Downloads](https://img.shields.io/npm/dm/@rjson/parser)](https://www.npmtrends.com/@rjson/parser)
+
 ## Welcome to RichJSON: JSON with inheritances, references and commands
 
 **RichJSON** is a powerful extension of the standard JSON format, meticulously designed to make your data highly modular, reusable, and significantly more compressed. By eliminating redundancy through intelligent referencing, it bridges the gap between human-readable configuration and machine-efficient data structures.
