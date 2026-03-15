@@ -8,7 +8,8 @@
 
 RichJSON is optimized to store JSON data in a space-efficient manner. While standard JSON often suffers from "data bloat" due to repeated objects, RichJSON allows you to define data once and reference it everywhere.
 
-> **Note:** This library is optimized for **compact storage and network bandwidth savings**. It is designed for scenarios where reducing IO and footprint is more critical than raw writing or querying throughput.
+> [!NOTE] 
+> This library is optimized for **compact storage and network bandwidth savings**. It is designed for scenarios where reducing IO and footprint is more critical than raw writing or querying throughput.
 
 ---
 
@@ -31,9 +32,7 @@ RichJSON transforms static files into dynamic structures. Here is the "magic" in
 
 Create a standard `.json` file and start using RichJSON commands.
 
-JSON
-
-```
+```JSON
 { 
   "data_template": {
     "data0": "value",
@@ -48,9 +47,7 @@ JSON
 
 Read the file using the `readRichJsonFile` function to expand the references.
 
-JavaScript
-
-```
+```JS
 var obj = readRichJsonFile(<filepath>);
 ```
 
@@ -58,9 +55,7 @@ var obj = readRichJsonFile(<filepath>);
 
 The output is a fully resolved, standard JSON object where all references are hydrated:
 
-JSON
-
-```
+```JSON
 { 
   "data_template": { 
     "data0": "value",
@@ -81,3 +76,4 @@ JSON
 
 Ready to shrink your footprints and modularize your workflow?
 
+* Checkout the [documentation](https://github.com/0xMaxLab/rjson-parser/wiki).
