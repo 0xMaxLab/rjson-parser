@@ -17,8 +17,9 @@ npm install @rjson/parser
 **TODOs:**
 * 👉 [RichJSON maven (java)]()
 * 👉 [RichJSON gradle (java)]()
-* 👉 [RichJSON pip (python)]()
+* 👉 [RichJSON conan (c++)]()
 * 👉 [RichJSON nuget (c#)]()
+* 👉 [RichJSON pip (python)]() 
 
 ---
 
