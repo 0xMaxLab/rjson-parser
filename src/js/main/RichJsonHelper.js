@@ -1,4 +1,4 @@
-import {__RICH_JSON_CLASS_MAPPING} from "./RichJsonClassMapping";
+import {__RICH_JSON_CLASS_MAPPING} from "./RichJsonClassMapping.js";
 
 let INSTANCE_ADDRESS_MAP = new WeakMap();
 let NEXT_ADDRESS = 0;

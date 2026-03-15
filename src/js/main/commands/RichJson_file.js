@@ -3,8 +3,8 @@
 */
 
 
-import {concatStrings} from "../RichJsonHelper";
-import {readRichJsonFile} from "../RichJsonFileHelper";
+import {concatStrings} from "../RichJsonHelper.js";
+import {readRichJsonFile} from "../RichJsonFileHelper.js";
 
 export function __executeFileCommand(root, current, currentCommand, currentMember, currentAddress, currentName) {
     return readRichJsonFile(concatStrings(currentMember, ".json"));

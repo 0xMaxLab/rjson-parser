@@ -5,8 +5,8 @@ import {
     __RICH_JSON_INTERPOLATION_WILDCARD,
     __RICH_JSON_KEY_COMMAND_MEMBER,
     __RICH_JSON_LATE_CONSTRUCTOR_MEMBER
-} from "./RichJson";
-import {getFieldByKey, isJsonObject, matchesWildcard, resolveAddress} from "./RichJsonHelper";
+} from "./RichJson.js";
+import {getFieldByKey, isJsonObject, matchesWildcard, resolveAddress} from "./RichJsonHelper.js";
 
 let __RICH_JSON_UNRESOLVED_CIRCULAR_LEVEL = 0;
 const _getField = (_struct, _name) => _struct[_name];

@@ -2,8 +2,8 @@
 	merges the given folder in one object
 */
 
-import {__executeFolderCommand} from "./RichJson_folder";
-import {getKeysSorted, mergeIntoTarget} from "../RichJsonHelper";
+import {__executeFolderCommand} from "./RichJson_folder.js";
+import {getKeysSorted, mergeIntoTarget} from "../RichJsonHelper.js";
 
 export function __executeMergeFolderCommand(root, current, currentCommand, currentMember, currentAddress, currentName) {
     let folder = __executeFolderCommand(root, current, currentCommand, currentMember, currentAddress, currentName);

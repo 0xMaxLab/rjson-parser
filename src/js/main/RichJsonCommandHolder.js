@@ -1,14 +1,14 @@
-import {mergeIntoWithoutRebind} from "./RichJsonHelper";
-import {__executeRefCommand} from "./commands/RichJson_ref";
-import {__executeEnvCommand} from "./commands/RichJson_env";
-import {__executeFileCommand} from "./commands/RichJson_file";
-import {__executeFolderCommand} from "./commands/RichJson_folder";
-import {__executeMergeCommand} from "./commands/RichJson_merge";
-import {__executeMergeFolderCommand} from "./commands/RichJson_merge_folder";
-import {__executeCopyCommand} from "./commands/RichJson_copy";
-import {__executeCloneCommand} from "./commands/RichJson_clone";
-import {__executeThisCommand} from "./commands/RichJson_this";
-import {__executeInvokeCommand} from "./commands/RichJson_invoke";
+import {mergeIntoWithoutRebind} from "./RichJsonHelper.js";
+import {__executeRefCommand} from "./commands/RichJson_ref.js";
+import {__executeEnvCommand} from "./commands/RichJson_env.js";
+import {__executeFileCommand} from "./commands/RichJson_file.js";
+import {__executeFolderCommand} from "./commands/RichJson_folder.js";
+import {__executeMergeCommand} from "./commands/RichJson_merge.js";
+import {__executeMergeFolderCommand} from "./commands/RichJson_merge_folder.js";
+import {__executeCopyCommand} from "./commands/RichJson_copy.js";
+import {__executeCloneCommand} from "./commands/RichJson_clone.js";
+import {__executeThisCommand} from "./commands/RichJson_this.js";
+import {__executeInvokeCommand} from "./commands/RichJson_invoke.js";
 
 class RichJsonCommandHolder {
     void = function () {

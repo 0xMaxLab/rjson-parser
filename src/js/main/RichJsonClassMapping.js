@@ -1,14 +1,11 @@
-import {RichJsonTestClass} from "../test/RichJsonTestClass";
-
 export const __RICH_JSON_CLASS_MAPPING = {
-    RichJsonTestClass: RichJsonTestClass
 }
 
 /**
  * Adds the given class mappings.
  * @param classMappings
  */
-export function addClassMappings(classMappings) {
+export function addClassMappings(classMappings) {r
     let names = Object.keys(classMappings);
     let name = undefined;
     for (let i = 0; i < names.length; ++i) {

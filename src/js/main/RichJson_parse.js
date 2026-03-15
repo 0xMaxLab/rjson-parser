@@ -1,5 +1,5 @@
-import {__parseRichJson} from "./RichJson";
-import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration";
+import {__parseRichJson} from "./RichJson.js";
+import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
 
 /**
  * Parses RichJson expressions in JSON object.

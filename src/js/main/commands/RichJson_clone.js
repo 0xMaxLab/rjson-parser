@@ -2,9 +2,9 @@
     makes a deep copy of the given struct
 */
 
-import {__RICH_JSON_IS_CLONE_APPLYING} from "../RichJson";
-import {cloneObject} from "../RichJsonHelper";
-import {__RICH_JSON_CONFIG} from "../RichJsonConfiguration";
+import {__RICH_JSON_IS_CLONE_APPLYING} from "../RichJson.js";
+import {cloneObject} from "../RichJsonHelper.js";
+import {__RICH_JSON_CONFIG} from "../RichJsonConfiguration.js";
 
 export let __RICH_JSON_CLONE_ADDRESS = undefined
 

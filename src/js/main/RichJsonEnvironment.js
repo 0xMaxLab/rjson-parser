@@ -1,4 +1,4 @@
-import {__RICH_JSON_KEY_COMMAND_MEMBER} from "./RichJson";
+import {__RICH_JSON_KEY_COMMAND_MEMBER} from "./RichJson.js";
 
 export const __RICH_JSON_ENVIRONMENT = {}
 

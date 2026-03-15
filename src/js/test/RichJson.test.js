@@ -12,6 +12,7 @@ import stringify from "json-stable-stringify";
 import {isResolved} from "../main/RichJson_isResolved";
 import {RichJsonTestClass} from "./RichJsonTestClass";
 import {addRichJsonEnv} from "../main/RichJsonEnvironment";
+import {addClassMapping} from "../main/index.js";
 
 test('Module', () => {
     let content = {
@@ -47,7 +48,10 @@ test('Module', () => {
     expect(content.first).toBe("$ilog:Hello World!");
 });
 
+class RichJsonTestClass {}
+
 test('Constructor', () => {
+    addClassMapping("RichJsonTestClass", RichJsonTestClass);
     let content = {
         "first=RichJsonTestClass": {
             "value": 100,
