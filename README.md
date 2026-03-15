@@ -75,5 +75,5 @@ The output is a fully resolved, standard JSON object where all references are hy
 ## 📦 Get Started
 
 Ready to shrink your footprints and modularize your workflow?
-👉 [RichJSON Wiki](https://github.com/0xMaxLab/rjson-parser/wiki)
-👉 [RichJSON npm](https://www.npmjs.com/package/@rjson/parser)
+* 👉 [RichJSON Wiki](https://github.com/0xMaxLab/rjson-parser/wiki)
+* 👉 [RichJSON npm](https://www.npmjs.com/package/@rjson/parser)
