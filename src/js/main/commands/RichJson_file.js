@@ -4,8 +4,8 @@
 
 
 import {concatStrings} from "../RichJsonHelper.js";
-import {readRichJsonFile} from "../RichJsonFileHelper.js";
+import {readFile} from "../RichJsonFileHelper.js";
 
 export function __executeFileCommand(root, current, currentCommand, currentMember, currentAddress, currentName) {
-    return readRichJsonFile(concatStrings(currentMember, ".json"));
+    return readFile(concatStrings(currentMember, ".json"));
 }

@@ -6,13 +6,13 @@ export const __RICH_JSON_ENVIRONMENT = {}
  * Adds constants to the environment.
  * @param envs
  */
-export function addRichJsonEnvs(envs) {
+export function addEnvironmentVariables(envs) {
     let names = Object.keys(envs);
     let name = undefined;
 
     for (let i = 0; i < names.length; ++i) {
         name = names[i];
-        addRichJsonEnv(name, envs[name])
+        addEnvironmentVariable(name, envs[name])
     }
 }
 
@@ -21,7 +21,7 @@ export function addRichJsonEnvs(envs) {
  * @param name
  * @param value
  */
-export function addRichJsonEnv(name, value) {
+export function addEnvironmentVariable(name, value) {
     if (name === __RICH_JSON_KEY_COMMAND_MEMBER) {
         return;
     }

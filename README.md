@@ -45,10 +45,10 @@ Create a standard `.json` file and start using RichJSON commands.
 
 #### 2. Resolve the data
 
-Read the file using the `readRichJsonFile` function to expand the references.
-
 ```JS
-var obj = readRichJsonFile(<filepath>);
+import * as RichJson from "@rjson/parser"
+
+let obj = RichJson.parse(data);
 ```
 
 #### 3. The Result

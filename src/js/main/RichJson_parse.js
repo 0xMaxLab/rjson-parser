@@ -6,7 +6,7 @@ import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
  * @param _struct
  * @returns {*|string}
  */
-export function parseRichJson(_struct) {
+export function parse(_struct) {
     if (__RICH_JSON_CONFIG.debugEnabled) {
         console.debug(`RichJson is going to be applied due to.`);
     }

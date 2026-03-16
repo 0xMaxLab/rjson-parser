@@ -1,17 +1,17 @@
 import {expect, test} from 'vitest'
 import {
-    excludeRichJsonModule,
-    includeRichJsonModule,
-    registerRichJsonModule,
+    excludeModule,
+    includeModule,
+    registerModule,
     RichJsonModule,
-    unregisterRichJsonModule
+    unregisterModule
 } from "../main/RichJsonModule";
 import {concatArrays, concatStrings, mergeObjects, resolveAddress} from "../main/RichJsonHelper";
-import {parseRichJson} from "../main/RichJson_parse";
+import {parse} from "../main/RichJson_parse";
 import stringify from "json-stable-stringify";
 import {isResolved} from "../main/RichJson_isResolved";
 import {RichJsonTestClass} from "./RichJsonTestClass";
-import {addRichJsonEnv} from "../main/RichJsonEnvironment";
+import {addEnvironmentVariable} from "../main/RichJsonEnvironment";
 import {addClassMapping} from "../main/index.js";
 
 test('Module', () => {
@@ -19,16 +19,16 @@ test('Module', () => {
         "first": "$ilog:Hello World!",
     };
 
-    registerRichJsonModule(
+    registerModule(
         new RichJsonModule("test")
             .addCommand("ilog", function (_cryptkey, _add_to_cache, _root, _command, _message, _address, _name) {
                 console.log(concatStrings("file_struct_plain_rich_json_module_ok: ", _message));
                 return "success";
             })
     );
-    includeRichJsonModule("test");
+    includeModule("test");
 
-    parseRichJson(content);
+    parse(content);
 
     expect(content).toBeDefined();
     expect(content.first).toBe("success");
@@ -37,10 +37,10 @@ test('Module', () => {
         "first": "$ilog:Hello World!",
     };
 
-    excludeRichJsonModule("test");
-    unregisterRichJsonModule("test");
+    excludeModule("test");
+    unregisterModule("test");
     try {
-        content = parseRichJson(content);
+        content = parse(content);
     } catch {
         // ignore
     }
@@ -64,7 +64,7 @@ test('Constructor', () => {
         }
     };
 
-    parseRichJson(content);
+    parse(content);
 
     expect(content.second.value).toBe(0);
     expect(stringify(content.first.second)).toBe(stringify(content.second.second));
@@ -87,7 +87,7 @@ test('Inheritance', () => {
         }
     };
 
-    parseRichJson(content);
+    parse(content);
 
     expect(content.first.x).toBe(10);
     expect(content.first.y).toBe(5);
@@ -119,7 +119,7 @@ test('Batch', () => {
         }
     };
 
-    parseRichJson(content);
+    parse(content);
 
     expect(stringify(content.fourth.sixth)).toBe(stringify(content.first.third))
     expect(content.fourth.sixth === content.first.third).toBeFalsy();
@@ -139,7 +139,7 @@ test('Pipe', () => {
         }
     };
 
-    parseRichJson(content);
+    parse(content);
 
     expect(content.first.third.fourth).toBe("fifth");
 });
@@ -154,7 +154,7 @@ test('Array', () => {
         "third": "$ref:first[0]",
     };
 
-    parseRichJson(content);
+    parse(content);
 
     expect(content.first[0]).toBe(content.third);
 });
@@ -177,7 +177,7 @@ test('Interpolation', () => {
         "eigth": "$ref:first/{$ref:first/third}"
     };
 
-    parseRichJson(content);
+    parse(content);
 
     expect(content.fourth).toBe("test_third_test");
     expect(content.fifth).toBe("test_{ $ref:first/third }");
@@ -223,7 +223,7 @@ test('$ref', () => {
         }
     };
 
-    parseRichJson(content);
+    parse(content);
 
     expect(content.first.third.fourth).toBe(content.fourth.fifth);
     expect(content.fourth.seventh.eigth).toBe(content.fourth);
@@ -234,8 +234,8 @@ test('$env', () => {
         "env": "$env:RichJsonTestEnv"
     };
 
-    addRichJsonEnv("RichJsonTestEnv", "Hello World!");
-    parseRichJson(content);
+    addEnvironmentVariable("RichJsonTestEnv", "Hello World!");
+    parse(content);
 
     expect(content.env).toBe("Hello World!");
 })
@@ -245,7 +245,7 @@ test('$this', () => {
         "this": "$this:"
     }
 
-    parseRichJson(content);
+    parse(content);
 
     expect(content).toBe(content.this)
     expect(content.this).toBe(content.this.this)
@@ -272,7 +272,7 @@ test('$merge', () => {
         "tenth": "$merge:ninth, eigth",
     };
 
-    parseRichJson(content);
+    parse(content);
 
     expect(stringify(content.fourth.fifth)).toBe(stringify(mergeObjects(content.first.second, content.first.third)));
     expect(stringify(content.tenth)).toBe(stringify(concatArrays(concatArrays(content.seventh, content.eigth), content.eigth)));
@@ -287,7 +287,7 @@ test('$copy', () => {
         "third": "$copy:first",
     };
 
-    parseRichJson(content);
+    parse(content);
 
     expect(content.first === content.third).toBeFalsy();
     expect(stringify(content.first)).toBe(stringify(content.third));
@@ -302,7 +302,7 @@ test('$clone', () => {
     };
     resolveAddress(content["$clone:first"]);
 
-    parseRichJson(clone);
+    parse(clone);
 
     expect(resolveAddress(content["$clone:first"]) === resolveAddress(clone.first)).toBeFalsy();
 });
@@ -313,7 +313,7 @@ test('$invoke', () => {
         "function_result": "$ref$invoke:function",
     };
 
-    parseRichJson(content);
+    parse(content);
 
     expect(content.function()).toBe(6);
     expect(content.function_result).toBe(6);
@@ -324,7 +324,7 @@ test('$file', () => {
         "file": "$file:resources/json/test0"
     }
 
-    parseRichJson(content);
+    parse(content);
 
     expect(content.file["root0"]).toBe(true);
 });
@@ -334,7 +334,7 @@ test('$folder', () => {
         "folder": "$folder:resources/json"
     }
 
-    parseRichJson(content);
+    parse(content);
 
     expect(content.folder["test0"]["root0"]).toBe(true);
     expect(content.folder["test1"]["root0"]).toBe(true);
@@ -345,7 +345,7 @@ test('$merge_folder', () => {
         "folder": "$merge_folder:resources/json"
     }
 
-    parseRichJson(content);
+    parse(content);
 
     expect(content.folder["root0"]).toBe(true);
     expect(content.folder["root1"]["prop1"]).toBe("Hello World!");

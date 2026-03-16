@@ -1,6 +1,6 @@
 import fs from 'fs';
 import {concatStrings, mergeIntoTarget} from "./RichJsonHelper.js";
-import {parseRichJson} from "./RichJson_parse.js";
+import {parse} from "./RichJson_parse.js";
 import * as PATH from 'node:path';
 import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
 
@@ -11,16 +11,16 @@ const FILE_CACHE = {};
  * @param path
  * @returns {{}}
  */
-export function readRichJsonDirectory(path) {
+export function readDirectory(path) {
     let entries = fs.readdirSync(path, {withFileTypes: true});
     let rv = {};
-
+    defaultNodeReader
     entries.forEach(entry => {
         if (entry.isFile()) {
             let nameWithoutExtension = PATH.parse(entry.name).name;
-            rv[nameWithoutExtension] = readRichJsonFile(concatStrings(path, "/", entry.name));
+            rv[nameWithoutExtension] = readFile(concatStrings(path, "/", entry.name));
         } else if (entry.isDirectory()) {
-            rv[entry.name] = readRichJsonDirectory(concatStrings(path, "/", entry.name));
+            rv[entry.name] = readDirectory(concatStrings(path, "/", entry.name));
         }
     });
 
@@ -32,14 +32,14 @@ export function readRichJsonDirectory(path) {
  * @param path
  * @returns {*|string}
  */
-export function readRichJsonFile(path) {
+export function readFile(path) {
     if (__RICH_JSON_CONFIG.fileCacheEnabled && Object.hasOwn(FILE_CACHE, path)) {
         return FILE_CACHE[path];
     }
 
     if (__RICH_JSON_CONFIG.fileCacheEnabled) FILE_CACHE[path] = {};
     let rv = JSON.parse(fs.readFileSync(path, 'utf-8'));
-    rv = parseRichJson(rv);
+    rv = parse(rv);
     if (__RICH_JSON_CONFIG.fileCacheEnabled) FILE_CACHE[path] = mergeIntoTarget(FILE_CACHE[path], rv);
 
     return rv;
