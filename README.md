@@ -26,11 +26,7 @@ RichJSON maintains **100% compatibility** with standard JSON parsers while intro
 
 ## How It Works
 
-RichJSON transforms static files into dynamic structures. Here is the "magic" in action:
-
 #### 1. Define your structure
-
-Create a standard `.json` file and start using RichJSON commands.
 
 ```JSON
 { 
