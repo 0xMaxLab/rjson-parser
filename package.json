@@ -23,6 +23,7 @@
   "author": "Maximilian Schwarz",
   "type": "module",
   "main": "./src/js/main/index.js",
+  "types": "./src/js/main/index.d.ts",
   "exports": {
     ".": "./src/js/main/index.js",
     "./helpers": "./src/js/main/RichJsonHelper.js"
