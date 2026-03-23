@@ -14,7 +14,7 @@ const FILE_CACHE = {};
 export function readDirectory(path) {
     let entries = fs.readdirSync(path, {withFileTypes: true});
     let rv = {};
-    defaultNodeReader
+
     entries.forEach(entry => {
         if (entry.isFile()) {
             let nameWithoutExtension = PATH.parse(entry.name).name;
