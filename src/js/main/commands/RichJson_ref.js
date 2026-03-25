@@ -6,7 +6,6 @@ import {concatStrings, isJsonObject, resolveAddress} from "../RichJsonHelper.js"
 import {__parseRichJsonInMember, __RICH_JSON_COMMAND_PATH_DELIMITER} from "../RichJson.js";
 
 export function __executeRefCommand(parser, context) {
-    console.log(context);
     if (context.currentMember === "") {
         return context.root;
     }
@@ -30,6 +29,5 @@ export function __executeRefCommand(parser, context) {
         context.currentMember = parser.__parseRichJsonInMember();
         prevMember = context.currentMember;
     }
-    console.log(context);
     return context.currentMember;
 }

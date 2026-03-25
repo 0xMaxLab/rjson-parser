@@ -5,8 +5,8 @@
 import {__executeFolderCommand} from "./RichJson_folder.js";
 import {getKeysSorted, mergeIntoTarget} from "../RichJsonHelper.js";
 
-export function __executeMergeFolderCommand(root, current, currentCommand, currentMember, currentAddress, currentName) {
-    let folder = __executeFolderCommand(root, current, currentCommand, currentMember, currentAddress, currentName);
+export function __executeMergeFolderCommand(parser, context) {
+    let folder = __executeFolderCommand(parser, context);
     let entry_names = getKeysSorted(folder);
     let rv = {};
 

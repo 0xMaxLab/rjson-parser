@@ -72,15 +72,15 @@ export class RichJsonParser {
     __RICH_JSON_CLONE_ADDRESS = undefined;
     con = new RichJsonContext();
 
-    parse(object, isRoot = false) {
-        this.con.current = object;
+    parse(current, isRoot = false) {
+        this.con.current = current;
         this.__RICH_JSON_CIRCULAR_LEVEL++;
 
         if (isRoot) {
-            this.con.root = object;
-            this.con.current = object;
-            this.con.currentMember = object;
-            this.con.currentAddress = resolveAddress(this.con.current);
+            this.con.root = current;
+            this.con.current = current;
+            this.con.currentMember = current;
+            this.con.currentAddress = resolveAddress(current);
             this.con.current = this.__parseRichJsonInMember();
             this.__RICH_JSON_CIRCULAR_LEVEL--;
             if (this.__RICH_JSON_CIRCULAR_LEVEL === 0) {
@@ -88,10 +88,12 @@ export class RichJsonParser {
                     console.debug("RichJson was applied successfully.");
                 }
             }
-            return this.con.current;
+            return current;
         }
 
-        let isJsonObj = isJsonObject(this.con.current);
+        let isJsonObj = isJsonObject(current);
+        let currentName = this.con.currentName;
+        let currentAddress = this.con.currentAddress;
         let get;
         let set;
         let names;
@@ -101,28 +103,27 @@ export class RichJsonParser {
             this.__preprocess_kcommands_constructors_inheritances();
             get = getObjectField;
             set = setObjectField;
-            names = getKeysSorted(this.con.current);
+            names = getKeysSorted(current);
         } else {
             get = getArrayElement;
             set = setArrayElement;
-            names = this.con.current;
+            names = current;
         }
 
         for (let i = 0; i < names.length; ++i) {
             name = names[i];
-            this.con.currentMember = get(this.con.current, name, i);
+            this.con.currentMember = get(current, name, i);
             this.con.currentAddress = isJsonObject(this.con.currentMember) || Array.isArray(this.con.currentMember)
                 ? resolveAddress(this.con.currentMember)
-                : concatStrings(this.con.currentAddress, isJsonObj ? `_${name}` : `_${i}`)
+                : concatStrings(currentAddress, isJsonObj ? `_${name}` : `_${i}`)
             ;
-            this.con.currentName = name = isJsonObj ? name : `"${this.con.currentName}_${i}`;
+            this.con.currentName = isJsonObj ? name : `"${currentName}_${i}`;
             this.con.currentMember = this.__parseRichJsonInMember();
-            this.con.currentName = name;
-            set(this.con.current, name, i, this.con.currentMember);
+            set(current, name, i, this.con.currentMember);
         }
 
         this.__RICH_JSON_CIRCULAR_LEVEL--;
-        return this.con.current;
+        return current;
     }
 
     __preprocess_kcommands_constructors_inheritances() {
@@ -209,11 +210,12 @@ export class RichJsonParser {
             return this.__executeRichJsonCommandIfContainedInMember();
         } else {
             let kcmd_ignored;
+            let address = this.con.currentAddress;
             let isJsonObj = isJsonObject(this.con.currentMember);
             if (isJsonObj) {
                 this.__executeClone(); // clone must be done first
                 this.__callConstructor();
-                this.__RICH_JSON_CIRCULAR_CACHE.stack[this.con.currentAddress] = this.con.currentMember;
+                this.__RICH_JSON_CIRCULAR_CACHE.stack[address] = this.con.currentMember;
                 kcmd_ignored = this.__getIgnoresForKeyCommands();
                 kcmd_ignored.forEach(function (_ignored) {
                     __setRichJsonCommandEnabled(_ignored, false);
@@ -224,7 +226,7 @@ export class RichJsonParser {
             this.con.currentMember = this.parse(this.con.currentMember);
 
             if (isJsonObj) {
-                this.__resetCloneIfPossible(this.con.currentAddress);
+                this.__resetCloneIfPossible(address);
                 kcmd_ignored.forEach(function (_ignored) {
                     __setRichJsonCommandEnabled(_ignored, true);
                 });

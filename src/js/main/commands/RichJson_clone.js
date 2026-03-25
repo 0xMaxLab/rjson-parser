@@ -16,7 +16,7 @@ export function __executeCloneCommand(parser, context) {
     parser.__RICH_JSON_CLONE_ADDRESS = context.currentAddress;
     context.currentMember = cloneObject(context.currentMember);
     if (__RICH_JSON_CONFIG.debugEnabled) {
-        console.debug(`RichJson resolved clone in '${context.currentAddress}'.`);
+        console.debug(`RichJson resolved clone in '${parser.__RICH_JSON_CLONE_ADDRESS}'.`);
     }
     return context.currentMember;
 }
