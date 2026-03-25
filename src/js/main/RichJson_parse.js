@@ -11,5 +11,5 @@ export function parse(_struct) {
         console.debug(`RichJson is going to be applied due to.`);
     }
 
-    return new RichJsonParser().parse(_struct, _struct, undefined, undefined);
+    return new RichJsonParser().parse(_struct, true);
 }
