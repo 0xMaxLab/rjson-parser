@@ -10,6 +10,7 @@ export function __executeRefCommand(parser, context) {
         return context.root;
     }
     let prevMember = context.root;
+    let currentAddress = context.currentAddress;
     let refs = context.currentMember.split(__RICH_JSON_COMMAND_PATH_DELIMITER);
     let ref = undefined;
 
@@ -29,5 +30,6 @@ export function __executeRefCommand(parser, context) {
         context.currentMember = parser.__parseRichJsonInMember();
         prevMember = context.currentMember;
     }
+    context.currentAddress = currentAddress;
     return context.currentMember;
 }

@@ -210,12 +210,12 @@ export class RichJsonParser {
             return this.__executeRichJsonCommandIfContainedInMember();
         } else {
             let kcmd_ignored;
-            let address = this.con.currentAddress;
+            let currentAddress = this.con.currentAddress;
             let isJsonObj = isJsonObject(this.con.currentMember);
             if (isJsonObj) {
                 this.__executeClone(); // clone must be done first
                 this.__callConstructor();
-                this.__RICH_JSON_CIRCULAR_CACHE.stack[address] = this.con.currentMember;
+                this.__RICH_JSON_CIRCULAR_CACHE.stack[currentAddress] = this.con.currentMember;
                 kcmd_ignored = this.__getIgnoresForKeyCommands();
                 kcmd_ignored.forEach(function (_ignored) {
                     __setRichJsonCommandEnabled(_ignored, false);
@@ -226,7 +226,7 @@ export class RichJsonParser {
             this.con.currentMember = this.parse(this.con.currentMember);
 
             if (isJsonObj) {
-                this.__resetCloneIfPossible(address);
+                this.__resetCloneIfPossible(currentAddress);
                 kcmd_ignored.forEach(function (_ignored) {
                     __setRichJsonCommandEnabled(_ignored, true);
                 });
@@ -362,11 +362,13 @@ export class RichJsonParser {
                 return this.con.currentMember;
             }
 
+            let root = this.con.root;
             for (let i = 0; i < pipe_commands.length; ++i) {
                 this.con.currentCommand = pipe_commands[i].split(__RICH_JSON_COMMAND_SUFFIX, 2);
                 if (this.con.currentCommand.length === 1) {
                     this.con.currentCommand.splice(0, 0, __RICH_JSON_COMMAND_REF);
                 }
+                this.con.root = this.con.currentMember;
                 this.con.currentMember = this.con.currentCommand[1].trim();
                 this.con.currentCommand = this.con.currentCommand[0].trim();
                 this.con.currentMember = this.__tryRichJsonCommand();
@@ -374,6 +376,7 @@ export class RichJsonParser {
                     return `${unresolved_command}${unresolved_member}`; // reset member due to disabled command
                 }
             }
+            this.con.root = root;
 
             return this.con.currentMember;
         } catch (exception) {

@@ -267,7 +267,7 @@ test('$merge', () => {
         },
         "sixth": "$merge:fourth/fifth, first",
         "seventh": ["v1", "v2"],
-        "eigth": ["v1", "v2"],
+        "eigth": ["v3", "v4"],
         "ninth": "$merge:seventh, eigth",
         "tenth": "$merge:ninth, eigth",
     };
