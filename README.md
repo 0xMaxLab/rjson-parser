@@ -26,7 +26,7 @@ npm install @rjson/parser
 
 RichJSON is optimized to store JSON data in a space-efficient manner. While standard JSON often suffers from "data bloat" due to repeated objects, RichJSON allows you to define data once and reference it everywhere. **Read more about in the [documentation](https://github.com/0xMaxLab/rjson-parser/wiki).**
 
-> [!NOTE] 
+> [!NOTE]
 > This library is optimized for **compact storage and network bandwidth savings**. It is designed for scenarios where reducing IO and footprint is more critical than raw writing or querying throughput.
 
 ---
@@ -48,8 +48,6 @@ RichJSON transforms static files into dynamic structures. Here is the "magic" in
 
 #### 1. Define your structure
 
-Create a standard `.json` file and start using RichJSON commands.
-
 ```JSON
 { 
   "data_template": {
@@ -63,10 +61,10 @@ Create a standard `.json` file and start using RichJSON commands.
 
 #### 2. Resolve the data
 
-Read the file using the `readRichJsonFile` function to expand the references.
-
 ```JS
-var obj = readRichJsonFile(<filepath>);
+import * as RichJson from "@rjson/parser"
+
+let obj = RichJson.parse(data);
 ```
 
 #### 3. The Result
@@ -74,13 +72,13 @@ var obj = readRichJsonFile(<filepath>);
 The output is a fully resolved, standard JSON object where all references are hydrated:
 
 ```JSON
-{ 
-  "data_template": { 
+{
+  "data_template": {
     "data0": "value",
     "data1": "value",
     "data2": "value"
   },
-  "applied_reference": { 
+  "applied_reference": {
     "data0": "value",
     "data1": "value",
     "data2": "value"

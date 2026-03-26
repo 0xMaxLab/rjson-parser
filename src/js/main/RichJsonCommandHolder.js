@@ -9,6 +9,7 @@ import {__executeCopyCommand} from "./commands/RichJson_copy.js";
 import {__executeCloneCommand} from "./commands/RichJson_clone.js";
 import {__executeThisCommand} from "./commands/RichJson_this.js";
 import {__executeInvokeCommand} from "./commands/RichJson_invoke.js";
+import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
 
 class RichJsonCommandHolder {
     void = function () {
@@ -40,7 +41,14 @@ class RichJsonCommandHolder {
 export let __RICH_JSON_COMMANDS = new RichJsonCommandHolder();
 export let __RICH_JSON_LATE_APPLIES = ["this", "clone", "invoke"];
 
-export function __setRichJsonCommandEnabled(command, enabled) {
+
+/**
+ * Toggles a RichJson command's enabled state.
+ * @param {string} command - Name of the command to toggle.
+ * @param {boolean} enabled - Whether to enable or disable the command.
+ * @throws {Error} If the command is not in the available registry.
+ */
+export function setCommandEnabled(command, enabled) {
     if (!Object.hasOwn(__RICH_JSON_COMMANDS.available, command)) {
         __throwCommandNotFound(command);
     }

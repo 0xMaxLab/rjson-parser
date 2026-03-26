@@ -78,7 +78,7 @@ export class RichJsonModule {
  * @param module
  * @returns {*}
  */
-export function registerRichJsonModule(module) {
+export function registerModule(module) {
     console.log(`RichJson registering module '${module.name}'`);
     __RICH_JSON_MODULES[module.name] = module;
     return module;
@@ -88,7 +88,7 @@ export function registerRichJsonModule(module) {
  * Unregister a RichJson module.
  * @param _name
  */
-export function unregisterRichJsonModule(_name) {
+export function unregisterModule(_name) {
     if (isRichJsonModuleRegistered(_name)) {
         if (__RICH_JSON_MODULES[_name].isIncluded)
             throw (`RichJson can not unregister module '${_name}' due to it is currently included`);
@@ -110,7 +110,7 @@ export function isRichJsonModuleRegistered(_name) {
  * Includes a RichJson module.
  * @param _name
  */
-export function includeRichJsonModule(_name) {
+export function includeModule(_name) {
     if (isRichJsonModuleRegistered(_name)) {
         if (!__RICH_JSON_MODULES[_name].isIncluded) {
             console.log(`RichJson including module '${_name}'`);
@@ -123,7 +123,7 @@ export function includeRichJsonModule(_name) {
  * Excludes a RichJson module.
  * @param _name
  */
-export function excludeRichJsonModule(_name) {
+export function excludeModule(_name) {
     if (isRichJsonModuleRegistered(_name)) {
         if (__RICH_JSON_MODULES[_name].isIncluded) {
             console.log(`RichJson excluding module '${_name}'`);
