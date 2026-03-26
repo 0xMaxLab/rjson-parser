@@ -8,15 +8,7 @@ import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
  * @returns {object} The merged object
  */
 export function mergeObjects(...objects) {
-    let rv = {};
-    let cache = new RichJsonCache();
-    for (let i = 0; i < objects.length; i++) {
-        _mergeIntoTarget(cache, rv, [objects[i]]);
-    }
-    if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
-        console.error(`RichJson mergeIntoTarget failed!`);
-    }
-    return rv;
+    return mergeIntoTarget({}, ...objects);
 }
 
 /**
@@ -26,31 +18,28 @@ export function mergeObjects(...objects) {
  * @returns {object} The merged target
  */
 export function mergeIntoTarget(target, ...others) {
-    let cache = new RichJsonCache();
-    target = _mergeIntoTarget(cache, target, others);
-    if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
-        console.error(`RichJson mergeIntoTarget failed!`);
-    }
-    return target;
-}
-
-function _mergeIntoTarget(cache, target, others) {
     let other = undefined;
+    let cache = undefined;
 
-    cache.level++;
     for (let i = 0; i < others.length; i++) {
         other = others[i];
         if (other === undefined) {
             continue;
         }
+        cache = new RichJsonCache();
         __mergeIntoTarget(cache, target, other);
+        if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
+            console.error(`RichJson mergeIntoTarget failed!`);
+        }
     }
-    cache.level--;
 
     return target;
 }
 
 export function __mergeIntoTarget(cache, target, other, force = false) {
+    cache.stack[cache.resolveAddress(other)] = other;
+    cache.level++;
+
     let names = Object.keys(other);
     let name = undefined;
     let member = undefined;
@@ -66,8 +55,7 @@ export function __mergeIntoTarget(cache, target, other, force = false) {
         } else {
             if (member !== undefined && isJsonObject(member) && isJsonObject(target[name])) {
                 if (!Object.hasOwn(cache.stack, cache.resolveAddress(member))) {
-                    cache.stack[cache.resolveAddress(member)] = member;
-                    _mergeIntoTarget(cache, target[name], [member]);
+                    __mergeIntoTarget(cache, target[name], member);
                 }
             } else if (!force && !Object.hasOwn(target, name)) {
                 target[name] = member;
@@ -75,6 +63,7 @@ export function __mergeIntoTarget(cache, target, other, force = false) {
         }
     }
 
+    cache.level--;
     return target;
 }
 
@@ -83,17 +72,8 @@ export function __mergeIntoTarget(cache, target, other, force = false) {
  * @param {object} objects Going to be merged
  * @returns {object} The merged object
  */
-export function mergeObjectsWithoutRebind(objects) {
-    let rv = {};
-    let cache = new RichJsonCache();
-    cache.stack = [];
-    for (let i = 0; i < objects.length; i++) {
-        _mergeIntoWithoutRebind(cache, rv, [objects[i]]);
-    }
-    if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
-        console.error(`RichJson mergeIntoTarget failed!`);
-    }
-    return rv;
+export function mergeObjectsWithoutRebind(...objects) {
+    return mergeIntoWithoutRebind({}, ...objects);
 }
 
 /**
@@ -103,30 +83,28 @@ export function mergeObjectsWithoutRebind(objects) {
  * @returns {object} The merged target
  */
 export function mergeIntoWithoutRebind(target, ...others) {
-    let cache = new RichJsonCache();
-    cache.stack = [];
-    target = _mergeIntoWithoutRebind(cache, target, others);
-    if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
-        console.error(`RichJson mergeIntoWithoutRebind failed!`);
-    }
-    return target;
-}
-
-function _mergeIntoWithoutRebind(cache, target, others) {
     let other = undefined;
+    let cache = undefined;
 
-    cache.level++;
     for (let i = 0; i < others.length; i++) {
         other = others[i];
-        if (other === undefined) continue;
+        if (other === undefined) {
+            continue;
+        }
+        cache = new RichJsonCache();
         __mergeIntoWithoutRebind(cache, target, other);
+        if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
+            console.error(`RichJson mergeIntoWithoutRebind failed!`);
+        }
     }
-    cache.level--;
 
     return target;
 }
 
 function __mergeIntoWithoutRebind(cache, target, other, force = false) {
+    cache.stack[cache.resolveAddress(other)] = other;
+    cache.level++;
+
     let names = Object.keys(other);
     let name = undefined;
     let member = undefined;
@@ -137,17 +115,17 @@ function __mergeIntoWithoutRebind(cache, target, other, force = false) {
         if (typeof member === "function") {
             if (!force && !Object.hasOwn(target, name)) target[name] = member;
         } else {
-            if (member !== undefined &&
-                isJsonObject(member) && isJsonObject(target[name]) &&
-                !cache.stack.includes(member)) {
-                cache.stack.push(member);
-                _mergeIntoWithoutRebind(cache, target[name], [member]);
+            if (member !== undefined && isJsonObject(member) && isJsonObject(target[name])) {
+                if (!Object.hasOwn(cache.stack, cache.resolveAddress(member))) {
+                    __mergeIntoWithoutRebind(cache, target[name], member);
+                }
             } else {
                 if (!force && !Object.hasOwn(target, name)) target[name] = member;
             }
         }
     }
 
+    cache.level--;
     return target;
 }
 
