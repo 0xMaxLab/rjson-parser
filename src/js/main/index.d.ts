@@ -25,3 +25,5 @@ export function mergeObjects(target: object, ...sources: object[]): object;
 export function cloneObject<T>(obj: T): T;
 export function isJsonObject(obj: any): boolean;
 export function resolveAddress(obj: any, address: string): any;
+
+export function keepKeyCommands(obj: any): any;

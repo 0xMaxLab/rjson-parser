@@ -25,3 +25,4 @@ export {
     getKeysSorted,
     resolveAddress,
 } from "./RichJsonHelper.js";
+export {keepKeyCommands} from "./RichJson_keepKeyCommands.js"

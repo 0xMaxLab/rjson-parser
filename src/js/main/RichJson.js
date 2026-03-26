@@ -47,10 +47,10 @@ export const __RICH_JSON_INTERPOLATION_WILDCARD = "*{*}*"
 export const __RICH_JSON_INTERPOLATION_OPENING_SIGN = "{"
 export const __RICH_JSON_INTERPOLATION_CLOSING_SIGN = "}"
 
-const getObjectField = (object, name) => object[name];
-const setObjectField = (object, name, i, value) => object[name] = value;
-const getArrayElement = (array, name, i) => array[i];
-const setArrayElement = (array, name, i, value) => array[i] = value;
+export const getObjectField = (object, name) => object[name];
+export const setObjectField = (object, name, i, value) => object[name] = value;
+export const getArrayElement = (array, name, i) => array[i];
+export const setArrayElement = (array, name, i, value) => array[i] = value;
 
 // this.con.root, this.con.current, this.con.currentCommand, this.con.currentMember, this.con.currentAddress, this.con.currentName
 export class RichJsonContext {
@@ -66,7 +66,6 @@ export class RichJsonParser {
     __RICH_JSON_CIRCULAR_LEVEL = 0;
     __RICH_JSON_CIRCULAR_CACHE = {
         stack: {},
-        resolved: {},
         inheritances: {},
     };
     __RICH_JSON_CLONE_ADDRESS = undefined;
