@@ -1,6 +1,6 @@
 {
   "name": "@rjson/parser",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "RJSON -- JSON with multiple inheritances, references and commands",
   "keywords": [
     "JSON",
