@@ -18,7 +18,7 @@ npm install @rjson/parser
 * 👉 [gradle (java)]()
 * 👉 [conan (c++)]()
 * 👉 [nuget (c#)]()
-* 👉 [pip (python)]()
+* 👉 [pip (python)]() 
 
 ---
 
