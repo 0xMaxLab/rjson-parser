@@ -1,6 +1,5 @@
 import {__RICH_JSON_CLASS_MAPPING} from "./RichJsonClassMapping.js";
 import {RichJsonCache} from "./RichJsonCache.js";
-import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
 
 /**
  * Merges two or more objects together into a new object.
@@ -28,7 +27,7 @@ export function mergeIntoTarget(target, ...others) {
         }
         cache = new RichJsonCache();
         __mergeIntoTarget(cache, target, other);
-        if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
+        if (cache.level !== 0) {
             console.error(`RichJson mergeIntoTarget failed!`);
         }
     }
@@ -93,7 +92,7 @@ export function mergeIntoWithoutRebind(target, ...others) {
         }
         cache = new RichJsonCache();
         __mergeIntoWithoutRebind(cache, target, other);
-        if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
+        if (cache.level !== 0) {
             console.error(`RichJson mergeIntoWithoutRebind failed!`);
         }
     }
@@ -142,7 +141,7 @@ export function cloneObject(object) {
     cache.next = cache.rv;
     cache.stack[cache.resolveAddress(object)] = cache.rv;
     object = _cloneObject(cache, object);
-    if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
+    if (cache.level !== 0) {
         console.error(`RichJson cloneObject failed!`);
     }
     return object;
