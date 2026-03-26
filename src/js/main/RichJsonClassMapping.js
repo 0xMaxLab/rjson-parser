@@ -1,11 +1,11 @@
-export const __RICH_JSON_CLASS_MAPPING = {
-}
+export const __RICH_JSON_CLASS_MAPPING = {}
 
 /**
  * Adds the given class mappings.
  * @param classMappings
  */
-export function addClassMappings(classMappings) {r
+export function addClassMappings(classMappings) {
+    r
     let names = Object.keys(classMappings);
     let name = undefined;
     for (let i = 0; i < names.length; ++i) {

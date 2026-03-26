@@ -2,9 +2,12 @@ import {
     __RICH_JSON_COMMAND_WILDCARD,
     __RICH_JSON_INTERPOLATION_WILDCARD,
     __RICH_JSON_KEY_COMMAND_MEMBER,
-    __RICH_JSON_LATE_CONSTRUCTOR_MEMBER, getArrayElement, getObjectField, RichJsonParser
+    __RICH_JSON_LATE_CONSTRUCTOR_MEMBER,
+    getArrayElement,
+    getObjectField,
+    RichJsonParser
 } from "./RichJson.js";
-import {getFieldByKey, isJsonObject, matchesWildcard, resolveAddress} from "./RichJsonHelper.js";
+import {getFieldByKey, isJsonObject, matchesWildcard} from "./RichJsonHelper.js";
 
 /**
  * Checks if the given object has unresolved RichJson expressions in it.

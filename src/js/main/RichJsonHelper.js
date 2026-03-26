@@ -49,7 +49,7 @@ export function __mergeIntoTarget(cache, target, other, force = false) {
         member = other[name];
 
         if (typeof member === "function") {
-            if (!force && !Object.hasOwn(target, name))  {
+            if (!force && !Object.hasOwn(target, name)) {
                 target[name] = member.bind(target);
             }
         } else {

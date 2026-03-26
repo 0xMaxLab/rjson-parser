@@ -1,10 +1,9 @@
 export class RichJsonCache {
-    INSTANCE_ADDRESS_MAP = new WeakMap();
-    NEXT_ADDRESS = 0;
+    addressMap = new WeakMap();
+    nextAddress = 0;
 
     level = 0;
     stack = {};
-    inheritances = {};
 
     /**
      * Resolves a unique address for given object.
@@ -12,10 +11,10 @@ export class RichJsonCache {
      * @returns {String} The address
      */
     resolveAddress(object) {
-        if (!this.INSTANCE_ADDRESS_MAP.has(object)) {
-            this.INSTANCE_ADDRESS_MAP.set(object, String(this.NEXT_ADDRESS++));
-            return String(this.NEXT_ADDRESS - 1);
+        if (!this.addressMap.has(object)) {
+            this.addressMap.set(object, String(this.nextAddress++));
+            return String(this.nextAddress - 1);
         }
-        return this.INSTANCE_ADDRESS_MAP.get(object);
+        return this.addressMap.get(object);
     }
 }

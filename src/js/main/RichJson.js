@@ -8,10 +8,9 @@ import {
     getKeysSorted,
     isJsonObject,
     matchesWildcard,
-    mergeIntoTarget,
-    resolveAddress
+    mergeIntoTarget
 } from "./RichJsonHelper.js";
-import {__RICH_JSON_COMMANDS, __setRichJsonCommandEnabled, __throwCommandNotFound} from "./RichJsonCommandHolder.js";
+import {__RICH_JSON_COMMANDS, setCommandEnabled, __throwCommandNotFound} from "./RichJsonCommandHolder.js";
 import {__mapClassByName} from "./RichJsonClassMapping.js";
 import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
 import {RichJsonCache} from "./RichJsonCache.js";
@@ -30,8 +29,6 @@ export const __RICH_JSON_ARRAY_WILDCARD = "*[*]*"
 export const __RICH_JSON_ARRAY_DELIMITERS = /[\[\]]/
 export const __RICH_JSON_ARRAY_REPLACE_SUBSTRING = "]["
 export const __RICH_JSON_ARRAY_REPLACE_NEWSTRING = "]|["
-
-export const __RICH_JSON_IS_CLONE_APPLYING = () => this.__RICH_JSON_CLONE_ADDRESS !== undefined
 
 export const __RICH_JSON_CONSTRUCTOR_SIGN = "="
 export const __RICH_JSON_LATE_CONSTRUCTOR_SIGN = "=="
@@ -52,7 +49,6 @@ export const setObjectField = (object, name, i, value) => object[name] = value;
 export const getArrayElement = (array, name, i) => array[i];
 export const setArrayElement = (array, name, i, value) => array[i] = value;
 
-// this.con.root, this.con.current, this.con.currentCommand, this.con.currentMember, this.con.currentAddress, this.con.currentName
 export class RichJsonContext {
     root = undefined;
     current = undefined;
@@ -63,14 +59,17 @@ export class RichJsonContext {
 }
 
 export class RichJsonParser {
-    __RICH_JSON_CIRCULAR_LEVEL = 0;
     cache = new RichJsonCache();
-    __RICH_JSON_CLONE_ADDRESS = undefined;
     con = new RichJsonContext();
+
+    constructor() {
+        this.cache.inheritances = {};
+        this.cache.cloneAddress = undefined;
+    }
 
     parse(current, isRoot = false) {
         this.con.current = current;
-        this.__RICH_JSON_CIRCULAR_LEVEL++;
+        this.cache.level++;
 
         if (isRoot) {
             this.con.root = current;
@@ -78,8 +77,8 @@ export class RichJsonParser {
             this.con.currentMember = current;
             this.con.currentAddress = this.cache.resolveAddress(current);
             this.con.current = this.__parseRichJsonInMember();
-            this.__RICH_JSON_CIRCULAR_LEVEL--;
-            if (this.__RICH_JSON_CIRCULAR_LEVEL === 0) {
+            this.cache.level--;
+            if (this.cache.level === 0) {
                 if (__RICH_JSON_CONFIG.debugEnabled) {
                     console.debug("RichJson was applied successfully.");
                 }
@@ -118,7 +117,7 @@ export class RichJsonParser {
             set(current, name, i, this.con.currentMember);
         }
 
-        this.__RICH_JSON_CIRCULAR_LEVEL--;
+        this.cache.level--;
         return current;
     }
 
@@ -216,7 +215,7 @@ export class RichJsonParser {
                 this.cache.stack[currentAddress] = this.con.currentMember;
                 kcmd_ignored = this.__getIgnoresForKeyCommands();
                 kcmd_ignored.forEach(function (_ignored) {
-                    __setRichJsonCommandEnabled(_ignored, false);
+                    setCommandEnabled(_ignored, false);
                 });
                 this.__resolveInheritances();
             }
@@ -226,7 +225,7 @@ export class RichJsonParser {
             if (isJsonObj) {
                 this.__resetCloneIfPossible(currentAddress);
                 kcmd_ignored.forEach(function (_ignored) {
-                    __setRichJsonCommandEnabled(_ignored, true);
+                    setCommandEnabled(_ignored, true);
                 });
                 this.con.currentMember = this.__executeKeyCommands();
             }
@@ -295,7 +294,7 @@ export class RichJsonParser {
 
     __getIgnoresForKeyCommands() {
         let rv = [];
-    
+
         if (Object.hasOwn(this.con.currentMember, __RICH_JSON_KEY_COMMAND_MEMBER)) {
             let kcmd = undefined;
             for (let i = 0, len = this.con.currentMember[__RICH_JSON_KEY_COMMAND_MEMBER].length; i < len; ++i) {
@@ -305,7 +304,7 @@ export class RichJsonParser {
                 }
             }
         }
-    
+
         return rv;
     }
 
@@ -434,9 +433,13 @@ export class RichJsonParser {
     }
 
     __resetCloneIfPossible(_address) {
-        if (__RICH_JSON_IS_CLONE_APPLYING && this.__RICH_JSON_CLONE_ADDRESS === _address) {
-            this.__RICH_JSON_CLONE_ADDRESS = undefined;
+        if (this.__isCloneApplying && this.cache.cloneAddress === _address) {
+            this.cache.cloneAddress = undefined;
         }
+    }
+
+    __isCloneApplying() {
+        return this.cache.cloneAddress !== undefined;
     }
 
     __executeKeyCommands() {

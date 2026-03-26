@@ -41,7 +41,14 @@ class RichJsonCommandHolder {
 export let __RICH_JSON_COMMANDS = new RichJsonCommandHolder();
 export let __RICH_JSON_LATE_APPLIES = ["this", "clone", "invoke"];
 
-export function __setRichJsonCommandEnabled(command, enabled) {
+
+/**
+ * Toggles a RichJson command's enabled state.
+ * @param {string} command - Name of the command to toggle.
+ * @param {boolean} enabled - Whether to enable or disable the command.
+ * @throws {Error} If the command is not in the available registry.
+ */
+export function setCommandEnabled(command, enabled) {
     if (!Object.hasOwn(__RICH_JSON_COMMANDS.available, command)) {
         __throwCommandNotFound(command);
     }

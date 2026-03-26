@@ -1,4 +1,4 @@
-import {__parseRichJson, RichJsonParser} from "./RichJson.js";
+import {RichJsonParser} from "./RichJson.js";
 import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
 
 /**

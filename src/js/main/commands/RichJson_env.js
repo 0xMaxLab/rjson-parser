@@ -2,11 +2,10 @@
     references the given env variable
 */
 
-import {isJsonObject, resolveAddress} from "../RichJsonHelper.js";
-import {__parseRichJsonInMember, __RICH_JSON_COMMAND_PATH_DELIMITER, __RICH_JSON_KEY_COMMAND_MEMBER} from "../RichJson.js";
+import {isJsonObject} from "../RichJsonHelper.js";
+import {__RICH_JSON_COMMAND_PATH_DELIMITER} from "../RichJson.js";
 import {__executeRefCommand} from "./RichJson_ref.js";
 import {__RICH_JSON_ENVIRONMENT, addEnvironmentVariables} from "../RichJsonEnvironment.js";
-
 
 
 export function __executeEnvCommand(parser, context) {

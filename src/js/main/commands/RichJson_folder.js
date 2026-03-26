@@ -5,5 +5,5 @@
 import {readDirectory} from "../RichJsonFileHelper.js";
 
 export function __executeFolderCommand(parser, context) {
-    return readDirectory(context.currentMember);
+    return readDirectory(context.currentMember, true);
 }
