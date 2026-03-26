@@ -300,11 +300,10 @@ test('$clone', () => {
     let clone = {
         "$clone:first": content["$clone:first"]
     };
-    resolveAddress(content["$clone:first"]);
 
     parse(clone);
 
-    expect(resolveAddress(content["$clone:first"]) === resolveAddress(clone.first)).toBeFalsy();
+    expect(content["$clone:first"] === clone.first).toBeFalsy();
 });
 
 test('$invoke', () => {

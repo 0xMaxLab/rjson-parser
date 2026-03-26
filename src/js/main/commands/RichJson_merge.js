@@ -8,7 +8,7 @@ import {__RICH_JSON_CIRCULAR_CACHE, __RICH_JSON_COMMAND_DELIMITER} from "../Rich
 
 export function __executeMergeCommand(parser, context) {
     let refs = context.currentMember.split(__RICH_JSON_COMMAND_DELIMITER);
-    let struct_or_array = getFieldByKey(parser.__RICH_JSON_CIRCULAR_CACHE.stack, context.currentAddress);
+    let struct_or_array = getFieldByKey(parser.cache.stack, context.currentAddress);
     let currentAddress = context.currentAddress;
     context.currentMember = refs[0].trim()
     context.currentMember = __executeRefCommand(parser, context);
@@ -24,13 +24,13 @@ export function __executeMergeCommand(parser, context) {
         }
     } else {
         struct_or_array = context.currentMember;
-        parser.__RICH_JSON_CIRCULAR_CACHE.stack[context.currentAddress] = struct_or_array; // TODO look ahead for array or object in __resolveRichJsonInMember
+        parser.cache.stack[context.currentAddress] = struct_or_array; // TODO look ahead for array or object in __resolveRichJsonInMember
         for (let i = 1; i < refs.length; ++i) {
             context.currentMember = refs[i].trim();
             context.currentMember = __executeRefCommand(parser, context);
             context.currentAddress = currentAddress;
             struct_or_array = concatArrays(struct_or_array, context.currentMember);
-            parser.__RICH_JSON_CIRCULAR_CACHE.stack[context.currentAddress] = struct_or_array; // concat creates a new array
+            parser.cache.stack[context.currentAddress] = struct_or_array; // concat creates a new array
         }
     }
 

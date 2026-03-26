@@ -20,12 +20,12 @@ export function __executeRefCommand(parser, context) {
             if (Object.hasOwn(prevMember, ref)) {
                 context.currentMember = prevMember[ref];
             } else {
-                throw (`Member '${ref}' in '${resolveAddress(prevMember)}' does not exist`);
+                throw (`Member '${ref}' in '${parser.cache.resolveAddress(prevMember)}' does not exist`);
             }
         }
         context.currentAddress = isJsonObject(context.currentMember) || Array.isArray(context.currentMember)
-            ? resolveAddress(context.currentMember)
-            : concatStrings(resolveAddress(prevMember), "_", ref)
+            ? parser.cache.resolveAddress(context.currentMember)
+            : concatStrings(parser.cache.resolveAddress(prevMember), "_", ref)
         ;
         context.currentMember = parser.__parseRichJsonInMember();
         prevMember = context.currentMember;

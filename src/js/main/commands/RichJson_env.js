@@ -21,7 +21,7 @@ export function __executeEnvCommand(parser, context) {
     if (Object.hasOwn(__RICH_JSON_ENVIRONMENT, firstRef)) {
         context.currentMember = __RICH_JSON_ENVIRONMENT[firstRef];
         context.root = isJsonObject(context.currentMember) ? context.currentMember : {};
-        context.currentAddress = resolveAddress(context.root);
+        context.currentAddress = parser.cache.resolveAddress(context.root);
         context.currentMember = parser.__parseRichJsonInMember();
         __RICH_JSON_ENVIRONMENT[firstRef] = context.currentMember;
         if (ref.length === 2) {

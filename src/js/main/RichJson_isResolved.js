@@ -12,7 +12,8 @@ import {getFieldByKey, isJsonObject, matchesWildcard, resolveAddress} from "./Ri
  * @returns {boolean}
  */
 export function isResolved(object) {
-    return __isResolved(new RichJsonParser(), object, resolveAddress(object))
+    let parser = new RichJsonParser();
+    return __isResolved(parser, object, parser.cache.resolveAddress(object))
 }
 
 function __isResolved(parser, object, address) {
@@ -20,10 +21,10 @@ function __isResolved(parser, object, address) {
         return true;
     }
 
-    if (getFieldByKey(parser.__RICH_JSON_CIRCULAR_CACHE.stack, address) !== undefined) {
+    if (getFieldByKey(parser.cache.stack, address) !== undefined) {
         return true;
     }
-    parser.__RICH_JSON_CIRCULAR_CACHE.stack[address] = object;
+    parser.cache.stack[address] = object;
 
     let isJsonObj = isJsonObject(object);
     if (isJsonObj && (
@@ -46,7 +47,7 @@ function __isResolved(parser, object, address) {
                 matchesWildcard(member, __RICH_JSON_INTERPOLATION_WILDCARD)) {
                 return false;
             }
-        } else if (!__isResolved(parser, member, resolveAddress(member))) {
+        } else if (!__isResolved(parser, member, parser.cache.resolveAddress(member))) {
             return false;
         }
     }

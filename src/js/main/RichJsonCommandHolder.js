@@ -9,6 +9,7 @@ import {__executeCopyCommand} from "./commands/RichJson_copy.js";
 import {__executeCloneCommand} from "./commands/RichJson_clone.js";
 import {__executeThisCommand} from "./commands/RichJson_this.js";
 import {__executeInvokeCommand} from "./commands/RichJson_invoke.js";
+import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
 
 class RichJsonCommandHolder {
     void = function () {

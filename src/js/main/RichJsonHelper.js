@@ -1,10 +1,6 @@
 import {__RICH_JSON_CLASS_MAPPING} from "./RichJsonClassMapping.js";
-
-let INSTANCE_ADDRESS_MAP = new WeakMap();
-let NEXT_ADDRESS = 0;
-
-let MERGE_OBJECTS_CIRCULAR_LEVEL = 0;
-let MERGE_OBJECTS_CIRCULAR_CACHE = [];
+import {RichJsonCache} from "./RichJsonCache.js";
+import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
 
 /**
  * Merges two or more objects together into a new object.
@@ -13,8 +9,12 @@ let MERGE_OBJECTS_CIRCULAR_CACHE = [];
  */
 export function mergeObjects(...objects) {
     let rv = {};
+    let cache = new RichJsonCache();
     for (let i = 0; i < objects.length; i++) {
-        mergeIntoTarget(rv, objects[i]);
+        _mergeIntoTarget(cache, rv, [objects[i]]);
+    }
+    if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
+        console.error(`RichJson mergeIntoTarget failed!`);
     }
     return rv;
 }
@@ -26,24 +26,31 @@ export function mergeObjects(...objects) {
  * @returns {object} The merged target
  */
 export function mergeIntoTarget(target, ...others) {
-    if (MERGE_OBJECTS_CIRCULAR_LEVEL === 0) {
-        MERGE_OBJECTS_CIRCULAR_CACHE = [];
+    let cache = new RichJsonCache();
+    target = _mergeIntoTarget(cache, target, others);
+    if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
+        console.error(`RichJson mergeIntoTarget failed!`);
     }
+    return target;
+}
 
+function _mergeIntoTarget(cache, target, others) {
     let other = undefined;
 
-    MERGE_OBJECTS_CIRCULAR_LEVEL++;
+    cache.level++;
     for (let i = 0; i < others.length; i++) {
         other = others[i];
-        if (other === undefined) continue;
-        __mergeIntoTarget(target, other);
+        if (other === undefined) {
+            continue;
+        }
+        __mergeIntoTarget(cache, target, other);
     }
-    MERGE_OBJECTS_CIRCULAR_LEVEL--;
+    cache.level--;
 
     return target;
 }
 
-export function __mergeIntoTarget(target, other, force = false) {
+export function __mergeIntoTarget(cache, target, other, force = false) {
     let names = Object.keys(other);
     let name = undefined;
     let member = undefined;
@@ -53,15 +60,17 @@ export function __mergeIntoTarget(target, other, force = false) {
         member = other[name];
 
         if (typeof member === "function") {
-            if (!force && !Object.hasOwn(target, name)) target[name] = member.bind(target);
+            if (!force && !Object.hasOwn(target, name))  {
+                target[name] = member.bind(target);
+            }
         } else {
-            if (member !== undefined &&
-                isJsonObject(member) && isJsonObject(target[name]) &&
-                !MERGE_OBJECTS_CIRCULAR_CACHE.includes(member)) {
-                MERGE_OBJECTS_CIRCULAR_CACHE.push(member);
-                mergeIntoTarget(target[name], member);
-            } else {
-                if (!force && !Object.hasOwn(target, name)) target[name] = member;
+            if (member !== undefined && isJsonObject(member) && isJsonObject(target[name])) {
+                if (!Object.hasOwn(cache.stack, cache.resolveAddress(member))) {
+                    cache.stack[cache.resolveAddress(member)] = member;
+                    _mergeIntoTarget(cache, target[name], [member]);
+                }
+            } else if (!force && !Object.hasOwn(target, name)) {
+                target[name] = member;
             }
         }
     }
@@ -74,10 +83,15 @@ export function __mergeIntoTarget(target, other, force = false) {
  * @param {object} objects Going to be merged
  * @returns {object} The merged object
  */
-export function mergeObjectsWithoutRebind(...objects) {
+export function mergeObjectsWithoutRebind(objects) {
     let rv = {};
+    let cache = new RichJsonCache();
+    cache.stack = [];
     for (let i = 0; i < objects.length; i++) {
-        mergeIntoWithoutRebind(rv, objects[i]);
+        _mergeIntoWithoutRebind(cache, rv, [objects[i]]);
+    }
+    if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
+        console.error(`RichJson mergeIntoTarget failed!`);
     }
     return rv;
 }
@@ -89,24 +103,30 @@ export function mergeObjectsWithoutRebind(...objects) {
  * @returns {object} The merged target
  */
 export function mergeIntoWithoutRebind(target, ...others) {
-    if (MERGE_OBJECTS_CIRCULAR_LEVEL === 0) {
-        MERGE_OBJECTS_CIRCULAR_CACHE = [];
+    let cache = new RichJsonCache();
+    cache.stack = [];
+    target = _mergeIntoWithoutRebind(cache, target, others);
+    if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
+        console.error(`RichJson mergeIntoWithoutRebind failed!`);
     }
+    return target;
+}
 
+function _mergeIntoWithoutRebind(cache, target, others) {
     let other = undefined;
 
-    MERGE_OBJECTS_CIRCULAR_LEVEL++;
+    cache.level++;
     for (let i = 0; i < others.length; i++) {
         other = others[i];
         if (other === undefined) continue;
-        __mergeIntoWithoutRebind(target, other);
+        __mergeIntoWithoutRebind(cache, target, other);
     }
-    MERGE_OBJECTS_CIRCULAR_LEVEL--;
+    cache.level--;
 
     return target;
 }
 
-export function __mergeIntoWithoutRebind(target, other, force = false) {
+function __mergeIntoWithoutRebind(cache, target, other, force = false) {
     let names = Object.keys(other);
     let name = undefined;
     let member = undefined;
@@ -119,9 +139,9 @@ export function __mergeIntoWithoutRebind(target, other, force = false) {
         } else {
             if (member !== undefined &&
                 isJsonObject(member) && isJsonObject(target[name]) &&
-                !MERGE_OBJECTS_CIRCULAR_CACHE.includes(member)) {
-                MERGE_OBJECTS_CIRCULAR_CACHE.push(member);
-                mergeIntoWithoutRebind(target[name], member);
+                !cache.stack.includes(member)) {
+                cache.stack.push(member);
+                _mergeIntoWithoutRebind(cache, target[name], [member]);
             } else {
                 if (!force && !Object.hasOwn(target, name)) target[name] = member;
             }
@@ -137,27 +157,30 @@ export function __mergeIntoWithoutRebind(target, other, force = false) {
  * @returns {object} The clone
  */
 export function cloneObject(object) {
+    let cache = new RichJsonCache();
+    cache.str = isJsonObject(object);
+    cache.rv = (isJsonObject(object) ? {} : []);
+    cache.next = undefined;
+    cache.next = cache.rv;
+    cache.stack[cache.resolveAddress(object)] = cache.rv;
+    object = _cloneObject(cache, object);
+    if (__RICH_JSON_CONFIG.debugEnabled && cache.level !== 0) {
+        console.error(`RichJson cloneObject failed!`);
+    }
+    return object;
+}
+
+function _cloneObject(cache, object) {
     if (object == null || (!isJsonObject(object) && !Array.isArray(object))) {
         return object;
     }
 
-    if (MERGE_OBJECTS_CIRCULAR_LEVEL === 0) {
-        MERGE_OBJECTS_CIRCULAR_CACHE = {
-            str: isJsonObject(object),
-            rv: (isJsonObject(object) ? {} : []),
-            next: undefined,
-            stack: {},
-        };
-        MERGE_OBJECTS_CIRCULAR_CACHE.next = MERGE_OBJECTS_CIRCULAR_CACHE.rv;
-        MERGE_OBJECTS_CIRCULAR_CACHE.stack[resolveAddress(object)] = MERGE_OBJECTS_CIRCULAR_CACHE.rv;
-    }
-
-    let target = MERGE_OBJECTS_CIRCULAR_CACHE.next;
+    let target = cache.next;
     let name = undefined;
     let member = undefined;
     let newObj = undefined;
 
-    MERGE_OBJECTS_CIRCULAR_LEVEL++;
+    cache.level++;
     if (isJsonObject(object)) {
         let names = Object.keys(object);
         for (let i = 0; i < names.length; i++) {
@@ -166,14 +189,14 @@ export function cloneObject(object) {
             if (typeof member === "function") {
                 target[name] = member.bind(target);
             } else if (isJsonObject(member) || Array.isArray(member)) {
-                if (getFieldByKey(MERGE_OBJECTS_CIRCULAR_CACHE.stack, resolveAddress(member)) === undefined) {
+                if (getFieldByKey(cache.stack, cache.resolveAddress(member)) === undefined) {
                     newObj = (isJsonObject(member)) ? {} : [];
-                    MERGE_OBJECTS_CIRCULAR_CACHE.str = isJsonObject(member);
-                    MERGE_OBJECTS_CIRCULAR_CACHE.stack[resolveAddress(member)] = newObj;
-                    MERGE_OBJECTS_CIRCULAR_CACHE.next = newObj;
-                    target[name] = cloneObject(member);
+                    cache.str = isJsonObject(member);
+                    cache.stack[cache.resolveAddress(member)] = newObj;
+                    cache.next = newObj;
+                    target[name] = _cloneObject(cache, member);
                 } else {
-                    target[name] = MERGE_OBJECTS_CIRCULAR_CACHE.stack[resolveAddress(member)];
+                    target[name] = cache.stack[cache.resolveAddress(member)];
                 }
             } else {
                 target[name] = member;
@@ -183,21 +206,21 @@ export function cloneObject(object) {
         for (let i = 0; i < object.length; i++) {
             member = object[i];
             if (isJsonObject(member) || Array.isArray(member)) {
-                if (getFieldByKey(MERGE_OBJECTS_CIRCULAR_CACHE.stack, resolveAddress(member)) === undefined) {
+                if (getFieldByKey(cache.stack, cache.resolveAddress(member)) === undefined) {
                     newObj = (isJsonObject(member)) ? {} : [];
-                    MERGE_OBJECTS_CIRCULAR_CACHE.str = isJsonObject(member);
-                    MERGE_OBJECTS_CIRCULAR_CACHE.stack[resolveAddress(member)] = newObj;
-                    MERGE_OBJECTS_CIRCULAR_CACHE.next = newObj;
-                    target.push(cloneObject(member));
+                    cache.str = isJsonObject(member);
+                    cache.stack[cache.resolveAddress(member)] = newObj;
+                    cache.next = newObj;
+                    target.push(_cloneObject(cache, member));
                 } else {
-                    target.push(MERGE_OBJECTS_CIRCULAR_CACHE.stack[resolveAddress(member)]);
+                    target.push(cache.stack[cache.resolveAddress(member)]);
                 }
             } else {
                 target.push(member);
             }
         }
     }
-    MERGE_OBJECTS_CIRCULAR_LEVEL--;
+    cache.level--;
 
     return target;
 }
@@ -211,24 +234,6 @@ export function cloneObject(object) {
  */
 export function getFieldByKey(object, key) {
     return Object.hasOwn(object, key) ? object[key] : undefined;
-}
-
-/**
- * Resolves a unique address for given object.
- * @param {object} object
- * @returns {String} The address
- */
-export function resolveAddress(object) {
-    if (!INSTANCE_ADDRESS_MAP.has(object)) {
-        INSTANCE_ADDRESS_MAP.set(object, String(NEXT_ADDRESS++));
-        return String(NEXT_ADDRESS - 1);
-    }
-    return INSTANCE_ADDRESS_MAP.get(object);
-}
-
-export function __resetAddressCache() {
-    INSTANCE_ADDRESS_MAP = new WeakMap();
-    NEXT_ADDRESS = 0;
 }
 
 /**
