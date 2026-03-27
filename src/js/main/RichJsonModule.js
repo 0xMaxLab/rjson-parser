@@ -1,13 +1,3 @@
-/*
-    A module is a command defintion that is stored in RichJson's module space.
-	In order to includeRichJsonModule a module you have to do the following steps:
-		1. registerRichJsonModule your module like this: registerRichJsonModule(new RichJsonModule("name"));
-		2. includeRichJsonModule your module like this: includeRichJsonModule("name");
-
-	Raptor offers generic modules, which are available always, if your RichJson_Configuration
-	macro RICH_JSON_INCLUDED_MODULES contains it.
-*/
-
 import {__RICH_JSON_COMMANDS, __RICH_JSON_LATE_APPLIES} from "./RichJsonCommandHolder.js";
 
 const __RICH_JSON_MODULES = {};
@@ -26,6 +16,17 @@ export class RichJsonModule {
         this.name = name;
     }
 
+    /**
+     * Registers a command that is flagged for late application.
+     * This adds the command name to the late application queue and defines its
+     * execution logic and ignore rules.
+     *
+     * @param name    The unique identifier for the command.
+     * @param func    The function or logic to be executed when the command is called.
+     * @param ignores An optional array of identifiers or contexts that this command
+     * should ignore. Defaults to undefined.
+     * @return        The current instance for method chaining.
+     */
     addLateApply(name, func, ignores = undefined) {
         this.lateApplies.push(name);
         if (Array.isArray(ignores)) {
@@ -34,6 +35,17 @@ export class RichJsonModule {
         return this.addCommand(name, func);
     }
 
+    /**
+     * Adds a standard command to the command registry.
+     * Mapping the command name to its respective function and optionally
+     * setting up ignore rules.
+     *
+     * @param name    The unique identifier for the command.
+     * @param func    The function or logic to be executed when the command is called.
+     * @param ignores An optional array of identifiers or contexts that this command
+     * should ignore. Defaults to undefined.
+     * @return        The current instance for method chaining.
+     */
     addCommand(name, func, ignores = undefined) {
         this.commands[name] = func;
         if (Array.isArray(ignores)) {
@@ -86,48 +98,48 @@ export function registerModule(module) {
 
 /**
  * Unregister a RichJson module.
- * @param _name
+ * @param name
  */
-export function unregisterModule(_name) {
-    if (isRichJsonModuleRegistered(_name)) {
-        if (__RICH_JSON_MODULES[_name].isIncluded)
-            throw (`RichJson can not unregister module '${_name}' due to it is currently included`);
-        console.log(`RichJson unregistering module '${_name}'`);
-        delete __RICH_JSON_MODULES[_name];
+export function unregisterModule(name) {
+    if (isModuleRegistered(name)) {
+        if (__RICH_JSON_MODULES[name].isIncluded)
+            throw (`RichJson can not unregister module '${name}' due to it is currently included`);
+        console.log(`RichJson unregistering module '${name}'`);
+        delete __RICH_JSON_MODULES[name];
     }
 }
 
 /**
  * Checks if a RichJson module is registered.
- * @param _name
+ * @param name
  * @returns {boolean}
  */
-export function isRichJsonModuleRegistered(_name) {
-    return Object.hasOwn(__RICH_JSON_MODULES, _name);
+export function isModuleRegistered(name) {
+    return Object.hasOwn(__RICH_JSON_MODULES, name);
 }
 
 /**
  * Includes a RichJson module.
- * @param _name
+ * @param name
  */
-export function includeModule(_name) {
-    if (isRichJsonModuleRegistered(_name)) {
-        if (!__RICH_JSON_MODULES[_name].isIncluded) {
-            console.log(`RichJson including module '${_name}'`);
-            __RICH_JSON_MODULES[_name].__include();
+export function includeModule(name) {
+    if (isModuleRegistered(name)) {
+        if (!__RICH_JSON_MODULES[name].isIncluded) {
+            console.log(`RichJson including module '${name}'`);
+            __RICH_JSON_MODULES[name].__include();
         }
     }
 }
 
 /**
  * Excludes a RichJson module.
- * @param _name
+ * @param name
  */
-export function excludeModule(_name) {
-    if (isRichJsonModuleRegistered(_name)) {
-        if (__RICH_JSON_MODULES[_name].isIncluded) {
-            console.log(`RichJson excluding module '${_name}'`);
-            __RICH_JSON_MODULES[_name].__exclude();
+export function excludeModule(name) {
+    if (isModuleRegistered(name)) {
+        if (__RICH_JSON_MODULES[name].isIncluded) {
+            console.log(`RichJson excluding module '${name}'`);
+            __RICH_JSON_MODULES[name].__exclude();
         }
     }
 }
