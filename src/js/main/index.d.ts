@@ -34,6 +34,8 @@ export function cloneObject<T>(obj: T): T;
 
 export function isJsonObject(obj: any): boolean;
 
+export function getKeysSorted(obj: any): string[];
+
 export function keepKeyCommands(obj: any): any;
 
 export  function setCommandEnabled(cmd: string, enabled: boolean): void;
