@@ -196,7 +196,7 @@ export class RichJsonParser {
         }
 
         if (typeof this.con.currentMember === "string") {
-            if (matchesWildcard(this.con.currentMember, __RICH_JSON_INTERPOLATION_WILDCARD)) {
+            if (__RICH_JSON_CONFIG.stringInterpolationsEnabled && matchesWildcard(this.con.currentMember, __RICH_JSON_INTERPOLATION_WILDCARD)) {
                 this.con.currentMember = this.__parseInterpolations();
                 if (!this.con.currentMember.isParsed) {
                     return this.con.currentMember.result;

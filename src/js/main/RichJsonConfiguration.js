@@ -2,6 +2,7 @@ import {mergeIntoTarget} from "./RichJsonHelper.js";
 
 export let __RICH_JSON_CONFIG = {
     debugEnabled: false,
+    stringInterpolationsEnabled: true,
     fileCacheEnabled: true,
     lateConstructorEnabled: true,
     crashOnNestedCloneEnabled: false,
@@ -27,6 +28,7 @@ export function updateConfiguration(config) {
 
     __RICH_JSON_CONFIG = mergeIntoTarget({
         debugEnabled: false,
+        stringInterpolationsEnabled: true,
         fileCacheEnabled: true,
         lateConstructorEnabled: true,
         crashOnNestedCloneEnabled: false,
