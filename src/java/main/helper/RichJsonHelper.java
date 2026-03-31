@@ -1,6 +1,9 @@
-package core;
+package helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import core.RichJsonCache;
+import core.RichJsonConstants;
+import core.RichJsonParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -283,7 +286,7 @@ public class RichJsonHelper {
             return false;
 
         // Check gegen dein Mapping-System
-        return true; // TODO core.RichJsonClassMapping.isMapped(object.getClass().getSimpleName());
+        return true; // TODO other.RichJsonClassMapping.isMapped(object.getClass().getSimpleName());
     }
 
     /**

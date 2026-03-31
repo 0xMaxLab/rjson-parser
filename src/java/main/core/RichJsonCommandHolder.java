@@ -1,6 +1,7 @@
 package core;
 
 import commands.*;
+import other.RichJsonConfig;
 
 import java.util.*;
 

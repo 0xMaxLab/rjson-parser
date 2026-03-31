@@ -1,4 +1,4 @@
-package core;
+package other;
 
 public class RichJsonConfig {
     public static boolean debugEnabled = true;

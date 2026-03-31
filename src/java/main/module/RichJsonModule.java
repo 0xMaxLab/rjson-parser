@@ -1,6 +1,7 @@
-package core;
+package module;
 
 import commands.RichJsonCommand;
+import core.RichJsonCommandHolder;
 
 import java.util.ArrayList;
 import java.util.HashMap;

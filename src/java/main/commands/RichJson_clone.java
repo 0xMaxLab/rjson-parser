@@ -1,11 +1,9 @@
 package commands;
 
-import core.RichJsonConfig;
+import other.RichJsonConfig;
 import core.RichJsonContext;
-import core.RichJsonHelper;
+import helper.RichJsonHelper;
 import core.RichJsonParser;
-
-import java.util.Map;
 
 
 public class RichJson_clone implements RichJsonCommand {

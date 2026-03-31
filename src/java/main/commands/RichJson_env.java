@@ -1,6 +1,7 @@
 package commands;
 
 import core.*;
+import other.RichJsonEnvironment;
 
 import java.util.Map;
 

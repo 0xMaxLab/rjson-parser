@@ -1,6 +1,10 @@
 package core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import helper.RichJsonHelper;
+import other.RichJsonClassMapping;
+import other.RichJsonConfig;
+
 import java.util.*;
 
 public class RichJsonParser {
@@ -288,7 +292,7 @@ public class RichJsonParser {
             for (var cmd : batch_commands) {
                 this.con.currentCommand = cmd;
                 if (this.__isRichJsonCommandEnabled(this.con.currentCommand)) {
-                    if (RichJsonHelper.matchesWildcard((String)this.con.currentMember, RichJsonConstants.ARRAY_WILDCARD)) {
+                    if (this.con.currentMember instanceof String && RichJsonHelper.matchesWildcard((String)this.con.currentMember, RichJsonConstants.ARRAY_WILDCARD)) {
                         // Regex für [ oder ]
                         var arrayParts = ((String)this.con.currentMember).split("[\\[\\]]", 3);
                         this.con.currentMember = arrayParts[0];

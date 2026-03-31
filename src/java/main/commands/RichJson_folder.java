@@ -1,11 +1,9 @@
 package commands;
 
-import core.RichJsonConfig;
+import other.RichJsonConfig;
 import core.RichJsonContext;
-import core.RichJsonFileHelper;
+import helper.RichJsonFileHelper;
 import core.RichJsonParser;
-
-import java.util.Map;
 
 /**
  * Liest den Datenbaum eines gegebenen Ordnerpfads ein.

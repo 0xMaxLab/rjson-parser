@@ -1,8 +1,8 @@
 package commands;
 
 import core.RichJsonContext;
-import core.RichJsonFileHelper;
-import core.RichJsonHelper;
+import helper.RichJsonFileHelper;
+import helper.RichJsonHelper;
 import core.RichJsonParser;
 
 public class RichJson_file implements RichJsonCommand {

@@ -1,6 +1,9 @@
-package core;
+package helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import core.RichJsonCommandHolder;
+import other.RichJsonConfig;
+import core.RichJsonParser;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;

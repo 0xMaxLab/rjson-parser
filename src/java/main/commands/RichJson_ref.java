@@ -2,7 +2,7 @@ package commands;
 
 import core.RichJsonConstants;
 import core.RichJsonContext;
-import core.RichJsonHelper;
+import helper.RichJsonHelper;
 import core.RichJsonParser;
 
 import java.util.Map;

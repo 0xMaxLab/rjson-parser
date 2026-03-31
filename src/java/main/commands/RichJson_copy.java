@@ -2,7 +2,7 @@ package commands;
 
 import core.RichJsonCommandHolder;
 import core.RichJsonContext;
-import core.RichJsonHelper;
+import helper.RichJsonHelper;
 import core.RichJsonParser;
 
 public class RichJson_copy implements RichJsonCommand {

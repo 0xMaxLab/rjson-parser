@@ -1,4 +1,4 @@
-import core.RichJsonHelper;
+import helper.RichJsonHelper;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -1,4 +1,6 @@
-package core;
+package other;
+
+import core.RichJsonConstants;
 
 import java.util.HashMap;
 import java.util.Map;

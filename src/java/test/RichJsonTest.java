@@ -2,7 +2,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import commands.RichJsonCommand;
 import core.*;
+import helper.RichJsonHelper;
+import module.RichJsonModule;
+import module.RichJsonModuleManager;
 import org.junit.jupiter.api.Test;
+import other.RichJsonEnvironment;
 
 import java.util.List;
 import java.util.Map;
@@ -231,12 +235,9 @@ public class RichJsonTest {
                         "second": "second"
                     }
                 ],
-                "third": "$ref:first.0"
+                "third": "$ref:first[0]"
             }
         """);
-        // Hinweis: In der Java Ref-Logik haben wir Pfade mit "." oder "/" implementiert.
-        // Falls deine Listen-Referenz in Java "first.0" oder "first/0" ist, hier anpassen.
-        // JS war "$ref:first[0]". Gegebenenfalls den RefCommand-Parser im Java anpassen.
 
         getParser().parse(content, true);
 
