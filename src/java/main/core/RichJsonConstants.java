@@ -1,3 +1,5 @@
+package core;
+
 public class RichJsonConstants {
     public static final String COMMAND_PREFIX = "$";
     public static final String COMMAND_SUFFIX = ":";
