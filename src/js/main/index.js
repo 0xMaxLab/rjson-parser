@@ -1,14 +1,14 @@
-export {parse} from "./RichJson_parse.js";
-export {isResolved} from "./RichJson_isResolved.js";
-export {addClassMapping, addClassMappings} from "./RichJsonClassMapping.js";
-export {addEnvironmentVariable, addEnvironmentVariables} from "./RichJsonEnvironment.js";
-export {updateConfiguration} from "./RichJsonConfiguration.js";
+export {parse} from "./core/RichJson_parse.js";
+export {isResolved} from "./helper/RichJson_isResolved.js";
+export {addClassMapping, addClassMappings} from "./other/RichJsonClassMapping.js";
+export {addEnvironmentVariable, addEnvironmentVariables} from "./other/RichJsonEnvironment.js";
+export {updateConfiguration} from "./other/RichJsonConfiguration.js";
 export {
     RichJsonModule, registerModule, includeModule, excludeModule, unregisterModule
-} from "./RichJsonModule.js";
+} from "./module/RichJsonModule.js";
 export {
     readFile, readDirectory
-} from "./RichJsonFileHelper.js";
+} from "./helper/RichJsonFileHelper.js";
 export {
     mergeObjects,
     mergeIntoTarget,
@@ -17,6 +17,6 @@ export {
     cloneObject,
     isJsonObject,
     getKeysSorted,
-} from "./RichJsonHelper.js";
-export {keepKeyCommands} from "./RichJson_keepKeyCommands.js"
-export {setCommandEnabled} from "./RichJsonCommandHolder.js"
+} from "./helper/RichJsonHelper.js";
+export {keepKeyCommands} from "./helper/RichJson_keepKeyCommands.js"
+export {setCommandEnabled} from "./core/RichJsonCommandHolder.js"

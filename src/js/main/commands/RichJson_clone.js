@@ -2,8 +2,8 @@
     makes a deep copy of the given struct
 */
 
-import {cloneObject} from "../RichJsonHelper.js";
-import {__RICH_JSON_CONFIG} from "../RichJsonConfiguration.js";
+import {cloneObject} from "../helper/RichJsonHelper.js";
+import {__RICH_JSON_CONFIG} from "../other/RichJsonConfiguration.js";
 
 export function __executeCloneCommand(parser, context) {
     if (parser.__isCloneApplying()) {

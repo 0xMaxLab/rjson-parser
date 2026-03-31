@@ -1,4 +1,4 @@
-import "./RichJsonHelper.js"
+import "../helper/RichJsonHelper.js"
 import {
     __mergeIntoTarget,
     cloneObject,
@@ -9,10 +9,10 @@ import {
     isJsonObject,
     matchesWildcard,
     mergeIntoTarget
-} from "./RichJsonHelper.js";
+} from "../helper/RichJsonHelper.js";
 import {__RICH_JSON_COMMANDS, setCommandEnabled, __throwCommandNotFound} from "./RichJsonCommandHolder.js";
-import {__mapClassByName} from "./RichJsonClassMapping.js";
-import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
+import {__mapClassByName} from "../other/RichJsonClassMapping.js";
+import {__RICH_JSON_CONFIG} from "../other/RichJsonConfiguration.js";
 import {RichJsonCache} from "./RichJsonCache.js";
 
 export const __RICH_JSON_COMMAND_PREFIX = "$"

@@ -5,13 +5,13 @@ import {
     registerModule,
     RichJsonModule,
     unregisterModule
-} from "../main/RichJsonModule";
-import {concatArrays, concatStrings, mergeObjects, resolveAddress} from "../main/RichJsonHelper";
-import {parse} from "../main/RichJson_parse";
+} from "../main/module/RichJsonModule.js";
+import {concatArrays, concatStrings, mergeObjects, resolveAddress} from "../main/helper/RichJsonHelper.js";
+import {parse} from "../main/core/RichJson_parse.js";
 import stringify from "json-stable-stringify";
-import {isResolved} from "../main/RichJson_isResolved";
+import {isResolved} from "../main/helper/RichJson_isResolved.js";
 import {RichJsonTestClass} from "./RichJsonTestClass";
-import {addEnvironmentVariable} from "../main/RichJsonEnvironment";
+import {addEnvironmentVariable} from "../main/other/RichJsonEnvironment.js";
 import {addClassMapping} from "../main/index.js";
 
 test('Module', () => {

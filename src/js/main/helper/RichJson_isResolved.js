@@ -6,7 +6,7 @@ import {
     getArrayElement,
     getObjectField,
     RichJsonParser
-} from "./RichJson.js";
+} from "../core/RichJson.js";
 import {getFieldByKey, isJsonObject, matchesWildcard} from "./RichJsonHelper.js";
 
 /**

@@ -2,8 +2,8 @@
     references the given member's value (any)
 */
 
-import {concatStrings, isJsonObject} from "../RichJsonHelper.js";
-import {__RICH_JSON_COMMAND_PATH_DELIMITER} from "../RichJson.js";
+import {concatStrings, isJsonObject} from "../helper/RichJsonHelper.js";
+import {__RICH_JSON_COMMAND_PATH_DELIMITER} from "../core/RichJson.js";
 
 export function __executeRefCommand(parser, context) {
     if (context.currentMember === "") {

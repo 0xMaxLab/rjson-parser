@@ -1,5 +1,5 @@
-import {__RICH_JSON_CLASS_MAPPING} from "./RichJsonClassMapping.js";
-import {RichJsonCache} from "./RichJsonCache.js";
+import {__RICH_JSON_CLASS_MAPPING} from "../other/RichJsonClassMapping.js";
+import {RichJsonCache} from "../core/RichJsonCache.js";
 
 /**
  * Merges two or more objects together into a new object.

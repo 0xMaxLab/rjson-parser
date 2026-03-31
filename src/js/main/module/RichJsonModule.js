@@ -1,4 +1,4 @@
-import {__RICH_JSON_COMMANDS, __RICH_JSON_LATE_APPLIES} from "./RichJsonCommandHolder.js";
+import {__RICH_JSON_COMMANDS, __RICH_JSON_LATE_APPLIES} from "../core/RichJsonCommandHolder.js";
 
 const __RICH_JSON_MODULES = {};
 

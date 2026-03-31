@@ -2,9 +2,9 @@
     joins two structs or arrays together
 */
 
-import {concatArrays, getFieldByKey, isJsonObject, mergeIntoTarget} from "../RichJsonHelper.js";
+import {concatArrays, getFieldByKey, isJsonObject, mergeIntoTarget} from "../helper/RichJsonHelper.js";
 import {__executeRefCommand} from "./RichJson_ref.js";
-import {__RICH_JSON_COMMAND_DELIMITER} from "../RichJson.js";
+import {__RICH_JSON_COMMAND_DELIMITER} from "../core/RichJson.js";
 
 export function __executeMergeCommand(parser, context) {
     let refs = context.currentMember.split(__RICH_JSON_COMMAND_DELIMITER);

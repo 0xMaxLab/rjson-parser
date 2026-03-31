@@ -1,5 +1,5 @@
 import {cloneObject} from "./RichJsonHelper.js";
-import {__RICH_JSON_KEY_COMMAND_MEMBER} from "./RichJson.js";
+import {__RICH_JSON_KEY_COMMAND_MEMBER} from "../core/RichJson.js";
 
 /**
  * Make key commands constant for given JSON object.

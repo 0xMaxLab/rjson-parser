@@ -1,4 +1,4 @@
-import {mergeIntoTarget} from "./RichJsonHelper.js";
+import {mergeIntoTarget} from "../helper/RichJsonHelper.js";
 
 export let __RICH_JSON_CONFIG = {
     debugEnabled: false,

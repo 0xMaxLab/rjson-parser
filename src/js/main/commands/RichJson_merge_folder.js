@@ -3,7 +3,7 @@
 */
 
 import {__executeFolderCommand} from "./RichJson_folder.js";
-import {getKeysSorted, mergeIntoTarget} from "../RichJsonHelper.js";
+import {getKeysSorted, mergeIntoTarget} from "../helper/RichJsonHelper.js";
 
 export function __executeMergeFolderCommand(parser, context) {
     let folder = __executeFolderCommand(parser, context);

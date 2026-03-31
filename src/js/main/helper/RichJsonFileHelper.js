@@ -1,9 +1,9 @@
 import fs from 'fs';
 import {concatStrings, mergeIntoTarget} from "./RichJsonHelper.js";
-import {parse} from "./RichJson_parse.js";
+import {parse} from "../core/RichJson_parse.js";
 import * as PATH from 'node:path';
-import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
-import {__RICH_JSON_LATE_APPLIES, setCommandEnabled} from "./RichJsonCommandHolder.js";
+import {__RICH_JSON_CONFIG} from "../other/RichJsonConfiguration.js";
+import {__RICH_JSON_LATE_APPLIES, setCommandEnabled} from "../core/RichJsonCommandHolder.js";
 
 const FILE_CACHE = {};
 

@@ -2,7 +2,7 @@
     makes a deep copy of the given struct or array
 */
 
-import {cloneObject} from "../RichJsonHelper.js";
+import {cloneObject} from "../helper/RichJsonHelper.js";
 import {__executeRefCommand} from "./RichJson_ref.js";
 
 export function __executeCopyCommand(parser, context) {
