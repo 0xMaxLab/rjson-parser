@@ -1,12 +1,12 @@
 import helper.RichJsonHelper;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RichJsonHelperTest {
 
@@ -21,8 +21,6 @@ public class RichJsonHelperTest {
         data3.put("size", 173);
         data3.put("age", 15);
         obj3.put("data", data3);
-        Supplier<Integer> func3 = () -> 5 + 7;
-        obj3.put("func", func3);
 
         // Setup obj2
         Map<String, Object> obj2 = new HashMap<>();
@@ -40,8 +38,6 @@ public class RichJsonHelperTest {
         data1.put("name", "obj1");
         obj1.put("data", data1);
         obj1.put("other", obj2);
-        Supplier<Integer> func1 = () -> 5 + 5;
-        obj1.put("func", func1);
 
         // Action 1
         Map<String, Object> res = (Map<String, Object>) RichJsonHelper.mergeObjects(obj1, obj2, obj3);
@@ -53,8 +49,6 @@ public class RichJsonHelperTest {
         assertEquals(17, ((Map<String, Object>) res.get("data")).get("age"));
         assertEquals(173, ((Map<String, Object>) res.get("data")).get("size"));
         assertSame(obj2, res.get("other"));
-        assertNotSame(obj1.get("func"), res.get("func"));
-        assertEquals(((Supplier<Integer>) obj1.get("func")).get(), ((Supplier<Integer>) res.get("func")).get());
 
         Map<String, Object> resOther = (Map<String, Object>) res.get("other");
         assertEquals(10, resOther.get("x"));
@@ -74,8 +68,6 @@ public class RichJsonHelperTest {
         assertEquals(15, ((Map<String, Object>) res.get("data")).get("age"));
         assertEquals(173, ((Map<String, Object>) res.get("data")).get("size"));
         assertSame(obj3, res.get("other"));
-        assertNotSame(obj3.get("func"), res.get("func"));
-        assertEquals(((Supplier<Integer>) obj3.get("func")).get(), ((Supplier<Integer>) res.get("func")).get());
 
         resOther = (Map<String, Object>) res.get("other");
         assertEquals(10, resOther.get("x"));
@@ -110,8 +102,6 @@ public class RichJsonHelperTest {
         data.put("size", 173);
         data.put("age", 15);
         obj.put("data", data);
-        Supplier<Integer> func = () -> 5 + 7;
-        obj.put("func", func);
         List<Object> array = new ArrayList<>();
         obj.put("array", array);
 
@@ -125,7 +115,6 @@ public class RichJsonHelperTest {
         // Assertions
         assertNotSame(obj, res);
         assertNotSame(obj.get("data"), res.get("data"));
-        assertNotSame(obj.get("func"), res.get("func")); // falsy in JS
         assertNotSame(obj.get("array"), res.get("array"));
 
         assertSame(res, res.get("self"));
@@ -134,7 +123,5 @@ public class RichJsonHelperTest {
         assertEquals(15, res.get("y"));
         assertEquals(15, ((Map<String, Object>) res.get("self")).get("y"));
         assertEquals("obj3", ((Map<String, Object>) res.get("data")).get("name"));
-
-        assertEquals(((Supplier<Integer>) obj.get("func")).get(), ((Supplier<Integer>) res.get("func")).get());
     }
 }

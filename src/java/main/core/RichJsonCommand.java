@@ -1,7 +1,4 @@
-package commands;
-
-import core.RichJsonContext;
-import core.RichJsonParser;
+package core;
 
 @FunctionalInterface
 public interface RichJsonCommand {

@@ -36,6 +36,7 @@ public class RichJsonCommandHolder {
         this.available.put("file", new RichJson_file());
         this.available.put("folder", new RichJson_folder());
         this.available.put("merge_folder", new RichJson_merge_folder());
+        this.available.put("invoke", new RichJson_invoke());
     }
 
     /**

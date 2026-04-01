@@ -1,5 +1,6 @@
 package commands;
 
+import core.RichJsonCommand;
 import core.RichJsonContext;
 import helper.RichJsonFileHelper;
 import helper.RichJsonHelper;

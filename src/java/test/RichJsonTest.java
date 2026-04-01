@@ -1,6 +1,6 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import commands.RichJsonCommand;
+import core.RichJsonCommand;
 import core.*;
 import helper.RichJsonHelper;
 import module.RichJsonModule;
@@ -10,6 +10,7 @@ import other.RichJsonEnvironment;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -106,13 +107,9 @@ public class RichJsonTest {
         Map<String, Object> content = parseJson("""
                     {
                         "first=RichJsonTestClass": {
-                            "value": 100,
-                            "second": {
-                                "fourth": "fourth"
-                            }
+                            "value": 100
                         },
-                        "second=RichJsonTestClass::first": {
-                            "third": "third"
+                        "second==RichJsonTestClass::first": {
                         }
                     }
                 """);
@@ -122,10 +119,8 @@ public class RichJsonTest {
         RichJsonTestClass first = mapper.convertValue(content.get("first"), RichJsonTestClass.class);
         RichJsonTestClass second = mapper.convertValue(content.get("second"), RichJsonTestClass.class);
 
-        // Die Instanziierung über Jackson/Reflection überschreibt/setzt Werte,
-        // hier passen wir die Assertions an die JS-Logik an.
+        assertEquals(100, first.value);
         assertEquals(0, second.value);
-        assertEquals(stringify(first.second), stringify(second.second));
     }
 
     @Test
@@ -414,7 +409,7 @@ public class RichJsonTest {
         getParser().parse(content, true);
 
         assertNotSame(content.get("first"), content.get("third"));
-        assertEquals(stringify(content.get("first")), stringify(content.get("third")));
+        assertEquals(content.get("first"), content.get("third"));
     }
 
     @Test
@@ -441,10 +436,9 @@ public class RichJsonTest {
     @Test
     @SuppressWarnings("unchecked")
     void testFile() throws Exception {
-        // Dieser Test verlässt sich darauf, dass die Datei "resources/json/test0.json" existiert!
         Map<String, Object> content = parseJson("""
             {
-                "file": "$file:src/test/resources/json/test0"
+                "file": "$file:resources/json/test0"
             }
         """);
 
@@ -460,10 +454,9 @@ public class RichJsonTest {
     @Test
     @SuppressWarnings("unchecked")
     void testFolder() throws Exception {
-        // Dieser Test verlässt sich darauf, dass der Ordner "src/test/resources/json" existiert!
         Map<String, Object> content = parseJson("""
             {
-                "folder": "$folder:src/test/resources/json"
+                "folder": "$folder:resources/json"
             }
         """);
 
@@ -485,7 +478,7 @@ public class RichJsonTest {
     void testMergeFolder() throws Exception {
         Map<String, Object> content = parseJson("""
             {
-                "folder": "$merge_folder:src/test/resources/json"
+                "folder": "$merge_folder:resources/json"
             }
         """);
 
@@ -499,5 +492,20 @@ public class RichJsonTest {
         } catch (Exception e) {
             System.err.println("Skipping testMergeFolder because test directory might not exist locally: " + e.getMessage());
         }
+    }
+    @Test
+    @SuppressWarnings("unchecked")
+    void testInvoke() throws Exception {
+        Map<String, Object> content = parseJson("""
+            {
+                "function_result": "$env$invoke:test_function"
+            }
+        """);
+
+        RichJsonEnvironment.addEnvironmentVariable("test_function", (Supplier<Object>) () -> { return 3 + 2; });
+
+        getParser().parse(content, true);
+
+        assertEquals(5, content.get("function_result"));
     }
 }

@@ -1,6 +1,6 @@
 package module;
 
-import commands.RichJsonCommand;
+import core.RichJsonCommand;
 import core.RichJsonCommandHolder;
 
 import java.util.ArrayList;
