@@ -218,21 +218,25 @@ def get_keys_sorted(obj):
     keys.sort(key=str.lower)
     return keys
 
+#def is_json_object(obj):
+#    """
+#    Checks if given object is a JSON object (dictionary or mapped class).
+#
+#    :param obj: The object to check.
+#    :return: True if it's considered a JSON object, False otherwise.
+#    """
+#    if obj is None or isinstance(obj, (list, str, int, float, bool)):
+#        return False
+#
+#    is_dict = isinstance(obj, dict)
+#    class_name = obj.__class__.__name__
+#    is_mapped_class = hasattr(obj, "__class__") and class_name in _RICH_JSON_CLASS_MAPPING
+#
+#    return is_dict or is_mapped_class
 def is_json_object(obj):
-    """
-    Checks if given object is a JSON object (dictionary or mapped class).
-
-    :param obj: The object to check.
-    :return: True if it's considered a JSON object, False otherwise.
-    """
-    if obj is None or isinstance(obj, (list, str, int, float, bool)):
+    if obj is None or isinstance(obj, (str, int, float, bool, list, tuple, set)):
         return False
-
-    is_dict = isinstance(obj, dict)
-    class_name = obj.__class__.__name__
-    is_mapped_class = hasattr(obj, "__class__") and class_name in _RICH_JSON_CLASS_MAPPING
-
-    return is_dict or is_mapped_class
+    return isinstance(obj, (dict)) or hasattr(obj, "__dict__")
 
 def concat_strings(*strings):
     """

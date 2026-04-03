@@ -24,7 +24,7 @@ def _execute_ref_command(parser, context):
         else:
             context.current_address = concat_strings(parser.cache.resolve_address(prev_member), "_", ref)
 
-        context.current_member = parser._parse_rich_json_in_member(context)
+        context.current_member = parser._parse_rich_json_in_member()
         prev_member = context.current_member
 
     context.current_address = current_address

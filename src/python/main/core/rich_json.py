@@ -1,5 +1,5 @@
 from .rich_json_cache import RichJsonCache
-from .rich_json_command_holder import set_command_enabled, _throw_command_not_found
+from .rich_json_command_holder import RichJsonCommandHolder
 from ..helper.rich_json_helper import (
     concat_arrays, concat_strings,
     get_field_by_key, get_keys_sorted, is_json_object, matches_wildcard, merge_into_target, clone_object,
@@ -13,7 +13,6 @@ from .rich_json_constants import (
     _RICH_JSON_COMMAND_SUFFIX,
     _RICH_JSON_COMMAND_WILDCARD,
     _RICH_JSON_COMMAND_DELIMITER,
-    _RICH_JSON_COMMAND_PATH_DELIMITER,
     _RICH_JSON_COMMAND_PIPE_SIGN,
     _RICH_JSON_COMMAND_REF,
     _RICH_JSON_COMMAND_CLONE,
@@ -34,6 +33,29 @@ from .rich_json_constants import (
     _RICH_JSON_INTERPOLATION_OPENING_SIGN,
     _RICH_JSON_INTERPOLATION_CLOSING_SIGN
 )
+
+def set_command_enabled(command, enabled):
+    """
+    Toggles a RichJson command's enabled state.
+
+    :param command: Name of the command to toggle.
+    :param enabled: Whether to enable or disable the command.
+    :raises Exception: If the command is not in the available registry.
+    """
+    if command not in _RICH_JSON_COMMANDS.available:
+        _throw_command_not_found(command)
+
+    if enabled:
+        _RICH_JSON_COMMANDS.enabled[command] = _RICH_JSON_COMMANDS.available[command]
+    else:
+        _RICH_JSON_COMMANDS.enabled[command] = _RICH_JSON_COMMANDS.void_command
+
+    if _RICH_JSON_CONFIG.get("debugEnabled"):
+        state = "enabled" if enabled else "disabled"
+        print(f"RichJson command '{command}' was {state}.")
+
+def _throw_command_not_found(command):
+    raise Exception(f"RichJson Command '{command}' not found")
 
 
 # Abstraction for getting/setting fields for both dicts and lists
@@ -65,7 +87,7 @@ class RichJsonParser:
             self.con.current = current
             self.con.current_member = current
             self.con.current_address = self.cache.resolve_address(current)
-            self.con.current = self.__parse_rich_json_in_member()
+            self.con.current = self._parse_rich_json_in_member()
             self.cache.level -= 1
             if self.cache.level == 0 and _RICH_JSON_CONFIG.get("debugEnabled"):
                 print("RichJson was applied successfully.")
@@ -76,7 +98,7 @@ class RichJsonParser:
         current_address = self.con.current_address
 
         if is_json_obj:
-            self.__preprocess_kcommands_constructors_inheritances()
+            self._preprocess_kcommands_constructors_inheritances()
             get_func = get_object_field
             set_func = set_object_field
             names = get_keys_sorted(current)
@@ -101,13 +123,13 @@ class RichJsonParser:
             )
 
             self.con.current_name = actual_name if is_json_obj else f'"{current_name}_{i}'
-            self.con.current_member = self.__parse_rich_json_in_member()
+            self.con.current_member = self._parse_rich_json_in_member()
             set_func(current, actual_name, i, self.con.current_member)
 
         self.cache.level -= 1
         return current
 
-    def __preprocess_kcommands_constructors_inheritances(self):
+    def _preprocess_kcommands_constructors_inheritances(self):
         names = list(self.con.current.keys())
         for name in names:
             iscmd = _RICH_JSON_NAME_IS_COMMAND(name)
@@ -140,7 +162,7 @@ class RichJsonParser:
                         name_parts = name.split(_RICH_JSON_CONSTRUCTOR_SIGN, 1)
                         ctr = _map_class_by_name(name_parts[1].strip())
                         temp_cache = RichJsonCache()
-                        member = merge_into_target(temp_cache, ctr(), member, True)
+                        member = _merge_into_target(temp_cache, ctr(), member, True)
                         name = name_parts[0]
 
                 if isite:  # New object reference after constructor call
@@ -150,7 +172,7 @@ class RichJsonParser:
                 if not is_json_object(member):
                     raise Exception(f"Inheritance on member '{name}' is not possible, because it is not an object.")
 
-    def __parse_rich_json_in_member(self):
+    def _parse_rich_json_in_member(self):
         if self.con.current_address in self.cache.stack:
             if _RICH_JSON_CONFIG.get("debugEnabled"):
                 print(f"RichJson cache <-- '{self.con.current_address}' {self.cache.stack[self.con.current_address]}")
@@ -160,44 +182,44 @@ class RichJsonParser:
                 print(f"RichJson cache --> '{self.con.current_address}' {self.con.current_member}")
             self.cache.stack[self.con.current_address] = self.con.current_member
 
-        if not self.__is_member_rich_json_able(self.con.current_member):
+        if not self._is_member_rich_json_able(self.con.current_member):
             return self.con.current_member
 
         if isinstance(self.con.current_member, str):
             if _RICH_JSON_CONFIG.get("stringInterpolationsEnabled") and matches_wildcard(self.con.current_member, _RICH_JSON_INTERPOLATION_WILDCARD):
-                interpolation_result = self.__parse_interpolations()
+                interpolation_result = self._parse_interpolations()
                 self.con.current_member = interpolation_result["result"]
                 if not interpolation_result["is_parsed"]:
                     return self.con.current_member
-            return self.__execute_rich_json_command_if_contained_in_member()
+            return self._execute_rich_json_command_if_contained_in_member()
         else:
             kcmd_ignored = []
             current_address = self.con.current_address
             is_json_obj = is_json_object(self.con.current_member)
 
             if is_json_obj:
-                self.__execute_clone()  # clone must be done first
-                self.__call_constructor()
+                self._execute_clone()  # clone must be done first
+                self._call_constructor()
                 self.cache.stack[current_address] = self.con.current_member
-                kcmd_ignored = self.__get_ignores_for_key_commands()
+                kcmd_ignored = self._get_ignores_for_key_commands()
                 for _ignored in kcmd_ignored:
                     set_command_enabled(_ignored, False)
-                self.__resolve_inheritances()
+                self._resolve_inheritances()
 
             self.con.current_member = self.parse(self.con.current_member)
 
             if is_json_obj:
-                self.__reset_clone_if_possible(current_address)
+                self._reset_clone_if_possible(current_address)
                 for _ignored in kcmd_ignored:
                     set_command_enabled(_ignored, True)
-                self.con.current_member = self.__execute_key_commands()
+                self.con.current_member = self._execute_key_commands()
 
             return self.con.current_member
 
-    def __is_member_rich_json_able(self, member):
+    def _is_member_rich_json_able(self, member):
         return isinstance(member, str) or isinstance(member, list) or is_json_object(member)
 
-    def __parse_interpolations(self):
+    def _parse_interpolations(self):
         rv = ""
         inp = self.con.current_member
         ipn_level = -1
@@ -222,7 +244,7 @@ class RichJsonParser:
                 if len(ipns) == ipn_level + 3 and not ipns[ipn_level + 2]["is_parsed"]:
                     self.con.current_member = concat_strings(_RICH_JSON_INTERPOLATION_OPENING_SIGN, self.con.current_member, _RICH_JSON_INTERPOLATION_CLOSING_SIGN)
                 else:
-                    self.con.current_member = self.__execute_rich_json_command_if_contained_in_member()
+                    self.con.current_member = self._execute_rich_json_command_if_contained_in_member()
 
                 ipn_parsed = not matches_wildcard(self.con.current_member, _RICH_JSON_COMMAND_WILDCARD)
                 if not ipn_parsed:
@@ -246,22 +268,22 @@ class RichJsonParser:
         self.cache.stack[self.con.current_address] = rv
         return {"result": rv, "is_parsed": True if len(ipns) == 0 else ipns[0]["is_parsed"]}
 
-    def __get_ignores_for_key_commands(self):
+    def _get_ignores_for_key_commands(self):
         rv = []
         if _RICH_JSON_KEY_COMMAND_MEMBER in self.con.current_member:
             for kcmd in self.con.current_member[_RICH_JSON_KEY_COMMAND_MEMBER]:
-                if self.__is_rich_json_command_enabled(kcmd) and kcmd in _RICH_JSON_COMMANDS.kcmd_ignored:
+                if self._is_rich_json_command_enabled(kcmd) and kcmd in _RICH_JSON_COMMANDS.kcmd_ignored:
                     rv = concat_arrays(rv, _RICH_JSON_COMMANDS.kcmd_ignored[kcmd])
         return rv
 
-    def __execute_rich_json_command_if_contained_in_member(self):
+    def _execute_rich_json_command_if_contained_in_member(self):
         if matches_wildcard(self.con.current_member, _RICH_JSON_COMMAND_WILDCARD):
             self.cache.stack[self.con.current_address] = {}
             parts = self.con.current_member.split(_RICH_JSON_COMMAND_SUFFIX, 1)
             self.con.current_command = parts[0]
             self.con.current_member = parts[1].strip()
-            self.con.current_member = self.__try_rich_json_command()
-            self.__reset_clone_if_possible(self.con.current_address)
+            self.con.current_member = self._try_rich_json_command()
+            self._reset_clone_if_possible(self.con.current_address)
 
             if callable(self.con.current_member) and is_json_object(self.con.current_member):
                 merge_into_target(self.cache.stack[self.con.current_address], self.con.current_member)
@@ -270,7 +292,7 @@ class RichJsonParser:
 
         return self.con.current_member
 
-    def __try_rich_json_command(self):
+    def _try_rich_json_command(self):
         try:
             unresolved_command = self.con.current_command
             self.con.current_command = self.con.current_command[1:]  # remove prefix
@@ -285,7 +307,7 @@ class RichJsonParser:
             batch_commands = self.con.current_command.split(_RICH_JSON_COMMAND_PREFIX)
             for cmd in batch_commands:
                 self.con.current_command = cmd
-                if self.__is_rich_json_command_enabled(self.con.current_command):
+                if self._is_rich_json_command_enabled(self.con.current_command):
                     if matches_wildcard(self.con.current_member, _RICH_JSON_ARRAY_WILDCARD):
                         array_parts = _RICH_JSON_ARRAY_DELIMITERS.split(self.con.current_member, 2)
                         self.con.current_member = array_parts[0]
@@ -310,7 +332,7 @@ class RichJsonParser:
                 self.con.root = self.con.current_member
                 self.con.current_member = cmd_parts[1].strip()
                 self.con.current_command = cmd_parts[0].strip()
-                self.con.current_member = self.__try_rich_json_command()
+                self.con.current_member = self._try_rich_json_command()
 
                 if matches_wildcard(self.con.current_member, _RICH_JSON_COMMAND_WILDCARD):
                     return f"{unresolved_command}{unresolved_member}"
@@ -321,21 +343,21 @@ class RichJsonParser:
             print(f"Error: {exception}")
             raise Exception(f"RichJson {_RICH_JSON_COMMAND_PREFIX}{self.con.current_command} could not be resolved in {self.con.current_name}.")
 
-    def __is_rich_json_command_enabled(self, command):
+    def _is_rich_json_command_enabled(self, command):
         if command not in _RICH_JSON_COMMANDS.available:
             _throw_command_not_found(command)
         return _RICH_JSON_COMMANDS.enabled[command] != _RICH_JSON_COMMANDS.void_command
 
-    def __execute_clone(self):
+    def _execute_clone(self):
         if _RICH_JSON_KEY_COMMAND_MEMBER in self.con.current_member:
             key_commands = self.con.current_member[_RICH_JSON_KEY_COMMAND_MEMBER]
-            if _RICH_JSON_COMMAND_CLONE in key_commands and self.__is_rich_json_command_enabled(_RICH_JSON_COMMAND_CLONE):
+            if _RICH_JSON_COMMAND_CLONE in key_commands and self._is_rich_json_command_enabled(_RICH_JSON_COMMAND_CLONE):
                 self.con.current_command = _RICH_JSON_COMMAND_CLONE
-                self.con.current_member = self.__try_rich_json_key_command()
+                self.con.current_member = self._try_rich_json_key_command()
                 key_commands = self.con.current_member[_RICH_JSON_KEY_COMMAND_MEMBER]
                 key_commands.remove(_RICH_JSON_COMMAND_CLONE)
 
-    def __call_constructor(self):
+    def _call_constructor(self):
         if _RICH_JSON_CONFIG.get("lateConstructorEnabled") and _RICH_JSON_LATE_CONSTRUCTOR_MEMBER in self.con.current_member:
             cstr = self.con.current_member[_RICH_JSON_LATE_CONSTRUCTOR_MEMBER]
             self.con.current_member = _merge_into_target(cstr(), self.con.current_member)
@@ -366,6 +388,9 @@ class RichJsonParser:
         if self.cache.clone_address == address:
             self.cache.clone_address = None
 
+    def _is_clone_applying(self):
+        return self.cache.clone_address is not None
+
     def _execute_key_commands(self):
         if isinstance(self.con.current_member, dict) and _RICH_JSON_KEY_COMMAND_MEMBER in self.con.current_member:
             key_commands = list(self.con.current_member[_RICH_JSON_KEY_COMMAND_MEMBER])
@@ -378,3 +403,6 @@ class RichJsonParser:
 
     def _try_rich_json_key_command(self):
         return _RICH_JSON_COMMANDS.enabled[self.con.current_command](self, self.con)
+
+
+_RICH_JSON_COMMANDS = RichJsonCommandHolder()

@@ -1,5 +1,6 @@
 import logging
-from ..core.rich_json_command_holder import _RICH_JSON_COMMANDS, _RICH_JSON_LATE_APPLIES
+from ..core.rich_json import _RICH_JSON_COMMANDS
+from ..core.rich_json_constants import _RICH_JSON_LATE_APPLIES
 
 # Globales Dictionary für registrierte Module
 _RICH_JSON_MODULES = {}
