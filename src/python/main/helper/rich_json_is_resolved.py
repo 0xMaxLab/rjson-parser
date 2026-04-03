@@ -7,7 +7,7 @@ from ..core.rich_json import (
     get_object_field,
     RichJsonParser
 )
-from .rich_json_helper import get_field_by_key, is_json_object, matches_wildcard
+from .rich_json_helper import get_field, is_json_object, matches_wildcard
 
 def is_resolved(obj):
     """
@@ -21,7 +21,7 @@ def _is_resolved_recursive(parser, obj, address):
         return True
 
     # Check if already processed to avoid infinite loops
-    if get_field_by_key(parser.cache.stack, address) is not None:
+    if get_field(parser.cache.stack, address) is not None:
         return True
 
     parser.cache.stack[address] = obj

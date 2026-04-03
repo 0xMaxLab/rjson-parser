@@ -12,7 +12,7 @@ from main.helper.rich_json_helper import (
     concat_arrays,
     concat_strings,
     merge_objects,
-    clone_object
+    clone_object, merge_into_target
 )
 from main.core.rich_json import RichJsonParser
 from main.helper.rich_json_is_resolved import is_resolved

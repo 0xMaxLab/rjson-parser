@@ -19,7 +19,7 @@ def _execute_env_command(parser, context):
         context.root = context.current_member if is_json_object(context.current_member) else {}
         context.current_address = parser.cache.resolve_address(context.root)
 
-        context.current_member = parser._parse_rich_json_in_member(context)
+        context.current_member = parser._parse_rich_json_in_member()
         _RICH_JSON_ENVIRONMENT[first_ref] = context.current_member
 
         if len(ref) == 2:
