@@ -84,7 +84,7 @@ def set_command_enabled(command, enabled):
     else:
         _RICH_JSON_COMMANDS.enabled[command] = _RICH_JSON_COMMANDS.void_command
 
-    if get_field(_RICH_JSON_CONFIG, "debugEnabled"):
+    if get_field(_RICH_JSON_CONFIG, "debug_enabled"):
         state = "enabled" if enabled else "disabled"
         print(f"RichJson command '{command}' was {state}.")
 
@@ -131,7 +131,7 @@ class RichJsonParser:
             self.con.current_address = self.cache.resolve_address(current)
             self.con.current = self._parse_rich_json_in_member()
             self.cache.level -= 1
-            if self.cache.level == 0 and get_field(_RICH_JSON_CONFIG, "debugEnabled"):
+            if self.cache.level == 0 and get_field(_RICH_JSON_CONFIG, "debug_enabled"):
                 print("RichJson was applied successfully.")
             return current
 
@@ -221,11 +221,11 @@ class RichJsonParser:
 
     def _parse_rich_json_in_member(self):
         if self.con.current_address in self.cache.stack:
-            if get_field(_RICH_JSON_CONFIG, "debugEnabled"):
+            if get_field(_RICH_JSON_CONFIG, "debug_enabled"):
                 print(f"RichJson cache <-- '{self.con.current_address}' {self.cache.stack[self.con.current_address]}")
             return self.cache.stack[self.con.current_address]
         else:
-            if get_field(_RICH_JSON_CONFIG, "debugEnabled"):
+            if get_field(_RICH_JSON_CONFIG, "debug_enabled"):
                 print(f"RichJson cache --> '{self.con.current_address}' {self.con.current_member}")
             self.cache.stack[self.con.current_address] = self.con.current_member
 
@@ -233,8 +233,8 @@ class RichJsonParser:
             return self.con.current_member
 
         if isinstance(self.con.current_member, str):
-            if get_field(_RICH_JSON_CONFIG, "stringInterpolationsEnabled") and matches_wildcard(self.con.current_member,
-                                                                                                _RICH_JSON_INTERPOLATION_WILDCARD):
+            if (get_field(_RICH_JSON_CONFIG, "string_interpolations_enabled")
+                    and matches_wildcard(self.con.current_member, _RICH_JSON_INTERPOLATION_WILDCARD)):
                 interpolation_result = self._parse_interpolations()
                 self.con.current_member = interpolation_result["result"]
                 if not interpolation_result["is_parsed"]:
@@ -269,10 +269,9 @@ class RichJsonParser:
 
     def _parse_interpolations(self):
         rv = ""
-        inp = str(self.con.current_member)  # Ensure we are working with a string
+        inp = str(self.con.current_member)
         ipn_level = -1
         ipns = []
-        ipn_parsed = True
 
         i = 0
         while i < len(inp):
@@ -290,61 +289,44 @@ class RichJsonParser:
                     i += 2
                 else:
                     ipn_level += 1
-                    # CRITICAL: JS pushes a new object when level increases
-                    if len(ipns) <= ipn_level:
-                        ipns.append({"rv": "", "is_parsed": True})
 
             # 2. HANDLE CLOSING SIGN
             elif c == _RICH_JSON_INTERPOLATION_CLOSING_SIGN:
-                # Get the content accumulated for this specific level
                 self.con.current_member = ipns[ipn_level]["rv"]
-                ipns[ipn_level]["rv"] = "" # Reset this level's buffer
+                ipns[ipn_level]["rv"] = ""
                 ipn_level -= 1
-
-                # Check if children were unresolved
                 if len(ipns) == ipn_level + 3 and not ipns[ipn_level + 2]["is_parsed"]:
-                    self.con.current_member = f"{_RICH_JSON_INTERPOLATION_OPENING_SIGN}{self.con.current_member}{_RICH_JSON_INTERPOLATION_CLOSING_SIGN}"
+                    self.con.current_member = concat_strings(_RICH_JSON_INTERPOLATION_OPENING_SIGN, self.con.current_member, _RICH_JSON_INTERPOLATION_CLOSING_SIGN)
                 else:
-                    # This is where $ref: is actually processed
                     self.con.current_member = self._execute_rich_json_command_if_contained_in_member()
 
-                # Determine if we successfully parsed this interpolation
-                ipn_parsed = not matches_wildcard(str(self.con.current_member), _RICH_JSON_COMMAND_WILDCARD)
-
-                if not ipn_parsed:
+                # Capture the current level content
+                if matches_wildcard(str(self.con.current_member), _RICH_JSON_COMMAND_WILDCARD):
                     ipns[ipn_level + 1]["is_parsed"] = False
-                    # Wrap it back up if it failed to resolve
-                    self.con.current_member = f"{_RICH_JSON_INTERPOLATION_OPENING_SIGN}{self.con.current_member}{_RICH_JSON_INTERPOLATION_CLOSING_SIGN}"
+                    self.con.current_member =  concat_strings(_RICH_JSON_INTERPOLATION_OPENING_SIGN, self.con.current_member, _RICH_JSON_INTERPOLATION_CLOSING_SIGN)
 
-                # Pass the result up the chain
                 if ipn_level == -1:
-                    rv += str(self.con.current_member)
+                    rv += self.con.current_member
                 else:
-                    ipns[ipn_level]["rv"] += str(self.con.current_member)
+                    ipns[ipn_level]["rv"] += self.con.current_member
 
-            # 3. ACCUMULATE INSIDE INTERPOLATION
             elif ipn_level > -1:
-                # Ensure the level exists before appending (safeguard)
                 if len(ipns) < ipn_level + 1:
                     ipns.append({"rv": "", "is_parsed": True})
                 ipns[ipn_level]["rv"] += c
 
-            # 4. ACCUMULATE NORMAL TEXT
+            # 3. ACCUMULATE CONTENT
             else:
                 rv += c
-
             i += 1
 
-        # Final cache and return
         self.cache.stack[self.con.current_address] = rv
-
-        # Determine the final 'is_parsed' state
-        final_is_parsed = True if not ipns else ipns[0]["is_parsed"]
+        final_is_parsed = ipns[0]["is_parsed"] if ipns else True
 
         return {"result": rv, "is_parsed": final_is_parsed}
 
     def _get_ignores_for_key_commands(self):
-        rv = []
+        rv = [] 
         if has_field(self.con.current_member, _RICH_JSON_KEY_COMMAND_MEMBER):
             kcmds = get_field(self.con.current_member, _RICH_JSON_KEY_COMMAND_MEMBER)
             for kcmd in kcmds:
@@ -430,12 +412,12 @@ class RichJsonParser:
                     key_commands.remove(_RICH_JSON_COMMAND_CLONE)
 
     def _call_constructor(self):
-        if get_field(_RICH_JSON_CONFIG, "lateConstructorEnabled") and has_field(self.con.current_member,
+        if get_field(_RICH_JSON_CONFIG, "late_constructor_enabled") and has_field(self.con.current_member,
                                                                                 _RICH_JSON_LATE_CONSTRUCTOR_MEMBER):
             cstr = get_field(self.con.current_member, _RICH_JSON_LATE_CONSTRUCTOR_MEMBER)
             self.con.current_member = _merge_into_target(self.cache, cstr(), self.con.current_member)
             delete_field(self.con.current_member, _RICH_JSON_LATE_CONSTRUCTOR_MEMBER)
-            if get_field(_RICH_JSON_CONFIG, "debugEnabled"):
+            if get_field(_RICH_JSON_CONFIG, "debug_enabled"):
                 print(f"RichJson resolved construct for '{type(cstr)}'.")
 
     def _resolve_inheritances(self):

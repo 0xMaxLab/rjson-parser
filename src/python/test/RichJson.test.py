@@ -186,14 +186,15 @@ class TestRichJsonSuite(unittest.TestCase):
                 "third": {"fourth": "Hello World!"}
             },
             "fourth": {"fifth": "$merge:first/second, first/third"},
-            "seventh": ["v1", "v2"], "eigth": ["v3", "v4"],
-            "ninth": "$merge:seventh, eigth",
-            "tenth": "$merge:ninth, eigth",
+            "seventh": ["v1", "v2"],
+            "eight": ["v3", "v4"],
+            "ninth": "$merge:seventh, eight",
+            "tenth": "$merge:ninth, eight",
         }
         self.parser.parse(content, is_root=True)
         expected_merge = merge_objects(content["first"]["second"], content["first"]["third"])
         self.assertEqual(stringify(content["fourth"]["fifth"]), stringify(expected_merge))
-        self.assertEqual(content["tenth"], ["v1", "v2", "v3", "v4", "v3", "v4"])
+        self.assertEqual(content["tenth"], concat_arrays(concat_arrays(content["seventh"], content["eight"]), content["eight"]))
 
     def test_copy(self):
         content = {

@@ -45,10 +45,10 @@ def read_file(path, _execute_late_applies=False):
     :param _execute_late_applies: Whether to execute late applies (default: False).
     :return: The parsed JSON data (dict or list).
     """
-    if _RICH_JSON_CONFIG.get('fileCacheEnabled') and path in FILE_CACHE:
+    if _RICH_JSON_CONFIG.get('file_cache_enabled') and path in FILE_CACHE:
         return FILE_CACHE[path]
 
-    if _RICH_JSON_CONFIG.get('fileCacheEnabled'):
+    if _RICH_JSON_CONFIG.get('file_cache_enabled'):
         FILE_CACHE[path] = {}
 
     if not _execute_late_applies:
@@ -64,7 +64,7 @@ def read_file(path, _execute_late_applies=False):
         for cmd in _RICH_JSON_LATE_APPLIES:
             set_command_enabled(cmd, True)
 
-    if _RICH_JSON_CONFIG.get('fileCacheEnabled'):
+    if _RICH_JSON_CONFIG.get('file_cache_enabled'):
         FILE_CACHE[path] = merge_into_target(FILE_CACHE[path], rv)
 
     return rv

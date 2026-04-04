@@ -8,7 +8,7 @@ def parse(obj):
     :param obj: The JSON object (dictionary/list) to parse.
     :return: The parsed object.
     """
-    if _RICH_JSON_CONFIG.get("debugEnabled"):
+    if _RICH_JSON_CONFIG.get("debug_enabled"):
         print("RichJson is going to be applied.")
 
     parser = RichJsonParser()

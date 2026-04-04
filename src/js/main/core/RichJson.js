@@ -245,7 +245,7 @@ export class RichJsonParser {
         let ipnParsed;
         let c;
 
-        for (let i = 0; i <= inp.length; ++i) {
+        for (let i = 0; i < inp.length; ++i) {
             c = inp.charAt(i);
             if (c === __RICH_JSON_INTERPOLATION_OPENING_SIGN) {
                 c = inp.charAt(i + 1);
