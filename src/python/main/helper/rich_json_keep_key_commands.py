@@ -1,6 +1,7 @@
 from .rich_json_helper import clone_object
 from ..core.rich_json import _RICH_JSON_KEY_COMMAND_MEMBER
 
+
 def keep_key_commands(json_object):
     """
     Make key commands constant for the given JSON object by creating a deep copy

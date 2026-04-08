@@ -1,9 +1,10 @@
 """
 Joins two structs or arrays together
 """
-from ..helper.rich_json_helper import concat_arrays, get_field, is_json_object, merge_into_target
 from .rich_json_ref import _execute_ref_command
 from ..core.rich_json import _RICH_JSON_COMMAND_DELIMITER
+from ..helper.rich_json_helper import concat_arrays, get_field, is_json_object, merge_into_target
+
 
 def _execute_merge_command(parser, context):
     refs = context.current_member.split(_RICH_JSON_COMMAND_DELIMITER)

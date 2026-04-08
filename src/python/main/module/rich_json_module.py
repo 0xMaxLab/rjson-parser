@@ -1,14 +1,16 @@
 import logging
+
 from ..core.rich_json import _RICH_JSON_COMMANDS
 from ..core.rich_json_constants import _RICH_JSON_LATE_APPLIES
 
-# Globales Dictionary für registrierte Module
 _RICH_JSON_MODULES = {}
+
 
 class RichJsonModule:
     """
     Use this class in order to write your own RichJson modules.
     """
+
     def __init__(self, name):
         self.name = name
         self.late_applies = []

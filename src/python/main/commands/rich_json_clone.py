@@ -2,8 +2,10 @@
 Makes a deep copy of the given struct
 """
 import logging
+
 from ..helper.rich_json_helper import clone_object
 from ..other.rich_json_configuration import _RICH_JSON_CONFIG
+
 
 def _execute_clone_command(parser, context):
     if parser._is_clone_applying():

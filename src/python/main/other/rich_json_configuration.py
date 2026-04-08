@@ -8,6 +8,7 @@ _RICH_JSON_CONFIG = {
     "crash_on_nested_clone_enabled": False,
 }
 
+
 def update_configuration(config):
     """
     Updates the global configuration for the library.

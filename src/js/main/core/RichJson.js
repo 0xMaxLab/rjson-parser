@@ -79,9 +79,7 @@ export class RichJsonParser {
             this.con.current = this.__parseRichJsonInMember();
             this.cache.level--;
             if (this.cache.level === 0) {
-                if (__RICH_JSON_CONFIG.debugEnabled) {
-                    console.debug("RichJson was applied successfully.");
-                }
+                console.log("RichJson was applied successfully.");
             }
             return current;
         }

@@ -1,10 +1,11 @@
 """
 References the given env variable
 """
-from ..helper.rich_json_helper import is_json_object
-from ..core.rich_json_constants import _RICH_JSON_COMMAND_PATH_DELIMITER
 from .rich_json_ref import _execute_ref_command
+from ..core.rich_json_constants import _RICH_JSON_COMMAND_PATH_DELIMITER
+from ..helper.rich_json_helper import is_json_object
 from ..other.rich_json_environment import _RICH_JSON_ENVIRONMENT, add_environment_variables
+
 
 def _execute_env_command(parser, context):
     if is_json_object(context.current_member):

@@ -1,4 +1,3 @@
-import json
 from .rich_json_cache import RichJsonCache
 from .rich_json_command_holder import RichJsonCommandHolder
 from .rich_json_constants import (
@@ -29,51 +28,11 @@ from .rich_json_constants import (
 from ..helper.rich_json_helper import (
     concat_arrays, concat_strings,
     get_keys_sorted, is_json_object, matches_wildcard, merge_into_target, clone_object,
-    _merge_into_target
+    _merge_into_target, has_field, get_field, delete_field, set_field
 )
 from ..other.rich_json_class_mapping import _map_class_by_name
 from ..other.rich_json_configuration import _RICH_JSON_CONFIG
 
-
-# --- Field Management Helpers ---
-
-def has_field(obj, key):
-    """Safely checks if a key (in a dict) or an attribute (in an instance) exists."""
-    if isinstance(obj, dict):
-        return key in obj
-    return hasattr(obj, key)
-
-
-def get_field(obj, key, default=None):
-    """Safely retrieves a value from a dict or an instance attribute."""
-    if isinstance(obj, dict):
-        return obj.get(key, default)
-    return getattr(obj, key, default)
-
-
-def set_field(obj, key, value):
-    """Safely sets a value in a dict or as an attribute on an instance."""
-    if isinstance(obj, dict):
-        obj[key] = value
-    else:
-        setattr(obj, key, value)
-
-
-def delete_field(obj, key):
-    """Safely removes a key from a dict or an attribute from an instance."""
-    if isinstance(obj, dict):
-        if key in obj:
-            del obj[key]
-    else:
-        if hasattr(obj, key):
-            delattr(obj, key)
-
-
-def stringify(obj):
-    """Entspricht json-stable-stringify."""
-    return json.dumps(obj, sort_keys=True, default=lambda o: o.__dict__ if hasattr(o, '__dict__') else str(o))
-
-# --- Parser Implementation ---
 
 def set_command_enabled(command, enabled):
     if command not in _RICH_JSON_COMMANDS.available:
@@ -131,7 +90,7 @@ class RichJsonParser:
             self.con.current_address = self.cache.resolve_address(current)
             self.con.current = self._parse_rich_json_in_member()
             self.cache.level -= 1
-            if self.cache.level == 0 and get_field(_RICH_JSON_CONFIG, "debug_enabled"):
+            if self.cache.level == 0:
                 print("RichJson was applied successfully.")
             return current
 
@@ -170,7 +129,6 @@ class RichJsonParser:
         return current
 
     def _preprocess_kcommands_constructors_inheritances(self):
-        # Use get_keys_sorted to handle both dict keys and instance attributes
         names = get_keys_sorted(self.con.current)
 
         for name in names:
@@ -276,8 +234,6 @@ class RichJsonParser:
         i = 0
         while i < len(inp):
             c = inp[i]
-
-            # 1. HANDLE OPENING SIGN
             if c == _RICH_JSON_INTERPOLATION_OPENING_SIGN:
                 c_next = inp[i + 1] if i + 1 < len(inp) else ""
                 c_next_next = inp[i + 2] if i + 2 < len(inp) else ""
@@ -289,33 +245,31 @@ class RichJsonParser:
                     i += 2
                 else:
                     ipn_level += 1
-
-            # 2. HANDLE CLOSING SIGN
             elif c == _RICH_JSON_INTERPOLATION_CLOSING_SIGN:
                 self.con.current_member = ipns[ipn_level]["rv"]
                 ipns[ipn_level]["rv"] = ""
                 ipn_level -= 1
                 if len(ipns) == ipn_level + 3 and not ipns[ipn_level + 2]["is_parsed"]:
-                    self.con.current_member = concat_strings(_RICH_JSON_INTERPOLATION_OPENING_SIGN, self.con.current_member, _RICH_JSON_INTERPOLATION_CLOSING_SIGN)
+                    self.con.current_member = concat_strings(_RICH_JSON_INTERPOLATION_OPENING_SIGN,
+                                                             self.con.current_member,
+                                                             _RICH_JSON_INTERPOLATION_CLOSING_SIGN)
                 else:
                     self.con.current_member = self._execute_rich_json_command_if_contained_in_member()
 
-                # Capture the current level content
                 if matches_wildcard(str(self.con.current_member), _RICH_JSON_COMMAND_WILDCARD):
                     ipns[ipn_level + 1]["is_parsed"] = False
-                    self.con.current_member =  concat_strings(_RICH_JSON_INTERPOLATION_OPENING_SIGN, self.con.current_member, _RICH_JSON_INTERPOLATION_CLOSING_SIGN)
+                    self.con.current_member = concat_strings(_RICH_JSON_INTERPOLATION_OPENING_SIGN,
+                                                             self.con.current_member,
+                                                             _RICH_JSON_INTERPOLATION_CLOSING_SIGN)
 
                 if ipn_level == -1:
                     rv += self.con.current_member
                 else:
                     ipns[ipn_level]["rv"] += self.con.current_member
-
             elif ipn_level > -1:
                 if len(ipns) < ipn_level + 1:
                     ipns.append({"rv": "", "is_parsed": True})
                 ipns[ipn_level]["rv"] += c
-
-            # 3. ACCUMULATE CONTENT
             else:
                 rv += c
             i += 1
@@ -326,7 +280,7 @@ class RichJsonParser:
         return {"result": rv, "is_parsed": final_is_parsed}
 
     def _get_ignores_for_key_commands(self):
-        rv = [] 
+        rv = []
         if has_field(self.con.current_member, _RICH_JSON_KEY_COMMAND_MEMBER):
             kcmds = get_field(self.con.current_member, _RICH_JSON_KEY_COMMAND_MEMBER)
             for kcmd in kcmds:
@@ -413,7 +367,7 @@ class RichJsonParser:
 
     def _call_constructor(self):
         if get_field(_RICH_JSON_CONFIG, "late_constructor_enabled") and has_field(self.con.current_member,
-                                                                                _RICH_JSON_LATE_CONSTRUCTOR_MEMBER):
+                                                                                  _RICH_JSON_LATE_CONSTRUCTOR_MEMBER):
             cstr = get_field(self.con.current_member, _RICH_JSON_LATE_CONSTRUCTOR_MEMBER)
             self.con.current_member = _merge_into_target(self.cache, cstr(), self.con.current_member)
             delete_field(self.con.current_member, _RICH_JSON_LATE_CONSTRUCTOR_MEMBER)

@@ -1,3 +1,4 @@
+from .rich_json_helper import get_field, is_json_object, matches_wildcard
 from ..core.rich_json import (
     _RICH_JSON_COMMAND_WILDCARD,
     _RICH_JSON_INTERPOLATION_WILDCARD,
@@ -7,7 +8,7 @@ from ..core.rich_json import (
     get_object_field,
     RichJsonParser
 )
-from .rich_json_helper import get_field, is_json_object, matches_wildcard
+
 
 def is_resolved(obj):
     """
@@ -15,6 +16,7 @@ def is_resolved(obj):
     """
     parser = RichJsonParser()
     return _is_resolved_recursive(parser, obj, parser.cache.resolve_address(obj))
+
 
 def _is_resolved_recursive(parser, obj, address):
     if obj is None:
@@ -35,7 +37,6 @@ def _is_resolved_recursive(parser, obj, address):
     ):
         return False
 
-    # Determine iteration (dict keys or list indices)
     if is_json_obj:
         names = list(obj.keys())
         get_func = get_object_field
@@ -56,7 +57,6 @@ def _is_resolved_recursive(parser, obj, address):
                     matches_wildcard(member, _RICH_JSON_INTERPOLATION_WILDCARD)):
                 return False
 
-        # Recursive check for objects and lists
         elif not _is_resolved_recursive(parser, member, parser.cache.resolve_address(member)):
             return False
 

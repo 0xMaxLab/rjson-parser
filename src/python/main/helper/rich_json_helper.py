@@ -1,6 +1,8 @@
-import types
 import re
+import types
+
 from ..core.rich_json_cache import RichJsonCache
+
 
 def has_field(obj, key):
     """Safely checks if a key (in a dict) or an attribute (in an instance) exists."""
@@ -8,11 +10,13 @@ def has_field(obj, key):
         return key in obj
     return hasattr(obj, key)
 
+
 def get_field(obj, key, default=None):
     """Safely retrieves a value from a dict or an instance attribute."""
     if isinstance(obj, dict):
         return obj.get(key, default)
     return getattr(obj, key, default)
+
 
 def set_field(obj, key, value):
     """Safely sets a value in a dict or as an attribute on an instance."""
@@ -20,6 +24,7 @@ def set_field(obj, key, value):
         obj[key] = value
     else:
         setattr(obj, key, value)
+
 
 def delete_field(obj, key):
     """Safely removes a key from a dict or an attribute from an instance if it exists."""
@@ -30,8 +35,10 @@ def delete_field(obj, key):
         if hasattr(obj, key):
             delattr(obj, key)
 
+
 def merge_objects(*objects):
     return merge_into_target({}, *objects)
+
 
 def merge_into_target(target, *others):
     for other in others:
@@ -43,8 +50,8 @@ def merge_into_target(target, *others):
             print("Error: RichJson merge_into_target failed!")
     return target
 
+
 def _merge_into_target(cache, target, other, force=False):
-    # Guard: only objects/dicts can be merged
     if not is_json_object(other):
         return target
 
@@ -76,8 +83,10 @@ def _merge_into_target(cache, target, other, force=False):
     cache.level -= 1
     return target
 
+
 def merge_objects_without_rebind(*objects):
     return merge_into_without_rebind({}, *objects)
+
 
 def merge_into_without_rebind(target, *others):
     for other in others:
@@ -88,6 +97,7 @@ def merge_into_without_rebind(target, *others):
         if cache.level != 0:
             print("Error: RichJson merge_into_without_rebind failed!")
     return target
+
 
 def _merge_into_without_rebind(cache, target, other, force=False):
     if not is_json_object(other):
@@ -121,6 +131,7 @@ def _merge_into_without_rebind(cache, target, other, force=False):
     cache.level -= 1
     return target
 
+
 def clone_object(object_to_clone):
     cache = RichJsonCache()
     cache.str = is_json_object(object_to_clone)
@@ -132,6 +143,7 @@ def clone_object(object_to_clone):
     if cache.level != 0:
         print("Error: RichJson clone_object failed!")
     return cloned
+
 
 def _clone_object(cache, obj):
     if obj is None or (not is_json_object(obj) and not isinstance(obj, list)):
@@ -164,7 +176,6 @@ def _clone_object(cache, obj):
             else:
                 set_field(target, name, member)
     else:
-        # Array logic
         for member in obj:
             if is_json_object(member) or isinstance(member, list):
                 addr = cache.resolve_address(member)
@@ -184,10 +195,12 @@ def _clone_object(cache, obj):
     cache.level -= 1
     return target
 
+
 def is_json_object(obj):
     if obj is None or isinstance(obj, (str, int, float, bool, list, tuple, set)):
         return False
     return isinstance(obj, dict) or hasattr(obj, "__dict__")
+
 
 def get_keys_sorted(obj):
     if isinstance(obj, dict):
@@ -199,6 +212,7 @@ def get_keys_sorted(obj):
     keys.sort(key=str.lower)
     return keys
 
+
 def concat_strings(*strings):
     """
     Concat redundancy strings.
@@ -207,6 +221,7 @@ def concat_strings(*strings):
     :return: The concatenated string.
     """
     return "".join(strings)
+
 
 def concat_arrays(*arrays):
     """
@@ -219,6 +234,7 @@ def concat_arrays(*arrays):
     for array in arrays:
         rv.append(array)
     return rv
+
 
 def matches_wildcard(string, wildcard):
     """

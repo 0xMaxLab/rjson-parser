@@ -1,5 +1,6 @@
 _RICH_JSON_CLASS_MAPPING = {}
 
+
 def add_class_mappings(class_mappings):
     """
     Adds the given class mappings.
@@ -11,6 +12,7 @@ def add_class_mappings(class_mappings):
 
     for name, class_type in class_mappings.items():
         add_class_mapping(name, class_type)
+
 
 def add_class_mapping(name, class_type):
     """
@@ -25,6 +27,7 @@ def add_class_mapping(name, class_type):
 
     _RICH_JSON_CLASS_MAPPING[name] = class_type
 
+
 def _map_class_by_name(name):
     """
     Internal function to retrieve a mapped class by its name.
@@ -34,6 +37,7 @@ def _map_class_by_name(name):
     :raises ValueError: If the class name could not be found.
     """
     if name not in _RICH_JSON_CLASS_MAPPING:
-        raise ValueError(f"RichJson could not find the class called '{name}'.\nMake sure it is defined in RichJsonClassMapping.")
+        raise ValueError(
+            f"RichJson could not find the class called '{name}'.\nMake sure it is defined in RichJsonClassMapping.")
 
     return _RICH_JSON_CLASS_MAPPING[name]

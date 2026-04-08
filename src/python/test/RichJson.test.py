@@ -1,6 +1,12 @@
-import unittest
 import json
-import logging
+import unittest
+
+from main.core.rich_json_parse import parse_rich_json
+from main.helper.rich_json_helper import (
+    concat_arrays,
+    merge_objects,
+)
+from main.helper.rich_json_is_resolved import is_resolved
 from main.module.rich_json_module import (
     RichJsonModule,
     register_module,
@@ -8,30 +14,20 @@ from main.module.rich_json_module import (
     exclude_module,
     unregister_module
 )
-from main.helper.rich_json_helper import (
-    concat_arrays,
-    concat_strings,
-    merge_objects,
-    clone_object, merge_into_target
-)
-from main.core.rich_json import RichJsonParser
-from main.helper.rich_json_is_resolved import is_resolved
-from main.other.rich_json_environment import add_environment_variable
 from main.other.rich_json_class_mapping import add_class_mapping
+from main.other.rich_json_environment import add_environment_variable
 
-# --- Test-Hilfsklasse ---
+
 class RichJsonTestClass:
     def __init__(self):
         self.value = 0
 
+
 def stringify(obj):
-    """Entspricht json-stable-stringify."""
     return json.dumps(obj, sort_keys=True, default=lambda o: o.__dict__ if hasattr(o, '__dict__') else str(o))
 
-class TestRichJsonSuite(unittest.TestCase):
 
-    def setUp(self):
-        self.parser = RichJsonParser()
+class TestRichJsonSuite(unittest.TestCase):
 
     def test_module(self):
         content = {"first": "$ilog:Hello World!"}
@@ -41,16 +37,15 @@ class TestRichJsonSuite(unittest.TestCase):
 
         register_module(module)
         include_module("test")
-        self.parser.parse(content, is_root=True)
+        parse_rich_json(content)
 
         self.assertEqual(content["first"], "success")
 
-        # Cleanup
         exclude_module("test")
         unregister_module("test")
         content_reset = {"first": "$ilog:Hello World!"}
         try:
-            self.parser.parse(content_reset, is_root=True)
+            parse_rich_json(content_reset, is_root=True)
         except:
             pass
         self.assertEqual(content_reset["first"], "$ilog:Hello World!")
@@ -66,7 +61,7 @@ class TestRichJsonSuite(unittest.TestCase):
                 "third": "third"
             }
         }
-        self.parser.parse(content, is_root=True)
+        parse_rich_json(content)
 
         self.assertEqual(content["second"].value, 0)
         self.assertEqual(stringify(content["first"].second), stringify(content["second"].second))
@@ -82,7 +77,7 @@ class TestRichJsonSuite(unittest.TestCase):
             "second::third": {"x": 5},
             "third::first": {"other": "$ref:first"}
         }
-        self.parser.parse(content, is_root=True)
+        parse_rich_json(content)
 
         self.assertEqual(content["first"]["x"], 10)
         self.assertIs(content["first"]["other"], content["second"])
@@ -100,7 +95,7 @@ class TestRichJsonSuite(unittest.TestCase):
                 "sixth": "$ref$clone:first/third"
             }
         }
-        self.parser.parse(content, is_root=True)
+        parse_rich_json(content)
         self.assertEqual(stringify(content["fourth"]["sixth"]), stringify(content["first"]["third"]))
         self.assertIsNot(content["fourth"]["sixth"], content["first"]["third"])
 
@@ -115,7 +110,7 @@ class TestRichJsonSuite(unittest.TestCase):
                 "sixth": "$ref:first/third"
             }
         }
-        self.parser.parse(content, is_root=True)
+        parse_rich_json(content)
         self.assertEqual(content["first"]["third"]["fourth"], "fifth")
 
     def test_array(self):
@@ -123,7 +118,7 @@ class TestRichJsonSuite(unittest.TestCase):
             "first": [{"second": "second"}],
             "third": "$ref:first[0]",
         }
-        self.parser.parse(content, is_root=True)
+        parse_rich_json(content)
         self.assertIs(content["first"][0], content["third"])
 
     def test_interpolation(self):
@@ -138,7 +133,7 @@ class TestRichJsonSuite(unittest.TestCase):
             "seventh": "test_{{}$ref:first/{$ref:{$ref:first/first}/{$ref:  first/third } }/third{}}",
             "eigth": "$ref:first/{$ref:first/third}"
         }
-        self.parser.parse(content, is_root=True)
+        parse_rich_json(content)
         self.assertEqual(content["fourth"], "test_third_test")
         self.assertEqual(content["fifth"], "test_{ $ref:first/third }")
         self.assertEqual(content["sixth"], "test_{$ref:first/third/third}second")
@@ -163,19 +158,19 @@ class TestRichJsonSuite(unittest.TestCase):
                 "seventh": {"eigth": "$ref:fourth"}
             }
         }
-        self.parser.parse(content, is_root=True)
+        parse_rich_json(content)
         self.assertEqual(content["first"]["third"]["fourth"], content["fourth"]["fifth"])
         self.assertIs(content["fourth"]["seventh"]["eigth"], content["fourth"])
 
     def test_env(self):
         add_environment_variable("RichJsonTestEnv", "Hello World!")
         content = {"env": "$env:RichJsonTestEnv"}
-        self.parser.parse(content, is_root=True)
+        parse_rich_json(content)
         self.assertEqual(content["env"], "Hello World!")
 
     def test_this(self):
         content = {"this": "$this:"}
-        self.parser.parse(content, is_root=True)
+        parse_rich_json(content)
         self.assertIs(content, content["this"])
         self.assertIs(content["this"], content["this"]["this"])
 
@@ -191,24 +186,25 @@ class TestRichJsonSuite(unittest.TestCase):
             "ninth": "$merge:seventh, eight",
             "tenth": "$merge:ninth, eight",
         }
-        self.parser.parse(content, is_root=True)
+        parse_rich_json(content)
         expected_merge = merge_objects(content["first"]["second"], content["first"]["third"])
         self.assertEqual(stringify(content["fourth"]["fifth"]), stringify(expected_merge))
-        self.assertEqual(content["tenth"], concat_arrays(concat_arrays(content["seventh"], content["eight"]), content["eight"]))
+        self.assertEqual(content["tenth"],
+                         concat_arrays(concat_arrays(content["seventh"], content["eight"]), content["eight"]))
 
     def test_copy(self):
         content = {
             "first": {"second": "second", "test": "$copy:first"},
             "third": "$copy:first"
         }
-        self.parser.parse(content, is_root=True)
+        parse_rich_json(content)
         self.assertIsNot(content["first"], content["third"])
         self.assertEqual(stringify(content["first"]), stringify(content["third"]))
 
     def test_clone_key(self):
         content = {"$clone:first": {"second": "second"}}
         clone_container = {"$clone:first": content["$clone:first"]}
-        self.parser.parse(clone_container, is_root=True)
+        parse_rich_json(clone_container)
         self.assertIsNot(content["$clone:first"], clone_container["first"])
 
     def test_invoke(self):
@@ -216,15 +212,13 @@ class TestRichJsonSuite(unittest.TestCase):
             "function": lambda: 4 + 2,
             "function_result": "$ref$invoke:function",
         }
-        self.parser.parse(content, is_root=True)
+        parse_rich_json(content)
         self.assertEqual(content["function"](), 6)
         self.assertEqual(content["function_result"], 6)
 
-    # Mock-Bereich für Dateisystem-Commands
     def test_file_folder_mocked(self):
-        # In einer echten Umgebung müssten hier 'unittest.mock'
-        # oder physische Dateien verwendet werden.
         pass
+
 
 if __name__ == '__main__':
     unittest.main()

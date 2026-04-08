@@ -25,9 +25,7 @@ public class RichJsonParser {
             this.cache.level--;
 
             if (this.cache.level == 0) {
-                if (RichJsonConfig.debugEnabled) {
-                    System.out.println("RichJson was applied successfully.");
-                }
+                System.out.println("RichJson was applied successfully.");
             }
             return current;
         }

@@ -3,16 +3,14 @@ class RichJsonCache:
     Cache for holding object references, resolving circular dependencies,
     and maintaining parsing state.
     """
+
     def __init__(self):
-        # In Python, we can use the object's built-in id() as a unique reference
-        # instead of a WeakMap for dictionaries/lists during the parsing lifecycle.
         self.address_map = {}
         self.next_address = 0
 
         self.level = 0
         self.stack = {}
 
-        # Additional state variables used by the parser
         self.inheritances = {}
         self.clone_address = None
 

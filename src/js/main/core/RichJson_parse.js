@@ -7,9 +7,7 @@ import {__RICH_JSON_CONFIG} from "../other/RichJsonConfiguration.js";
  * @returns object
  */
 export function parse(object) {
-    if (__RICH_JSON_CONFIG.debugEnabled) {
-        console.debug(`RichJson is going to be applied due to.`);
-    }
+    console.log(`RichJson is going to be applied...`);
 
     return new RichJsonParser().parse(object, true);
 }

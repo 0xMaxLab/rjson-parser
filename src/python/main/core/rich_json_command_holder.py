@@ -1,9 +1,11 @@
 from ..helper.rich_json_helper import merge_into_without_rebind
 
+
 class RichJsonCommandHolder:
     """
     Holds and manages the available, enabled, and built-in RichJson commands.
     """
+
     def __init__(self):
         from ..commands.rich_json_ref import _execute_ref_command
         from ..commands.rich_json_env import _execute_env_command

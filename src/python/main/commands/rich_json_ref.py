@@ -1,8 +1,9 @@
 """
 References the given member's value (any)
 """
-from ..helper.rich_json_helper import concat_strings, is_json_object
 from ..core.rich_json_constants import _RICH_JSON_COMMAND_PATH_DELIMITER
+from ..helper.rich_json_helper import concat_strings, is_json_object
+
 
 def _execute_ref_command(parser, context):
     if context.current_member == "":

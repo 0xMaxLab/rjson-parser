@@ -1,12 +1,14 @@
-import os
 import json
+import os
+
 from .rich_json_helper import concat_strings, merge_into_target
-from ..core.rich_json_parse import parse
-from ..other.rich_json_configuration import _RICH_JSON_CONFIG
 from ..core.rich_json import set_command_enabled
 from ..core.rich_json_constants import _RICH_JSON_LATE_APPLIES
+from ..core.rich_json_parse import parse_rich_json
+from ..other.rich_json_configuration import _RICH_JSON_CONFIG
 
 FILE_CACHE = {}
+
 
 def read_directory(path, _execute_late_applies=False):
     """
@@ -22,7 +24,6 @@ def read_directory(path, _execute_late_applies=False):
         for cmd in _RICH_JSON_LATE_APPLIES:
             set_command_enabled(cmd, False)
 
-    # Read all entries in the directory
     with os.scandir(path) as entries:
         for entry in entries:
             if entry.is_file():
@@ -36,6 +37,7 @@ def read_directory(path, _execute_late_applies=False):
             set_command_enabled(cmd, True)
 
     return rv
+
 
 def read_file(path, _execute_late_applies=False):
     """
@@ -58,7 +60,7 @@ def read_file(path, _execute_late_applies=False):
     with open(path, 'r', encoding='utf-8') as f:
         rv = json.load(f)
 
-    rv = parse(rv)
+    rv = parse_rich_json(rv)
 
     if not _execute_late_applies:
         for cmd in _RICH_JSON_LATE_APPLIES:
