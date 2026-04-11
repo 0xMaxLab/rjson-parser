@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from main.core.rich_json_parse import parse_rich_json
+from main.core.rich_json import parse_rich_json
 from main.helper.rich_json_helper import (
     concat_arrays,
     merge_objects,

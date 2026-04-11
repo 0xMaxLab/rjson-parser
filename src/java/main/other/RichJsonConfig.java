@@ -1,7 +1,8 @@
 package other;
 
 public class RichJsonConfig {
-    public static boolean debugEnabled = true;
+    public static boolean logEnabled = true;
+    public static boolean debugEnabled = false;
     public static boolean lateConstructorEnabled = true;
     public static boolean stringInterpolationsEnabled = true;
     public static boolean crashOnNestedCloneEnabled = true;

@@ -1,4 +1,5 @@
 import {__RICH_JSON_COMMANDS, __RICH_JSON_LATE_APPLIES} from "../core/RichJsonCommandHolder.js";
+import {__RICH_JSON_CONFIG} from "../other/RichJsonConfiguration.js";
 
 const __RICH_JSON_MODULES = {};
 
@@ -91,7 +92,9 @@ export class RichJsonModule {
  * @returns {*}
  */
 export function registerModule(module) {
-    console.log(`RichJson registering module '${module.name}'`);
+    if (__RICH_JSON_CONFIG.logEnabled) {
+        console.log(`RichJson registering module '${module.name}'`);
+    }
     __RICH_JSON_MODULES[module.name] = module;
     return module;
 }
@@ -104,7 +107,9 @@ export function unregisterModule(name) {
     if (isModuleRegistered(name)) {
         if (__RICH_JSON_MODULES[name].isIncluded)
             throw (`RichJson can not unregister module '${name}' due to it is currently included`);
-        console.log(`RichJson unregistering module '${name}'`);
+        if (__RICH_JSON_CONFIG.logEnabled) {
+            console.log(`RichJson unregistering module '${name}'`);
+        }
         delete __RICH_JSON_MODULES[name];
     }
 }
@@ -125,7 +130,9 @@ export function isModuleRegistered(name) {
 export function includeModule(name) {
     if (isModuleRegistered(name)) {
         if (!__RICH_JSON_MODULES[name].isIncluded) {
-            console.log(`RichJson including module '${name}'`);
+            if (__RICH_JSON_CONFIG.logEnabled) {
+                console.log(`RichJson including module '${name}'`);
+            }
             __RICH_JSON_MODULES[name].__include();
         }
     }
@@ -138,7 +145,9 @@ export function includeModule(name) {
 export function excludeModule(name) {
     if (isModuleRegistered(name)) {
         if (__RICH_JSON_MODULES[name].isIncluded) {
-            console.log(`RichJson excluding module '${name}'`);
+            if (__RICH_JSON_CONFIG.logEnabled) {
+                console.log(`RichJson excluding module '${name}'`);
+            }
             __RICH_JSON_MODULES[name].__exclude();
         }
     }

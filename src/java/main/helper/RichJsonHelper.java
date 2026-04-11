@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import core.RichJsonCache;
 import core.RichJsonConstants;
 import core.RichJsonParser;
+import other.RichJsonConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,21 @@ import java.util.regex.Pattern;
 public class RichJsonHelper {
 
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    public static Object parse(Object object) {
+        if (RichJsonConfig.logEnabled) {
+            System.out.println("RichJson is going to be applied...");
+        }
+
+        try {
+            return new RichJsonParser().parse(object, true);
+        } catch (Exception exception)  {
+            if (RichJsonConfig.debugEnabled) {
+                System.out.println(exception.getStackTrace());
+            }
+            return null;
+        }
+    }
 
     /**
      * Ensures that key commands within a JSON object are treated as constants by cloning them.

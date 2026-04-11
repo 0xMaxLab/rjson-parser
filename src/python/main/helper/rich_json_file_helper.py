@@ -2,9 +2,8 @@ import json
 import os
 
 from .rich_json_helper import concat_strings, merge_into_target
-from ..core.rich_json import set_command_enabled
+from ..core.rich_json import set_command_enabled, parse_rich_json
 from ..core.rich_json_constants import _RICH_JSON_LATE_APPLIES
-from ..core.rich_json_parse import parse_rich_json
 from ..other.rich_json_configuration import _RICH_JSON_CONFIG
 
 FILE_CACHE = {}

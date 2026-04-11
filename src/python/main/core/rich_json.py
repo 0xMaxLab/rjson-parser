@@ -1,3 +1,13 @@
+import logging
+import sys
+
+logger = logging.getLogger("RichJSON")
+logging.basicConfig(
+    level=logging.DEBUG,
+    stream=sys.stdout,
+    format='[%(levelname)s] %(name)s %(message)s'
+)
+
 from .rich_json_cache import RichJsonCache
 from .rich_json_command_holder import RichJsonCommandHolder
 from .rich_json_constants import (
@@ -33,6 +43,16 @@ from ..helper.rich_json_helper import (
 from ..other.rich_json_class_mapping import _map_class_by_name
 from ..other.rich_json_configuration import _RICH_JSON_CONFIG
 
+def parse_rich_json(obj):
+    """
+    Parses RichJson expressions in a JSON object.
+
+    :param obj: The JSON object (dictionary/list) to parse.
+    :return: The parsed object.
+    """
+
+    return RichJsonParser().parse(obj, True)
+
 
 def set_command_enabled(command, enabled):
     if command not in _RICH_JSON_COMMANDS.available:
@@ -45,7 +65,8 @@ def set_command_enabled(command, enabled):
 
     if get_field(_RICH_JSON_CONFIG, "debug_enabled"):
         state = "enabled" if enabled else "disabled"
-        print(f"RichJson command '{command}' was {state}.")
+        if _RICH_JSON_CONFIG["debug_enabled"]:
+            logger.debug(f"RichJson command '{command}' was {state}.")
 
 
 def _throw_command_not_found(command):
@@ -84,14 +105,16 @@ class RichJsonParser:
         self.cache.level += 1
 
         if is_root:
+            if _RICH_JSON_CONFIG["log_enabled"]:
+                logger.info("is going to be applied...")
             self.con.root = current
             self.con.current = current
             self.con.current_member = current
             self.con.current_address = self.cache.resolve_address(current)
             self.con.current = self._parse_rich_json_in_member()
             self.cache.level -= 1
-            if self.cache.level == 0:
-                print("RichJson was applied successfully.")
+            if _RICH_JSON_CONFIG["log_enabled"] and self.cache.level == 0:
+                logger.info("was applied successfully.")
             return current
 
         is_json_obj = is_json_object(current)
@@ -180,11 +203,11 @@ class RichJsonParser:
     def _parse_rich_json_in_member(self):
         if self.con.current_address in self.cache.stack:
             if get_field(_RICH_JSON_CONFIG, "debug_enabled"):
-                print(f"RichJson cache <-- '{self.con.current_address}' {self.cache.stack[self.con.current_address]}")
+                logger.debug(f"cache <-- '{self.con.current_address}' {self.cache.stack[self.con.current_address]}")
             return self.cache.stack[self.con.current_address]
         else:
             if get_field(_RICH_JSON_CONFIG, "debug_enabled"):
-                print(f"RichJson cache --> '{self.con.current_address}' {self.con.current_member}")
+                logger.debug(f"cache --> '{self.con.current_address}' {self.con.current_member}")
             self.cache.stack[self.con.current_address] = self.con.current_member
 
         if not self._is_member_rich_json_able(self.con.current_member):
@@ -344,7 +367,7 @@ class RichJsonParser:
             self.con.root = root
             return self.con.current_member
         except Exception as exception:
-            print(f"Error: {exception}")
+            logger.exception(f"{exception}")
             raise Exception(
                 f"RichJson {_RICH_JSON_COMMAND_PREFIX}{self.con.current_command} could not be resolved in {self.con.current_name}.")
 
@@ -372,7 +395,7 @@ class RichJsonParser:
             self.con.current_member = _merge_into_target(self.cache, cstr(), self.con.current_member)
             delete_field(self.con.current_member, _RICH_JSON_LATE_CONSTRUCTOR_MEMBER)
             if get_field(_RICH_JSON_CONFIG, "debug_enabled"):
-                print(f"RichJson resolved construct for '{type(cstr)}'.")
+                logger.debug(f"resolved construct for '{type(cstr)}'.")
 
     def _resolve_inheritances(self):
         inheritance_val = get_field(self.cache.inheritances, self.con.current_address)

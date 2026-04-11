@@ -1,5 +1,7 @@
 package module;
 
+import other.RichJsonConfig;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,7 +9,9 @@ public class RichJsonModuleManager {
     private static final Map<String, RichJsonModule> MODULES = new HashMap<>();
 
     public static RichJsonModule registerModule(RichJsonModule module) {
-        System.out.println("RichJson registering module '" + module.name + "'");
+        if (RichJsonConfig.logEnabled) {
+            System.out.println("RichJson registering module '" + module.name + "'");
+        }
         MODULES.put(module.name, module);
         return module;
     }
@@ -17,7 +21,9 @@ public class RichJsonModuleManager {
             if (MODULES.get(name).isIncluded) {
                 throw new RuntimeException("RichJson: Cannot unregister module '" + name + "' while it is included.");
             }
-            System.out.println("RichJson unregistering module '" + name + "'");
+            if (RichJsonConfig.logEnabled) {
+                System.out.println("RichJson unregistering module '" + name + "'");
+            }
             MODULES.remove(name);
         }
     }
@@ -30,7 +36,9 @@ public class RichJsonModuleManager {
         if (isModuleRegistered(name)) {
             RichJsonModule module = MODULES.get(name);
             if (!module.isIncluded) {
-                System.out.println("RichJson including module '" + name + "'");
+                if (RichJsonConfig.logEnabled) {
+                    System.out.println("RichJson including module '" + name + "'");
+                }
                 module.include();
             }
         }
@@ -40,7 +48,9 @@ public class RichJsonModuleManager {
         if (isModuleRegistered(name)) {
             RichJsonModule module = MODULES.get(name);
             if (module.isIncluded) {
-                System.out.println("RichJson excluding module '" + name + "'");
+                if (RichJsonConfig.logEnabled) {
+                    System.out.println("RichJson excluding module '" + name + "'");
+                }
                 module.exclude();
             }
         }

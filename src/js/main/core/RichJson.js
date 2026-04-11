@@ -78,7 +78,7 @@ export class RichJsonParser {
             this.con.currentAddress = this.cache.resolveAddress(current);
             this.con.current = this.__parseRichJsonInMember();
             this.cache.level--;
-            if (this.cache.level === 0) {
+            if (__RICH_JSON_CONFIG.logEnabled && this.cache.level === 0) {
                 console.log("RichJson was applied successfully.");
             }
             return current;
@@ -179,7 +179,7 @@ export class RichJsonParser {
     __parseRichJsonInMember() {
         if (Object.hasOwn(this.cache.stack, this.con.currentAddress)) {
             if (__RICH_JSON_CONFIG.debugEnabled) {
-                console.log(`RichJson cache <-- '${this.con.currentAddress}' ${this.cache.stack[this.con.currentAddress]}`);
+                console.debug(`RichJson cache <-- '${this.con.currentAddress}' ${this.cache.stack[this.con.currentAddress]}`);
             }
             return this.cache.stack[this.con.currentAddress];
         } else {

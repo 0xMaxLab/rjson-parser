@@ -24,7 +24,7 @@ public class RichJsonParser {
             this.con.current = this.__parseRichJsonInMember();
             this.cache.level--;
 
-            if (this.cache.level == 0) {
+            if (RichJsonConfig.logEnabled && this.cache.level == 0) {
                 System.out.println("RichJson was applied successfully.");
             }
             return current;
@@ -135,8 +135,14 @@ public class RichJsonParser {
 
     public Object __parseRichJsonInMember() throws Exception {
         if (this.cache.stack.containsKey(this.con.currentAddress)) {
+            if (RichJsonConfig.debugEnabled) {
+                System.out.println("RichJson cache <-- '" + this.con.currentAddress + "' " + this.cache.stack.get(this.con.currentAddress));
+            }
             return this.cache.stack.get(this.con.currentAddress);
         } else {
+            if (RichJsonConfig.debugEnabled) {
+                System.out.println("RichJson cache --> '" + this.con.currentAddress + "' " + this.con.currentMember);
+            }
             this.cache.stack.put(this.con.currentAddress, this.con.currentMember);
         }
 
