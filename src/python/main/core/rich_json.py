@@ -37,7 +37,7 @@ from .rich_json_constants import (
 )
 from ..helper.rich_json_helper import (
     concat_arrays, concat_strings,
-    get_keys_sorted, is_json_object, matches_wildcard, merge_into_target, clone_object,
+    get_keys_sorted, is_json_object, merge_into_target, clone_object,
     _merge_into_target, has_field, get_field, delete_field, set_field
 )
 from ..other.rich_json_class_mapping import _map_class_by_name
@@ -215,7 +215,7 @@ class RichJsonParser:
 
         if isinstance(self.con.current_member, str):
             if (get_field(_RICH_JSON_CONFIG, "string_interpolations_enabled")
-                    and matches_wildcard(self.con.current_member, _RICH_JSON_INTERPOLATION_WILDCARD)):
+                    and bool(_RICH_JSON_INTERPOLATION_WILDCARD.search(self.con.current_member))):
                 interpolation_result = self._parse_interpolations()
                 self.con.current_member = interpolation_result["result"]
                 if not interpolation_result["is_parsed"]:
@@ -279,7 +279,7 @@ class RichJsonParser:
                 else:
                     self.con.current_member = self._execute_rich_json_command_if_contained_in_member()
 
-                if matches_wildcard(str(self.con.current_member), _RICH_JSON_COMMAND_WILDCARD):
+                if bool(_RICH_JSON_COMMAND_WILDCARD.search(str(self.con.current_member))):
                     ipns[ipn_level + 1]["is_parsed"] = False
                     self.con.current_member = concat_strings(_RICH_JSON_INTERPOLATION_OPENING_SIGN,
                                                              self.con.current_member,
@@ -312,7 +312,7 @@ class RichJsonParser:
         return rv
 
     def _execute_rich_json_command_if_contained_in_member(self):
-        if matches_wildcard(self.con.current_member, _RICH_JSON_COMMAND_WILDCARD):
+        if bool(_RICH_JSON_COMMAND_WILDCARD.search(self.con.current_member)):
             self.cache.stack[self.con.current_address] = {}
             parts = self.con.current_member.split(_RICH_JSON_COMMAND_SUFFIX, 1)
             self.con.current_command = parts[0]
@@ -340,7 +340,7 @@ class RichJsonParser:
             for cmd in batch_commands:
                 self.con.current_command = cmd
                 if self._is_rich_json_command_enabled(self.con.current_command):
-                    if matches_wildcard(self.con.current_member, _RICH_JSON_ARRAY_WILDCARD):
+                    if isinstance(self.con.current_member, str) and bool(_RICH_JSON_ARRAY_WILDCARD.search(self.con.current_member)):
                         array_parts = _RICH_JSON_ARRAY_DELIMITERS.split(self.con.current_member, 2)
                         self.con.current_member = array_parts[0]
                         self.con.current_member = _RICH_JSON_COMMANDS.enabled[self.con.current_command](self, self.con)
@@ -362,7 +362,7 @@ class RichJsonParser:
                 self.con.current_member = cmd_parts[1].strip()
                 self.con.current_command = cmd_parts[0].strip()
                 self.con.current_member = self._try_rich_json_command()
-                if matches_wildcard(self.con.current_member, _RICH_JSON_COMMAND_WILDCARD):
+                if bool(_RICH_JSON_COMMAND_WILDCARD.search(self.con.current_member)):
                     return f"{unresolved_command}{unresolved_member}"
             self.con.root = root
             return self.con.current_member
@@ -405,7 +405,7 @@ class RichJsonParser:
         member = self.con.current_member
         for ite in chain:
             self.con.current_member = ite.strip()
-            if matches_wildcard(self.con.current_member, _RICH_JSON_COMMAND_WILDCARD):
+            if bool(_RICH_JSON_COMMAND_WILDCARD.search(self.con.current_member)):
                 parts = self.con.current_member.split(_RICH_JSON_COMMAND_SUFFIX, 1)
                 self.con.current_command = parts[0].strip()
                 self.con.current_member = parts[1].strip()

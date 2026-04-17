@@ -152,7 +152,7 @@ public class RichJsonParser {
 
         if (this.con.currentMember instanceof String) {
             var strMember = (String) this.con.currentMember;
-            if (RichJsonConfig.stringInterpolationsEnabled && RichJsonHelper.matchesWildcard(strMember, RichJsonConstants.INTERPOLATION_WILDCARD)) {
+            if (RichJsonConfig.stringInterpolationsEnabled && RichJsonConstants.INTERPOLATION_WILDCARD.matcher(strMember).find()) {
                 var res = this.__parseInterpolations();
                 if (!res.isParsed) {
                     return res.result;
@@ -222,7 +222,7 @@ public class RichJsonParser {
                         this.con.currentMember = this.__executeRichJsonCommandIfContainedInMember();
                     }
 
-                    var ipnParsed = !RichJsonHelper.matchesWildcard((String)this.con.currentMember, RichJsonConstants.COMMAND_WILDCARD);
+                    var ipnParsed = !RichJsonConstants.COMMAND_WILDCARD.matcher((String)this.con.currentMember).find();
                     if (!ipnParsed) ipns.get(ipnLevel + 1).isParsed = false;
 
                     this.con.currentMember = ipnParsed ? this.con.currentMember : RichJsonHelper.concatStrings(String.valueOf(RichJsonConstants.INTERPOLATION_OPENING_SIGN), (String)this.con.currentMember, String.valueOf(RichJsonConstants.INTERPOLATION_CLOSING_SIGN));
@@ -266,7 +266,7 @@ public class RichJsonParser {
 
     private Object __executeRichJsonCommandIfContainedInMember() {
         var strMember = (String) this.con.currentMember;
-        if (RichJsonHelper.matchesWildcard(strMember, RichJsonConstants.COMMAND_WILDCARD)) {
+        if (RichJsonConstants.COMMAND_WILDCARD.matcher(strMember).find()) {
             this.cache.stack.put(this.con.currentAddress, new HashMap<String, Object>());
             var parts = strMember.split(RichJsonConstants.COMMAND_SUFFIX, 2);
             this.con.currentCommand = parts[0];
@@ -296,8 +296,7 @@ public class RichJsonParser {
             for (var cmd : batch_commands) {
                 this.con.currentCommand = cmd;
                 if (this.__isRichJsonCommandEnabled(this.con.currentCommand)) {
-                    if (this.con.currentMember instanceof String && RichJsonHelper.matchesWildcard((String)this.con.currentMember, RichJsonConstants.ARRAY_WILDCARD)) {
-                        // Regex für [ oder ]
+                    if (this.con.currentMember instanceof String && RichJsonConstants.ARRAY_WILDCARD.matcher((String)this.con.currentMember).find()) {
                         var arrayParts = ((String)this.con.currentMember).split("[\\[\\]]", 3);
                         this.con.currentMember = arrayParts[0];
                         var result = RichJsonCommandHolder.executeCommand(this.con.currentCommand, this, this.con);
@@ -382,7 +381,7 @@ public class RichJsonParser {
 
         for (var entry : chain) {
             var currentEntry = entry.trim();
-            if (RichJsonHelper.matchesWildcard(currentEntry, RichJsonConstants.COMMAND_WILDCARD)) {
+            if (RichJsonConstants.COMMAND_WILDCARD.matcher(currentEntry).find()) {
                 var parts = currentEntry.split(RichJsonConstants.COMMAND_SUFFIX, 2);
                 this.con.currentCommand = parts[0].trim();
                 this.con.currentMember = parts[1].trim();

@@ -254,18 +254,3 @@ export function concatArrays(...arrays) {
     arrays.forEach((array) => rv.push(array));
     return rv;
 }
-
-/**
- * Checks if the given string matches the wildcard.
- * @param string
- * @param wildcard
- * @returns {boolean}
- */
-export function matchesWildcard(string, wildcard) {
-    if (typeof string !== "string") return false;
-    const escaped = wildcard.replace(/[.+?^${}()|\[\]\\]/g, "\\$&");
-    const regexStr = "^" + escaped.replace(/\*/g, ".*") + "$";
-    wildcard = new RegExp(regexStr);
-    return wildcard.test(string);
-}
-

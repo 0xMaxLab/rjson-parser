@@ -7,7 +7,7 @@ import {
     getObjectField,
     RichJsonParser
 } from "../core/RichJson.js";
-import {getFieldByKey, isJsonObject, matchesWildcard} from "./RichJsonHelper.js";
+import {getFieldByKey, isJsonObject} from "./RichJsonHelper.js";
 
 /**
  * Checks if the given object has unresolved RichJson expressions in it.
@@ -46,8 +46,8 @@ function __isResolved(parser, object, address) {
             continue;
         }
         if (typeof member === "string") {
-            if (matchesWildcard(member, __RICH_JSON_COMMAND_WILDCARD) ||
-                matchesWildcard(member, __RICH_JSON_INTERPOLATION_WILDCARD)) {
+            if (__RICH_JSON_COMMAND_WILDCARD.test(member) ||
+                __RICH_JSON_INTERPOLATION_WILDCARD.test(member)) {
                 return false;
             }
         } else if (!__isResolved(parser, member, parser.cache.resolveAddress(member))) {

@@ -235,20 +235,3 @@ def concat_arrays(*arrays):
         rv.append(array)
     return rv
 
-
-def matches_wildcard(string, wildcard):
-    """
-    Checks if the given string matches the wildcard.
-
-    :param string: The string to test.
-    :param wildcard: The wildcard pattern.
-    :return: True if it matches, False otherwise.
-    """
-    if not isinstance(string, str):
-        return False
-
-    # Escape regex specials and convert wildcard * to regex .*
-    escaped = re.escape(wildcard)
-    regex_str = "^" + escaped.replace(r"\*", ".*") + "$"
-
-    return bool(re.match(regex_str, string))

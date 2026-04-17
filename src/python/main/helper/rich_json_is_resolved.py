@@ -1,4 +1,4 @@
-from .rich_json_helper import get_field, is_json_object, matches_wildcard
+from .rich_json_helper import get_field, is_json_object
 from ..core.rich_json import (
     _RICH_JSON_COMMAND_WILDCARD,
     _RICH_JSON_INTERPOLATION_WILDCARD,
@@ -53,8 +53,8 @@ def _is_resolved_recursive(parser, obj, address):
 
         if isinstance(member, str):
             # Check for command or interpolation wildcards
-            if (matches_wildcard(member, _RICH_JSON_COMMAND_WILDCARD) or
-                    matches_wildcard(member, _RICH_JSON_INTERPOLATION_WILDCARD)):
+            if (bool(_RICH_JSON_COMMAND_WILDCARD.search(member)) or
+                    bool(_RICH_JSON_INTERPOLATION_WILDCARD.search(member))):
                 return False
 
         elif not _is_resolved_recursive(parser, member, parser.cache.resolve_address(member)):

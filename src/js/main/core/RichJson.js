@@ -7,7 +7,6 @@ import {
     getFieldByKey,
     getKeysSorted,
     isJsonObject,
-    matchesWildcard,
     mergeIntoTarget
 } from "../helper/RichJsonHelper.js";
 import {__RICH_JSON_COMMANDS, setCommandEnabled, __throwCommandNotFound} from "./RichJsonCommandHolder.js";
@@ -17,7 +16,7 @@ import {RichJsonCache} from "./RichJsonCache.js";
 
 export const __RICH_JSON_COMMAND_PREFIX = "$"
 export const __RICH_JSON_COMMAND_SUFFIX = ":"
-export const __RICH_JSON_COMMAND_WILDCARD = "$*:*"
+export const __RICH_JSON_COMMAND_WILDCARD = /^\$.*:.*/
 export const __RICH_JSON_COMMAND_DELIMITER = ","
 export const __RICH_JSON_COMMAND_PATH_DELIMITER = "/"
 export const __RICH_JSON_COMMAND_PIPE_SIGN = "|"
@@ -25,7 +24,7 @@ export const __RICH_JSON_COMMAND_REF = "$ref"
 export const __RICH_JSON_COMMAND_CLONE = "clone"
 export const __RICH_JSON_KEY_COMMAND_MEMBER = "__$_rich_json_key_commands_$__"
 
-export const __RICH_JSON_ARRAY_WILDCARD = "*[*]*"
+export const __RICH_JSON_ARRAY_WILDCARD = /.*\[.*].*/
 export const __RICH_JSON_ARRAY_DELIMITERS = /[\[\]]/
 export const __RICH_JSON_ARRAY_REPLACE_SUBSTRING = "]["
 export const __RICH_JSON_ARRAY_REPLACE_NEWSTRING = "]|["
@@ -40,7 +39,7 @@ export const __RICH_JSON_NAME_IS_CONSTRUCTOR = (name) => (name.indexOf(__RICH_JS
 export const __RICH_JSON_NAME_IS_LATE_CONSTRUCTOR = (name) => (name.indexOf(__RICH_JSON_LATE_CONSTRUCTOR_SIGN) >= 0)
 export const __RICH_JSON_NAME_IS_INHERITANCE = (name) => (name.indexOf(__RICH_JSON_INHERITANCE_SIGN) >= 0)
 
-export const __RICH_JSON_INTERPOLATION_WILDCARD = "*{*}*"
+export const __RICH_JSON_INTERPOLATION_WILDCARD = /.*\{.*}.*/
 export const __RICH_JSON_INTERPOLATION_OPENING_SIGN = "{"
 export const __RICH_JSON_INTERPOLATION_CLOSING_SIGN = "}"
 
@@ -194,7 +193,7 @@ export class RichJsonParser {
         }
 
         if (typeof this.con.currentMember === "string") {
-            if (__RICH_JSON_CONFIG.stringInterpolationsEnabled && matchesWildcard(this.con.currentMember, __RICH_JSON_INTERPOLATION_WILDCARD)) {
+            if (__RICH_JSON_CONFIG.stringInterpolationsEnabled && __RICH_JSON_INTERPOLATION_WILDCARD.test(this.con.currentMember)) {
                 this.con.currentMember = this.__parseInterpolations();
                 if (!this.con.currentMember.isParsed) {
                     return this.con.currentMember.result;
@@ -263,7 +262,7 @@ export class RichJsonParser {
                 } else {
                     this.con.currentMember = this.__executeRichJsonCommandIfContainedInMember();
                 }
-                ipnParsed = !matchesWildcard(this.con.currentMember, __RICH_JSON_COMMAND_WILDCARD);
+                ipnParsed = !__RICH_JSON_COMMAND_WILDCARD.test(this.con.currentMember);
                 if (!ipnParsed) {
                     ipns[ipnLevel + 1].isParsed = false;
                 }
@@ -307,7 +306,7 @@ export class RichJsonParser {
     }
 
     __executeRichJsonCommandIfContainedInMember() {
-        if (matchesWildcard(this.con.currentMember, __RICH_JSON_COMMAND_WILDCARD)) {
+        if (__RICH_JSON_COMMAND_WILDCARD.test(this.con.currentMember)) {
             this.cache.stack[this.con.currentAddress] = {};
             this.con.currentMember = this.con.currentMember.split(__RICH_JSON_COMMAND_SUFFIX, 2);
             this.con.currentCommand = this.con.currentMember[0];
@@ -340,7 +339,7 @@ export class RichJsonParser {
             for (let i = 0; i < batch_commands.length; ++i) {
                 this.con.currentCommand = batch_commands[i];
                 if (this.__isRichJsonCommandEnabled(this.con.currentCommand)) {
-                    if (matchesWildcard(this.con.currentMember, __RICH_JSON_ARRAY_WILDCARD)) {
+                    if (typeof this.con.currentMember === "string" && __RICH_JSON_ARRAY_WILDCARD.test(this.con.currentMember)) {
                         let array = this.con.currentMember.split(__RICH_JSON_ARRAY_DELIMITERS, 3);
                         this.con.currentMember = array[0];
                         this.con.currentMember = __RICH_JSON_COMMANDS.enabled[this.con.currentCommand](this, this.con);
@@ -367,7 +366,7 @@ export class RichJsonParser {
                 this.con.currentMember = this.con.currentCommand[1].trim();
                 this.con.currentCommand = this.con.currentCommand[0].trim();
                 this.con.currentMember = this.__tryRichJsonCommand();
-                if (matchesWildcard(this.con.currentMember, __RICH_JSON_COMMAND_WILDCARD)) {
+                if (__RICH_JSON_COMMAND_WILDCARD.test(this.con.currentMember)) {
                     return `${unresolved_command}${unresolved_member}`; // reset member due to disabled command
                 }
             }
@@ -419,7 +418,7 @@ export class RichJsonParser {
 
         for (let i = 0; i < inheritance_chain.length; ++i) {
             this.con.currentMember = inheritance_chain[i].trim();
-            if (matchesWildcard(this.con.currentMember, __RICH_JSON_COMMAND_WILDCARD)) {
+            if (__RICH_JSON_COMMAND_WILDCARD.test(this.con.currentMember)) {
                 this.con.currentMember = this.con.currentMember.split(__RICH_JSON_COMMAND_SUFFIX, 2);
                 this.con.currentCommand = this.con.currentMember[0].trim();
                 this.con.currentMember = this.con.currentMember[1].trim();

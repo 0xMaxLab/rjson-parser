@@ -122,8 +122,8 @@ public class RichJsonHelper {
         if (member instanceof String) {
             String str = (String) member;
             // Check auf Command-Wildcards oder Interpolationen
-            if (RichJsonHelper.matchesWildcard(str, RichJsonConstants.COMMAND_WILDCARD) ||
-                    RichJsonHelper.matchesWildcard(str, RichJsonConstants.INTERPOLATION_WILDCARD)) {
+            if (RichJsonConstants.COMMAND_WILDCARD.matcher(str).find() ||
+                    RichJsonConstants.INTERPOLATION_WILDCARD.matcher(str).find()) {
                 return false;
             }
         } else {
@@ -388,11 +388,5 @@ public class RichJsonHelper {
             return keys;
         }
         return new ArrayList<>();
-    }
-
-    public static boolean matchesWildcard(String text, String wildcard) {
-        if (text == null || wildcard == null) return false;
-        var regex = Pattern.quote(wildcard).replace("*", "\\E.*\\Q").replace("?", "\\E.\\Q");
-        return Pattern.compile("^" + regex + "$").matcher(text).matches();
     }
 }
