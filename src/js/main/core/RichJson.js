@@ -3,7 +3,6 @@ import {
     __mergeIntoTarget,
     cloneObject,
     concatArrays,
-    concatStrings,
     getFieldByKey,
     getKeysSorted,
     isJsonObject,
@@ -107,7 +106,7 @@ export class RichJsonParser {
             this.con.currentMember = get(current, name, i);
             this.con.currentAddress = isJsonObject(this.con.currentMember) || Array.isArray(this.con.currentMember)
                 ? this.cache.resolveAddress(this.con.currentMember)
-                : concatStrings(currentAddress, isJsonObj ? `_${name}` : `_${i}`)
+                : currentAddress + (isJsonObj ? `_${name}` : `_${i}`)
             ;
             this.con.currentName = isJsonObj ? name : `"${currentName}_${i}`;
             this.con.currentMember = this.__parseRichJsonInMember();
@@ -258,7 +257,7 @@ export class RichJsonParser {
                 ipns[ipnLevel].rv = "";
                 ipnLevel--;
                 if ((ipns.length === ipnLevel + 3 && !ipns[ipnLevel + 2].isParsed)) { // in order to not resolve if children are unresolved
-                    this.con.currentMember = concatStrings(__RICH_JSON_INTERPOLATION_OPENING_SIGN, this.con.currentMember, __RICH_JSON_INTERPOLATION_CLOSING_SIGN);
+                    this.con.currentMember = __RICH_JSON_INTERPOLATION_OPENING_SIGN + this.con.currentMember + __RICH_JSON_INTERPOLATION_CLOSING_SIGN;
                 } else {
                     this.con.currentMember = this.__executeRichJsonCommandIfContainedInMember();
                 }
@@ -268,7 +267,7 @@ export class RichJsonParser {
                 }
                 this.con.currentMember = ipnParsed
                     ? this.con.currentMember
-                    : concatStrings(__RICH_JSON_INTERPOLATION_OPENING_SIGN, this.con.currentMember, __RICH_JSON_INTERPOLATION_CLOSING_SIGN)
+                    : __RICH_JSON_INTERPOLATION_OPENING_SIGN + this.con.currentMember + __RICH_JSON_INTERPOLATION_CLOSING_SIGN
                 ;
                 if (ipnLevel === -1) {
                     rv += this.con.currentMember;

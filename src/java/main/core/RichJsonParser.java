@@ -44,7 +44,7 @@ public class RichJsonParser {
                 this.con.currentMember = member;
                 this.con.currentAddress = (member instanceof Map || member instanceof List)
                         ? this.cache.resolveAddress(member)
-                        : RichJsonHelper.concatStrings(currentAddress, "_" + name);
+                        : currentAddress + "_" + name;
 
                 this.con.currentName = name;
                 this.con.currentMember = this.__parseRichJsonInMember();
@@ -57,8 +57,7 @@ public class RichJsonParser {
                 this.con.currentMember = member;
                 this.con.currentAddress = (member instanceof Map || member instanceof List)
                         ? this.cache.resolveAddress(member)
-                        : RichJsonHelper.concatStrings(currentAddress, "_" + i);
-
+                        : currentAddress + "_" + i;
                 this.con.currentName = currentName + "_" + i;
                 this.con.currentMember = this.__parseRichJsonInMember();
                 list.set(i, this.con.currentMember);
@@ -217,7 +216,7 @@ public class RichJsonParser {
                     ipnLevel--;
 
                     if (ipns.size() == ipnLevel + 3 && !ipns.get(ipnLevel + 2).isParsed) {
-                        this.con.currentMember = RichJsonHelper.concatStrings(String.valueOf(RichJsonConstants.INTERPOLATION_OPENING_SIGN), (String)this.con.currentMember, String.valueOf(RichJsonConstants.INTERPOLATION_CLOSING_SIGN));
+                        this.con.currentMember = String.valueOf(RichJsonConstants.INTERPOLATION_OPENING_SIGN) + this.con.currentMember + RichJsonConstants.INTERPOLATION_CLOSING_SIGN;
                     } else {
                         this.con.currentMember = this.__executeRichJsonCommandIfContainedInMember();
                     }
@@ -225,7 +224,7 @@ public class RichJsonParser {
                     var ipnParsed = !RichJsonConstants.COMMAND_WILDCARD.matcher((String)this.con.currentMember).find();
                     if (!ipnParsed) ipns.get(ipnLevel + 1).isParsed = false;
 
-                    this.con.currentMember = ipnParsed ? this.con.currentMember : RichJsonHelper.concatStrings(String.valueOf(RichJsonConstants.INTERPOLATION_OPENING_SIGN), (String)this.con.currentMember, String.valueOf(RichJsonConstants.INTERPOLATION_CLOSING_SIGN));
+                    this.con.currentMember = ipnParsed ? this.con.currentMember : String.valueOf(RichJsonConstants.INTERPOLATION_OPENING_SIGN) + this.con.currentMember + RichJsonConstants.INTERPOLATION_CLOSING_SIGN;
 
                     if (ipnLevel == -1) rv.append(this.con.currentMember);
                     else ipns.get(ipnLevel).rv.append(this.con.currentMember);

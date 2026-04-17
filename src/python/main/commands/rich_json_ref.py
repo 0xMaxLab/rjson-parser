@@ -2,7 +2,7 @@
 References the given member's value (any)
 """
 from ..core.rich_json_constants import _RICH_JSON_COMMAND_PATH_DELIMITER
-from ..helper.rich_json_helper import concat_strings, is_json_object
+from ..helper.rich_json_helper import is_json_object
 
 
 def _execute_ref_command(parser, context):
@@ -23,7 +23,7 @@ def _execute_ref_command(parser, context):
         if is_json_object(context.current_member) or isinstance(context.current_member, list):
             context.current_address = parser.cache.resolve_address(context.current_member)
         else:
-            context.current_address = concat_strings(parser.cache.resolve_address(prev_member), "_", ref)
+            context.current_address = parser.cache.resolve_address(prev_member) + "_" + ref
 
         context.current_member = parser._parse_rich_json_in_member()
         prev_member = context.current_member

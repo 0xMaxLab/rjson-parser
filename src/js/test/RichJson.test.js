@@ -6,7 +6,7 @@ import {
     RichJsonModule,
     unregisterModule
 } from "../main/module/RichJsonModule.js";
-import {concatArrays, concatStrings, mergeObjects, resolveAddress} from "../main/helper/RichJsonHelper.js";
+import {concatArrays, mergeObjects} from "../main/helper/RichJsonHelper.js";
 import {parse} from "../main/core/RichJson_parse.js";
 import stringify from "json-stable-stringify";
 import {isResolved} from "../main/helper/RichJson_isResolved.js";
@@ -22,7 +22,7 @@ test('Module', () => {
     registerModule(
         new RichJsonModule("test")
             .addCommand("ilog", function (_cryptkey, _add_to_cache, _root, _command, _message, _address, _name) {
-                console.log(concatStrings("file_struct_plain_rich_json_module_ok: ", _message));
+                console.log("file_struct_plain_rich_json_module_ok: " + _message);
                 return "success";
             })
     );

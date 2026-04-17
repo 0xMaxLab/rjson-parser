@@ -234,17 +234,6 @@ export function isJsonObject(object) {
 }
 
 /**
- * Concat redundancy strings.
- * @param {...String} strings
- * @returns {String}
- */
-export function concatStrings(...strings) {
-    let rv = "";
-    strings.forEach((str) => rv += str);
-    return rv;
-}
-
-/**
  * Concat redundancy arrays.
  * @param {...Array} arrays
  * @returns {Array}

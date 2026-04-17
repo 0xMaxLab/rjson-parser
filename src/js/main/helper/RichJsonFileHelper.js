@@ -1,5 +1,5 @@
 import fs from 'fs';
-import {concatStrings, mergeIntoTarget} from "./RichJsonHelper.js";
+import {mergeIntoTarget} from "./RichJsonHelper.js";
 import {parse} from "../core/RichJson_parse.js";
 import * as PATH from 'node:path';
 import {__RICH_JSON_CONFIG} from "../other/RichJsonConfiguration.js";
@@ -24,9 +24,9 @@ export function readDirectory(path, _executeLateApplies = false) {
     entries.forEach(entry => {
         if (entry.isFile()) {
             let nameWithoutExtension = PATH.parse(entry.name).name;
-            rv[nameWithoutExtension] = readFile(concatStrings(path, "/", entry.name), true);
+            rv[nameWithoutExtension] = readFile(path + "/" + entry.name, true);
         } else if (entry.isDirectory()) {
-            rv[entry.name] = readDirectory(concatStrings(path, "/", entry.name), true);
+            rv[entry.name] = readDirectory(path + "/" + entry.name, true);
         }
     });
 

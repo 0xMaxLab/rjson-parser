@@ -36,7 +36,7 @@ from .rich_json_constants import (
     _RICH_JSON_INTERPOLATION_CLOSING_SIGN
 )
 from ..helper.rich_json_helper import (
-    concat_arrays, concat_strings,
+    concat_arrays,
     get_keys_sorted, is_json_object, merge_into_target, clone_object,
     _merge_into_target, has_field, get_field, delete_field, set_field
 )
@@ -141,7 +141,7 @@ class RichJsonParser:
             self.con.current_address = (
                 self.cache.resolve_address(self.con.current_member)
                 if is_member_obj_or_list
-                else concat_strings(current_address, suffix)
+                else current_address + suffix
             )
 
             self.con.current_name = actual_name if is_json_obj else f'"{current_name}_{i}'
@@ -273,16 +273,16 @@ class RichJsonParser:
                 ipns[ipn_level]["rv"] = ""
                 ipn_level -= 1
                 if len(ipns) == ipn_level + 3 and not ipns[ipn_level + 2]["is_parsed"]:
-                    self.con.current_member = concat_strings(_RICH_JSON_INTERPOLATION_OPENING_SIGN,
-                                                             self.con.current_member,
+                    self.con.current_member = (_RICH_JSON_INTERPOLATION_OPENING_SIGN +
+                                                             self.con.current_member +
                                                              _RICH_JSON_INTERPOLATION_CLOSING_SIGN)
                 else:
                     self.con.current_member = self._execute_rich_json_command_if_contained_in_member()
 
                 if bool(_RICH_JSON_COMMAND_WILDCARD.search(str(self.con.current_member))):
                     ipns[ipn_level + 1]["is_parsed"] = False
-                    self.con.current_member = concat_strings(_RICH_JSON_INTERPOLATION_OPENING_SIGN,
-                                                             self.con.current_member,
+                    self.con.current_member = (_RICH_JSON_INTERPOLATION_OPENING_SIGN +
+                                                             self.con.current_member +
                                                              _RICH_JSON_INTERPOLATION_CLOSING_SIGN)
 
                 if ipn_level == -1:

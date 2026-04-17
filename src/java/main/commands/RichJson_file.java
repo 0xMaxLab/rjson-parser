@@ -9,7 +9,7 @@ import core.RichJsonParser;
 public class RichJson_file implements RichJsonCommand {
     @Override
     public Object execute(RichJsonParser parser, RichJsonContext context) {
-        String fileName = RichJsonHelper.concatStrings((String) context.currentMember, ".json");
+        String fileName = context.currentMember + ".json";
         return RichJsonFileHelper.readFile(fileName, true);
     }
 }

@@ -1,7 +1,7 @@
 import json
 import os
 
-from .rich_json_helper import concat_strings, merge_into_target
+from .rich_json_helper import merge_into_target
 from ..core.rich_json import set_command_enabled, parse_rich_json
 from ..core.rich_json_constants import _RICH_JSON_LATE_APPLIES
 from ..other.rich_json_configuration import _RICH_JSON_CONFIG
@@ -27,9 +27,9 @@ def read_directory(path, _execute_late_applies=False):
         for entry in entries:
             if entry.is_file():
                 name_without_extension = os.path.splitext(entry.name)[0]
-                rv[name_without_extension] = read_file(concat_strings(path, "/", entry.name), True)
+                rv[name_without_extension] = read_file(path + "/" + entry.name, True)
             elif entry.is_dir():
-                rv[entry.name] = read_directory(concat_strings(path, "/", entry.name), True)
+                rv[entry.name] = read_directory(path + "/" + entry.name, True)
 
     if not _execute_late_applies:
         for cmd in _RICH_JSON_LATE_APPLIES:

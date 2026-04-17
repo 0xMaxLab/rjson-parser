@@ -1,4 +1,3 @@
-import re
 import types
 
 from ..core.rich_json_cache import RichJsonCache
@@ -211,17 +210,6 @@ def get_keys_sorted(obj):
         return []
     keys.sort(key=str.lower)
     return keys
-
-
-def concat_strings(*strings):
-    """
-    Concat redundancy strings.
-
-    :param strings: Variable length string arguments.
-    :return: The concatenated string.
-    """
-    return "".join(strings)
-
 
 def concat_arrays(*arrays):
     """

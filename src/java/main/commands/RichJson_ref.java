@@ -51,7 +51,7 @@ public class RichJson_ref implements RichJsonCommand {
             // Adresse für den Cache/Kontext aktualisieren (JS Logik)
             context.currentAddress = (context.currentMember instanceof Map || context.currentMember instanceof List)
                     ? parser.cache.resolveAddress(context.currentMember)
-                    : RichJsonHelper.concatStrings(parser.cache.resolveAddress(prevMember), "_", ref);
+                    : parser.cache.resolveAddress(prevMember) + "_" + ref;
 
             // WICHTIG: Das gefundene Member parsen, bevor es zum prevMember für die nächste Iteration wird
             context.currentMember = parser.__parseRichJsonInMember();

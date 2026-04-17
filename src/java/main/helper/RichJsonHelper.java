@@ -306,22 +306,6 @@ public class RichJsonHelper {
     }
 
     /**
-     * Konkateniert mehrere Objekte zu einem String.
-     *
-     * @param strings Variable Anzahl an Objekten (meist Strings)
-     * @return Der zusammengefügte String
-     */
-    public static String concatStrings(Object... strings) {
-        var rv = new StringBuilder();
-        for (var str : strings) {
-            if (str != null) {
-                rv.append(str);
-            }
-        }
-        return rv.toString();
-    }
-
-    /**
      * Konkateniert mehrere Listen zu einer neuen Liste.
      *
      * @param arrays Variable Anzahl an Listen

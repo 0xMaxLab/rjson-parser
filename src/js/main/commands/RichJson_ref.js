@@ -2,7 +2,7 @@
     references the given member's value (any)
 */
 
-import {concatStrings, isJsonObject} from "../helper/RichJsonHelper.js";
+import {isJsonObject} from "../helper/RichJsonHelper.js";
 import {__RICH_JSON_COMMAND_PATH_DELIMITER} from "../core/RichJson.js";
 
 export function __executeRefCommand(parser, context) {
@@ -25,7 +25,7 @@ export function __executeRefCommand(parser, context) {
         }
         context.currentAddress = isJsonObject(context.currentMember) || Array.isArray(context.currentMember)
             ? parser.cache.resolveAddress(context.currentMember)
-            : concatStrings(parser.cache.resolveAddress(prevMember), "_", ref)
+            : parser.cache.resolveAddress(prevMember) + "_" + ref
         ;
         context.currentMember = parser.__parseRichJsonInMember();
         prevMember = context.currentMember;
