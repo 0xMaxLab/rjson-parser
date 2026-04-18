@@ -8,6 +8,7 @@ import module.RichJsonModuleManager;
 import org.junit.jupiter.api.Test;
 import other.RichJsonEnvironment;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -388,10 +389,11 @@ public class RichJsonTest {
 
         List<Object> seventh = (List<Object>) content.get("seventh");
         List<Object> eigth = (List<Object>) content.get("eigth");
-        List<Object> concat1 = RichJsonHelper.concatArrays(seventh, eigth);
-        List<Object> finalConcat = RichJsonHelper.concatArrays(concat1, eigth);
-
-        assertEquals(stringify(finalConcat), stringify(content.get("tenth")));
+        List<Object> tenth = new ArrayList<>();
+        tenth.addAll(seventh);
+        tenth.addAll(eigth);
+        tenth.addAll(eigth);
+        assertEquals(stringify(tenth), stringify(content.get("tenth")));
     }
 
     @Test

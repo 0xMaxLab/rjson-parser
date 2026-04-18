@@ -3,7 +3,6 @@ import unittest
 
 from main.core.rich_json import parse_rich_json
 from main.helper.rich_json_helper import (
-    concat_arrays,
     merge_objects,
 )
 from main.helper.rich_json_is_resolved import is_resolved
@@ -189,9 +188,11 @@ class TestRichJsonSuite(unittest.TestCase):
         parse_rich_json(content)
         expected_merge = merge_objects(content["first"]["second"], content["first"]["third"])
         self.assertEqual(stringify(content["fourth"]["fifth"]), stringify(expected_merge))
-        self.assertEqual(content["tenth"],
-                         concat_arrays(concat_arrays(content["seventh"], content["eight"]), content["eight"]))
-
+        tenth = []
+        tenth.extend(content["seventh"])
+        tenth.extend(content["eight"])
+        tenth.extend(content["eight"])
+        self.assertEqual(content["tenth"], tenth)
     def test_copy(self):
         content = {
             "first": {"second": "second", "test": "$copy:first"},

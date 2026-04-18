@@ -3,6 +3,7 @@ package commands;
 import core.*;
 import helper.RichJsonHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,15 +33,14 @@ public class RichJson_merge implements RichJsonCommand {
             return targetMap;
         } else {
             // Logik für Listen (Arrays)
-            List<Object> targetList = (List<Object>) context.currentMember;
+            List<Object> targetList = new ArrayList<>();
             parser.cache.stack.put(originalAddress, targetList);
 
-            for (int i = 1; i < refs.length; i++) {
+            for (int i = 0; i < refs.length; i++) {
                 context.currentMember = refs[i].trim();
                 List<Object> nextRef = (List<Object>) RichJsonCommandHolder.executeCommand("ref", parser, context);
                 context.currentAddress = originalAddress;
-                targetList = RichJsonHelper.concatArrays(targetList, nextRef);
-                parser.cache.stack.put(originalAddress, targetList);
+                targetList.addAll(nextRef);
             }
             return targetList;
         }

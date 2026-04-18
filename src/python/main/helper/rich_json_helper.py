@@ -210,16 +210,3 @@ def get_keys_sorted(obj):
         return []
     keys.sort(key=str.lower)
     return keys
-
-def concat_arrays(*arrays):
-    """
-    Concat redundancy arrays.
-
-    :param arrays: Variable length array arguments.
-    :return: A list containing all the arrays.
-    """
-    rv = []
-    for array in arrays:
-        rv.append(array)
-    return rv
-

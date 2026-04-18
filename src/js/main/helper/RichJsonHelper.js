@@ -232,14 +232,3 @@ export function getKeysSorted(object) {
 export function isJsonObject(object) {
     return typeof object === 'object' && !Array.isArray(object) && (object.constructor === Object || Object.hasOwn(__RICH_JSON_CLASS_MAPPING, object.constructor.name));
 }
-
-/**
- * Concat redundancy arrays.
- * @param {...Array} arrays
- * @returns {Array}
- */
-export function concatArrays(...arrays) {
-    let rv = [];
-    arrays.forEach((array) => rv.push(array));
-    return rv;
-}

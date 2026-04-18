@@ -36,7 +36,6 @@ from .rich_json_constants import (
     _RICH_JSON_INTERPOLATION_CLOSING_SIGN
 )
 from ..helper.rich_json_helper import (
-    concat_arrays,
     get_keys_sorted, is_json_object, merge_into_target, clone_object,
     _merge_into_target, has_field, get_field, delete_field, set_field
 )
@@ -308,7 +307,7 @@ class RichJsonParser:
             kcmds = get_field(self.con.current_member, _RICH_JSON_KEY_COMMAND_MEMBER)
             for kcmd in kcmds:
                 if self._is_rich_json_command_enabled(kcmd) and kcmd in _RICH_JSON_COMMANDS.kcmd_ignored:
-                    rv = concat_arrays(rv, _RICH_JSON_COMMANDS.kcmd_ignored[kcmd])
+                    rv.extend(_RICH_JSON_COMMANDS.kcmd_ignored[kcmd])
         return rv
 
     def _execute_rich_json_command_if_contained_in_member(self):

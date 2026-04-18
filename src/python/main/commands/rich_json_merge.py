@@ -3,7 +3,7 @@ Joins two structs or arrays together
 """
 from .rich_json_ref import _execute_ref_command
 from ..core.rich_json import _RICH_JSON_COMMAND_DELIMITER
-from ..helper.rich_json_helper import concat_arrays, get_field, is_json_object, merge_into_target
+from ..helper.rich_json_helper import get_field, is_json_object, merge_into_target
 
 
 def _execute_merge_command(parser, context):
@@ -23,13 +23,12 @@ def _execute_merge_command(parser, context):
             context.current_address = current_address
             merge_into_target(struct_or_array, context.current_member)
     else:
-        struct_or_array = context.current_member
+        struct_or_array = []
         parser.cache.stack[context.current_address] = struct_or_array
-        for i in range(1, len(refs)):
+        for i in range(0, len(refs)):
             context.current_member = refs[i].strip()
             context.current_member = _execute_ref_command(parser, context)
             context.current_address = current_address
-            struct_or_array = concat_arrays(struct_or_array, context.current_member)
-            parser.cache.stack[context.current_address] = struct_or_array
+            struct_or_array.extend(context.current_member)
 
     return struct_or_array

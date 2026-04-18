@@ -2,7 +2,6 @@ import "../helper/RichJsonHelper.js"
 import {
     __mergeIntoTarget,
     cloneObject,
-    concatArrays,
     getFieldByKey,
     getKeysSorted,
     isJsonObject,
@@ -296,7 +295,7 @@ export class RichJsonParser {
             for (let i = 0, len = this.con.currentMember[__RICH_JSON_KEY_COMMAND_MEMBER].length; i < len; ++i) {
                 kcmd = this.con.currentMember[__RICH_JSON_KEY_COMMAND_MEMBER][i];
                 if (this.__isRichJsonCommandEnabled(kcmd) && Object.hasOwn(__RICH_JSON_COMMANDS.kcmd_ignored, kcmd)) {
-                    rv = concatArrays(rv, __RICH_JSON_COMMANDS.kcmd_ignored[kcmd]);
+                    rv = rv.join(__RICH_JSON_COMMANDS.kcmd_ignored[kcmd]);
                 }
             }
         }

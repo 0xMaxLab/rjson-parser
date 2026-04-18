@@ -6,7 +6,7 @@ import {
     RichJsonModule,
     unregisterModule
 } from "../main/module/RichJsonModule.js";
-import {concatArrays, mergeObjects} from "../main/helper/RichJsonHelper.js";
+import {mergeObjects} from "../main/helper/RichJsonHelper.js";
 import {parse} from "../main/core/RichJson_parse.js";
 import stringify from "json-stable-stringify";
 import {isResolved} from "../main/helper/RichJson_isResolved.js";
@@ -275,7 +275,11 @@ test('$merge', () => {
     parse(content);
 
     expect(stringify(content.fourth.fifth)).toBe(stringify(mergeObjects(content.first.second, content.first.third)));
-    expect(stringify(content.tenth)).toBe(stringify(concatArrays(concatArrays(content.seventh, content.eigth), content.eigth)));
+    let tenth = [];
+    tenth.join(content.seventh);
+    tenth.join(content.eigth);
+    tenth.join(content.eigth);
+    expect(stringify(content.tenth)).toBe(stringify(tenth));
 });
 
 test('$copy', () => {

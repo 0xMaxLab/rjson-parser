@@ -306,23 +306,6 @@ public class RichJsonHelper {
     }
 
     /**
-     * Konkateniert mehrere Listen zu einer neuen Liste.
-     *
-     * @param arrays Variable Anzahl an Listen
-     * @return Eine neue Liste, die alle Elemente enthält
-     */
-    @SafeVarargs
-    public static List<Object> concatArrays(List<Object>... arrays) {
-        var rv = new ArrayList<Object>();
-        for (var array : arrays) {
-            if (array != null) {
-                rv.addAll(array);
-            }
-        }
-        return rv;
-    }
-
-    /**
      * Holt ein Feld eines Objekts anhand eines Schlüssels (String).
      * Unterstützt Maps, Listen (falls der Key eine Zahl ist) und POJOs via Reflection/Jackson.
      */

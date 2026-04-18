@@ -2,7 +2,7 @@
     joins two structs or arrays together
 */
 
-import {concatArrays, getFieldByKey, isJsonObject, mergeIntoTarget} from "../helper/RichJsonHelper.js";
+import {getFieldByKey, isJsonObject, mergeIntoTarget} from "../helper/RichJsonHelper.js";
 import {__executeRefCommand} from "./RichJson_ref.js";
 import {__RICH_JSON_COMMAND_DELIMITER} from "../core/RichJson.js";
 
@@ -23,14 +23,13 @@ export function __executeMergeCommand(parser, context) {
             mergeIntoTarget(struct_or_array, context.currentMember);
         }
     } else {
-        struct_or_array = context.currentMember;
+        struct_or_array = [];
         parser.cache.stack[context.currentAddress] = struct_or_array; // TODO look ahead for array or object in __resolveRichJsonInMember
-        for (let i = 1; i < refs.length; ++i) {
+        for (let i = 0; i < refs.length; ++i) {
             context.currentMember = refs[i].trim();
             context.currentMember = __executeRefCommand(parser, context);
             context.currentAddress = currentAddress;
-            struct_or_array = concatArrays(struct_or_array, context.currentMember);
-            parser.cache.stack[context.currentAddress] = struct_or_array; // concat creates a new array
+            struct_or_array.join(context.currentMember);
         }
     }
 
