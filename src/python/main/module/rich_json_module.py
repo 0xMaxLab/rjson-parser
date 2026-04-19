@@ -1,8 +1,10 @@
-from ..core.rich_json import _RICH_JSON_COMMANDS, logger
+from ..core.rich_json import _RICH_JSON_COMMANDS
 from ..core.rich_json_constants import _RICH_JSON_LATE_APPLIES
+from ..helper.rich_json_logger import RichJsonLogger
 from ..other.rich_json_configuration import _RICH_JSON_CONFIG
 
 _RICH_JSON_MODULES = {}
+logger = RichJsonLogger.logger
 
 
 class RichJsonModule:
@@ -90,8 +92,8 @@ def register_module(module):
     """
     Registers a RichJson module.
     """
-    if _RICH_JSON_CONFIG["log_enabled"]:
-        logger.info(f"registering module '{module.name}'")
+    if _RICH_JSON_CONFIG["info_enabled"]:
+        logger.info(f"RichJSON: registering module '{module.name}'")
     _RICH_JSON_MODULES[module.name] = module
     return module
 
@@ -103,10 +105,10 @@ def unregister_module(name):
     if is_module_registered(name):
         module = _RICH_JSON_MODULES[name]
         if module.is_included:
-            raise RuntimeError(f"RichJSON: Cannot unregister module '{name}' because it is currently included")
+            raise RuntimeError(f"RichJSON: can not unregister module '{name}' because it is currently included")
 
-        if _RICH_JSON_CONFIG["log_enabled"]:
-            logger.info(f"unregistering module '{name}'")
+        if _RICH_JSON_CONFIG["info_enabled"]:
+            logger.info(f"RichJSON: unregistering module '{name}'")
         del _RICH_JSON_MODULES[name]
 
 
@@ -124,8 +126,8 @@ def include_module(name):
     if is_module_registered(name):
         module = _RICH_JSON_MODULES[name]
         if not module.is_included:
-            if _RICH_JSON_CONFIG["log_enabled"]:
-                logger.info(f"including module '{name}'")
+            if _RICH_JSON_CONFIG["info_enabled"]:
+                logger.info(f"RichJSON: including module '{name}'")
             module._include()
 
 
@@ -136,6 +138,6 @@ def exclude_module(name):
     if is_module_registered(name):
         module = _RICH_JSON_MODULES[name]
         if module.is_included:
-            if _RICH_JSON_CONFIG["log_enabled"]:
-                logger.info(f"excluding module '{name}'")
+            if _RICH_JSON_CONFIG["info_enabled"]:
+                logger.info(f"RichJSON: excluding module '{name}'")
             module._exclude()

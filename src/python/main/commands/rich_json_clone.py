@@ -16,7 +16,6 @@ def _execute_clone_command(parser, context):
     parser.cache.clone_address = context.current_address
     context.current_member = clone_object(context.current_member)
 
-    if _RICH_JSON_CONFIG["debug_enabled"]:
-        logging.debug(f"RichJson resolved clone in '{parser.cache.clone_address}'.")
+    parser.logger.debug(f"RichJson resolved clone in '{parser.cache.clone_address}'.")
 
     return context.current_member

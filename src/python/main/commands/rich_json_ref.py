@@ -14,6 +14,7 @@ def _execute_ref_command(parser, context):
     refs = context.current_member.split(_RICH_JSON_COMMAND_PATH_DELIMITER)
 
     for ref in refs:
+        context.current_name = ref
         if is_json_object(prev_member):
             if ref in prev_member:
                 context.current_member = prev_member[ref]
@@ -26,7 +27,9 @@ def _execute_ref_command(parser, context):
             context.current_address = parser.cache.resolve_address(prev_member) + "_" + ref
 
         context.current_member = parser._parse_rich_json_in_member()
+        context.current_path.append(ref)
         prev_member = context.current_member
 
     context.current_address = current_address
+    context.current_path[len(context.current_path) - len(refs): len(context.current_path)] = []
     return context.current_member

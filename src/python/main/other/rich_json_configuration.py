@@ -1,7 +1,7 @@
 from ..helper.rich_json_helper import merge_into_target
 
 _RICH_JSON_CONFIG = {
-    "log_enabled": True,
+    "info_enabled": True,
     "debug_enabled": False,
     "string_interpolations_enabled": True,
     "file_cache_enabled": True,
@@ -26,7 +26,7 @@ def update_configuration(config):
         return
 
     default_config = {
-        "logging_enabled": True,
+        "info_enabled": True,
         "debug_enabled": False,
         "string_interpolations_enabled": True,
         "file_cache_enabled": True,
