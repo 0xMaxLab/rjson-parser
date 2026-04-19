@@ -1,7 +1,7 @@
 import {mergeIntoTarget} from "../helper/RichJsonHelper.js";
 
 export let __RICH_JSON_CONFIG = {
-    logEnabled: true,
+    infoEnabled: true,
     debugEnabled: false,
     stringInterpolationsEnabled: true,
     fileCacheEnabled: true,
@@ -12,7 +12,7 @@ export let __RICH_JSON_CONFIG = {
 /**
  * Updates the global configuration for the library.
  * * @param {Object} config - The configuration object.
- * @param {boolean} [config.logEnabled=true] - When true, enables rich JSON logging.
+ * @param {boolean} [config.infoEnabled=true] - When true, enables rich JSON logging.
  * @param {boolean} [config.debugEnabled=false] - When true, enables rich JSON logging for debugging purposes.
  * @param {boolean} [config.stringInterpolationsEnabled=true] - Toggles whether string interpolations are resolved.
  * @param {boolean} [config.fileCacheEnabled=true] - Toggles the internal file system caching mechanism.
@@ -30,7 +30,7 @@ export function updateConfiguration(config) {
     }
 
     __RICH_JSON_CONFIG = mergeIntoTarget({
-        logEnabled: true,
+        infoEnabled: true,
         debugEnabled: false,
         stringInterpolationsEnabled: true,
         fileCacheEnabled: true,

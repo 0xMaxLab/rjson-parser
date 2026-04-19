@@ -15,8 +15,6 @@ export function __executeCloneCommand(parser, context) {
     }
     parser.cache.cloneAddress = context.currentAddress;
     context.currentMember = cloneObject(context.currentMember);
-    if (__RICH_JSON_CONFIG.debugEnabled) {
-        console.debug(`${parser.label} resolved clone at '${context.currentPath.join(__RICH_JSON_COMMAND_PATH_DELIMITER)}'.`);
-    }
+    parser.logger.debug(`${parser.label} resolved clone at '${context.currentPath.join(__RICH_JSON_COMMAND_PATH_DELIMITER)}'.`);
     return context.currentMember;
 }

@@ -60,12 +60,12 @@ export function setCommandEnabled(command, enabled) {
     }
 
     if (__RICH_JSON_CONFIG.debugEnabled) {
-        console.debug(`RichJson command '${command}' was ${enabled ? "enabled" : "disabled"}.`);
+        console.debug(`RichJSON: command '${command}' was ${enabled ? "enabled" : "disabled"}.`);
     }
 }
 
 export function __throwCommandNotFound(command) {
-    throw (`RichJson Command '${command}' not found`);
+    throw (`RichJSON: Command '${command}' not found`);
 }
 
 
