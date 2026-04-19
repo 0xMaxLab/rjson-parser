@@ -20,7 +20,6 @@ public class RichJsonTest {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    // Hilfsmethode, um das JS-Literal-Feeling in Java zu replizieren
     @SuppressWarnings("unchecked")
     private Map<String, Object> parseJson(String json) {
         try {
@@ -84,16 +83,13 @@ public class RichJsonTest {
             // ignore
         }
 
-        // Kommando wurde nicht aufgelöst, da Modul deaktiviert
         assertEquals("$ilog:Hello World!", content2.get("first"));
     }
 
-    // Dummy-Klasse für den Constructor-Test
     public static class RichJsonTestClass {
         public int value;
         public Map<String, Object> second;
 
-        // Jackson benötigt einen Default-Konstruktor
         public RichJsonTestClass() {
         }
     }
@@ -101,10 +97,6 @@ public class RichJsonTest {
     @Test
     @SuppressWarnings("unchecked")
     void testConstructor() throws Exception {
-        // Angenommen, du hast eine Methode zum Registrieren von Klassen.
-        // Falls deine Logik das über Reflection macht, muss der Fully Qualified Name rein.
-        // RichJsonClassMapping.addClassMapping("RichJsonTestClass", RichJsonTestClass.class);
-
         Map<String, Object> content = parseJson("""
                     {
                         "first=RichJsonTestClass": {

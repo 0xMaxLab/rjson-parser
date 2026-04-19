@@ -22,11 +22,9 @@ public class RichJson_env implements RichJsonCommand {
             Object envVal = RichJsonEnvironment.env.get(firstRef);
             context.currentMember = envVal;
 
-            // Setzt temporär den Root auf die Env-Variable für interne Auflösungen
             context.root = (envVal instanceof Map) ? envVal : Map.of();
             context.currentAddress = parser.cache.resolveAddress(context.root);
 
-            // Rekursives Parsen des Inhalts der Env-Variable
             context.currentMember = parser.__parseRichJsonInMember();
             RichJsonEnvironment.env.put(firstRef, context.currentMember);
 

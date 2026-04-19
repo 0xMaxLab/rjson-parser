@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/rjson-parser-java.iml" filepath="$PROJECT_DIR$/rjson-parser-java.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rjson-parser-python.iml" filepath="$PROJECT_DIR$/rjson-parser-python.iml" />
     </modules>
   </component>
 </project>

@@ -15,7 +15,6 @@ public class RichJson_merge implements RichJsonCommand {
         Object structOrArray = parser.cache.stack.get(context.currentAddress);
         String originalAddress = context.currentAddress;
 
-        // Ersten Ref auflösen
         context.currentMember = refs[0].trim();
         context.currentMember = RichJsonCommandHolder.executeCommand("ref", parser, context);
         context.currentAddress = originalAddress;
@@ -32,7 +31,6 @@ public class RichJson_merge implements RichJsonCommand {
             }
             return targetMap;
         } else {
-            // Logik für Listen (Arrays)
             List<Object> targetList = new ArrayList<>();
             parser.cache.stack.put(originalAddress, targetList);
 

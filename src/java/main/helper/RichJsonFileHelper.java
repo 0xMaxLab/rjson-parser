@@ -28,7 +28,6 @@ public class RichJsonFileHelper {
 
         if (entries == null) return rv;
 
-        // Deaktiviert "Late Applies" (z.B. Env/Ref), falls nicht explizit gewünscht
         if (!executeLateApplies) {
             RichJsonCommandHolder.lateApplies.forEach(cmd -> RichJsonCommandHolder.setCommandEnabled(cmd, false));
         }
@@ -36,16 +35,13 @@ public class RichJsonFileHelper {
         for (File entry : entries) {
             String name = entry.getName();
             if (entry.isFile()) {
-                // Dateiname ohne Endung als Key (z.B. "config" statt "config.json")
                 String nameWithoutExtension = name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name;
                 rv.put(nameWithoutExtension, readFile(entry.getPath(), true));
             } else if (entry.isDirectory()) {
-                // Rekursiver Aufruf für Unterordner
                 rv.put(name, readDirectory(entry.getPath(), true));
             }
         }
 
-        // Reaktivierung der Commands
         if (!executeLateApplies) {
             RichJsonCommandHolder.lateApplies.forEach(cmd -> RichJsonCommandHolder.setCommandEnabled(cmd, true));
         }
@@ -73,14 +69,11 @@ public class RichJsonFileHelper {
 
         Object rv;
         try {
-            // Datei einlesen
             Path path = Paths.get(pathStr);
             String content = Files.readString(path, StandardCharsets.UTF_8);
 
-            // In Map/List konvertieren
             rv = MAPPER.readValue(content, Object.class);
 
-            // Den RichJsonParser anwenden
             RichJsonParser parser = new RichJsonParser();
             rv = parser.parse(rv, true);
 

@@ -8,8 +8,6 @@ import java.util.*;
 public class RichJsonCommandHolder {
 
     public static final RichJsonCommandHolder INSTANCE = new RichJsonCommandHolder();
-
-    // Instanz-Variablen (explizite Typen erforderlich)
     public static final RichJsonCommand VOID_COMMAND = (p, c) -> null;
 
     public Map<String, RichJsonCommand> available = new HashMap<>();
@@ -21,7 +19,6 @@ public class RichJsonCommandHolder {
     public RichJsonCommandHolder() {
         this.registerBuiltInCommands();
 
-        // Initial alle verfügbaren Commands aktivieren
         this.enabled.putAll(this.available);
         this.builtIn.putAll(this.available);
     }

@@ -10,7 +10,6 @@ import java.util.Map;
  */
 public class RichJsonEnvironment {
 
-    // Das Äquivalent zu __RICH_JSON_ENVIRONMENT
     public static final Map<String, Object> env = new HashMap<>();
 
     /**
@@ -31,12 +30,10 @@ public class RichJsonEnvironment {
      * @param value Der Wert der Variable.
      */
     public static void addEnvironmentVariable(String name, Object value) {
-        // Ignoriere den Key-Command Member (analog zum JS Check)
         if (RichJsonConstants.KEY_COMMAND_MEMBER.equals(name)) {
             return;
         }
 
-        // Prüfe, ob das Macro bereits existiert
         if (env.containsKey(name)) {
             throw new RuntimeException("RichJson has the macro '" + name + "' already defined");
         }

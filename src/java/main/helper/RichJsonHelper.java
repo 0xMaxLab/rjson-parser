@@ -62,18 +62,15 @@ public class RichJsonHelper {
      */
     public static boolean isResolved(Object object) {
         RichJsonParser parser = new RichJsonParser();
-        // Nutzt die resolveAddress Logik des Caches für das Root-Objekt
         return isResolvedRecursive(parser, object, parser.cache.resolveAddress(object));
     }
 
     @SuppressWarnings("unchecked")
     private static boolean isResolvedRecursive(RichJsonParser parser, Object object, String address) {
-        // undefined/null gilt als aufgelöst
         if (object == null) {
             return true;
         }
 
-        // Zirkuläre Referenzen via Cache-Stack abfangen
         if (parser.cache.stack.containsKey(address)) {
             return true;
         }
@@ -81,7 +78,6 @@ public class RichJsonHelper {
 
         boolean isJsonObj = object instanceof Map;
 
-        // 1. Check auf Key-Commands oder Late-Constructors im Objekt
         if (isJsonObj) {
             Map<String, Object> map = (Map<String, Object>) object;
             if (map.containsKey(RichJsonConstants.KEY_COMMAND_MEMBER) ||
@@ -90,7 +86,6 @@ public class RichJsonHelper {
             }
         }
 
-        // 2. Iteration über Member (Map-Values oder List-Elemente)
         if (isJsonObj) {
             Map<String, Object> map = (Map<String, Object>) object;
             for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -114,20 +109,17 @@ public class RichJsonHelper {
      * Hilfsmethode zur Validierung eines einzelnen Members.
      */
     private static boolean checkMember(RichJsonParser parser, Object member, String keyOrIndex, String parentAddress) {
-        // Nur Strings, Listen und Maps können RichJson enthalten
         if (!parser.__isMemberRichJsonAble(member)) {
             return true;
         }
 
         if (member instanceof String) {
             String str = (String) member;
-            // Check auf Command-Wildcards oder Interpolationen
             if (RichJsonConstants.COMMAND_WILDCARD.matcher(str).find() ||
                     RichJsonConstants.INTERPOLATION_WILDCARD.matcher(str).find()) {
                 return false;
             }
         } else {
-            // Rekursiver Check für verschachtelte Strukturen
             String memberAddress = parser.cache.resolveAddress(member);
             if (!isResolvedRecursive(parser, member, memberAddress)) {
                 return false;
@@ -149,8 +141,6 @@ public class RichJsonHelper {
      */
     @SuppressWarnings("unchecked")
     public static Object mergeIntoTarget(Object target, Object... others) {
-        // Falls das Target ein POJO ist, konvertieren wir es in eine Map,
-        // um die Felder dynamisch erweitern zu können.
         var targetMap = (target instanceof Map)
                 ? (Map<String, Object>) target
                 : (Map<String, Object>) mapper.convertValue(target, Map.class);
@@ -158,7 +148,6 @@ public class RichJsonHelper {
         for (var other : others) {
             if (other == null) continue;
 
-            // Konvertiere 'other' ebenfalls in eine Map, falls es ein POJO ist
             var otherMap = (other instanceof Map)
                     ? (Map<String, Object>) other
                     : (Map<String, Object>) mapper.convertValue(other, Map.class);
@@ -176,7 +165,6 @@ public class RichJsonHelper {
 
     @SuppressWarnings("unchecked")
     public static Map<String, Object> __mergeIntoTarget(RichJsonCache cache, Map<String, Object> target, Map<String, Object> other, boolean force) {
-        // Nutzt System.identityHashCode für die Cache-Adresse bei echten Objekten
         cache.stack.put(cache.resolveAddress(other), other);
         cache.level++;
 
@@ -184,12 +172,10 @@ public class RichJsonHelper {
         for (var name : names) {
             var member = other.get(name);
 
-            // Logik für rekursives Mergen
             if (member != null && isJsonObject(member)) {
                 var targetMember = target.get(name);
 
                 if (isJsonObject(targetMember)) {
-                    // Falls beide JSON-Objekte sind, tiefer gehen
                     if (!cache.stack.containsKey(cache.resolveAddress(member))) {
                         var subTargetMap = (targetMember instanceof Map)
                                 ? (Map<String, Object>) targetMember
@@ -201,11 +187,8 @@ public class RichJsonHelper {
                 } else if (force || targetMember == null) {
                     target.put(name, member);
                 }
-            } else {
-                // Einfache Typen oder Arrays
-                if (force || !target.containsKey(name)) {
-                    target.put(name, member);
-                }
+            } else if (force || !target.containsKey(name)) {
+                target.put(name, member);
             }
         }
 
@@ -228,7 +211,7 @@ public class RichJsonHelper {
         } else if (isJsonObject(object)) {
             rootClone = new HashMap<String, Object>();
         } else {
-            return object; // Primitive oder unbekannte Typen
+            return object;
         }
 
         cache.stack.put(cache.resolveAddress(object), rootClone);
@@ -301,7 +284,6 @@ public class RichJsonHelper {
         if (object instanceof List || object instanceof String || object instanceof Number || object instanceof Boolean)
             return false;
 
-        // Check gegen dein Mapping-System
         return true; // TODO other.RichJsonClassMapping.isMapped(object.getClass().getSimpleName());
     }
 
@@ -314,13 +296,11 @@ public class RichJsonHelper {
             return null;
         }
 
-        // Fall 1: Das Objekt ist eine Map
         if (object instanceof Map) {
             var map = (Map<?, ?>) object;
             return map.get(key);
         }
 
-        // Fall 2: Das Objekt ist eine Liste (Key muss ein Index sein, z.B. "0")
         if (object instanceof List) {
             var list = (List<?>) object;
             try {
@@ -329,13 +309,10 @@ public class RichJsonHelper {
                     return list.get(index);
                 }
             } catch (NumberFormatException e) {
-                // Key ist kein gültiger Integer-Index für eine Liste
                 return null;
             }
         }
 
-        // Fall 3: Das Objekt ist ein POJO
-        // Wir nutzen den mapper, um das Feld zu extrahieren, falls es gemappt ist
         if (isJsonObject(object)) {
             try {
                 var map = (Map<String, Object>) mapper.convertValue(object, Map.class);

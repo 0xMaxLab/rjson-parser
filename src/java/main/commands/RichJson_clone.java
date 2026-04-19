@@ -18,7 +18,6 @@ public class RichJson_clone implements RichJsonCommand {
         }
 
         parser.cache.cloneAddress = context.currentAddress;
-        // Benutzt den Helper für Deep Copy
         context.currentMember = RichJsonHelper.cloneObject(context.currentMember);
 
         if (RichJsonConfig.debugEnabled) {

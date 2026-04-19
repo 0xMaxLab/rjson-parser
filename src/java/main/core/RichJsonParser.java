@@ -336,17 +336,14 @@ public class RichJsonParser {
         if (this.con.currentMember instanceof Map) {
             var map = (Map<String, Object>) this.con.currentMember;
             if (map.containsKey(RichJsonConstants.KEY_COMMAND_MEMBER)) {
-                // Hier ein 'new ArrayList<>()' drumherum packen
                 var kcmds = new ArrayList<>((List<String>) map.get(RichJsonConstants.KEY_COMMAND_MEMBER));
 
                 if (kcmds.contains(RichJsonConstants.COMMAND_CLONE) && this.__isRichJsonCommandEnabled(RichJsonConstants.COMMAND_CLONE)) {
                     this.con.currentCommand = RichJsonConstants.COMMAND_CLONE;
                     this.con.currentMember = this.__tryRichJsonKeyCommand();
 
-                    // Jetzt klappt das remove()
                     kcmds.remove(RichJsonConstants.COMMAND_CLONE);
 
-                    // Die modifizierte Liste wieder zurück in die Map schreiben
                     ((Map<String, Object>) this.con.currentMember).put(RichJsonConstants.KEY_COMMAND_MEMBER, kcmds);
                 }
             }
