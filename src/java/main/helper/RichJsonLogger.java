@@ -12,7 +12,8 @@ public class RichJsonLogger {
     public static final Logger logger = LoggerFactory.getLogger(RichJsonLogger.class);
 
     private final String label;
-    private String padding = "";
+    private static String padding = "";
+    private int groupLevel = 0;
     private long startTime;
     private long endTime;
 
@@ -41,7 +42,8 @@ public class RichJsonLogger {
      */
     public void groupStart() {
         if (RichJsonConfig.infoEnabled || RichJsonConfig.debugEnabled) {
-            this.padding += "  ";
+            groupLevel++;
+            padding += "  ";
         }
     }
 
@@ -50,7 +52,8 @@ public class RichJsonLogger {
      */
     public void groupEnd() {
         if ((RichJsonConfig.infoEnabled || RichJsonConfig.debugEnabled) && padding.length() >= 2) {
-            this.padding = padding.substring(0, padding.length() - 2);
+            groupLevel--;
+            padding = padding.substring(0, padding.length() - 2);
         }
     }
 
@@ -58,7 +61,10 @@ public class RichJsonLogger {
      * Resets indentation to zero.
      */
     public void groupEndAll() {
-        this.padding = "";
+        for (int i = 0; i < groupLevel; i++) {
+            padding = padding.substring(0, padding.length() - 2);
+        }
+        groupLevel = 0;
     }
 
     /**

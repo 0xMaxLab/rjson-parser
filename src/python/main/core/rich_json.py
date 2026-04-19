@@ -1,4 +1,6 @@
 import sys
+from multiprocessing.process import active_children
+
 from ..helper.rich_json_logger import RichJsonLogger
 
 logger = RichJsonLogger.logger
@@ -117,7 +119,7 @@ class RichJsonParser:
             self.con.current_address = self.cache.resolve_address(current)
             self.con.current = self._parse_rich_json_in_member()
             self.cache.level -= 1
-            self.logger.group_end()
+            self.logger.group_end_all()
             if self.cache.level == -1:
                 self.logger.info("was applied successfully.")
             else:
@@ -389,7 +391,8 @@ class RichJsonParser:
             self.con.current_path.pop()
             return self.con.current_member
         except Exception as exception:
-            self.logger.exception(f"{exception}")
+            self.logger.group_end_all()
+            self.logger.error(f"{exception}")
             raise Exception(
                 f"{self.label} {_RICH_JSON_COMMAND_PREFIX}{self.con.current_command} could not be resolved at {_RICH_JSON_COMMAND_PATH_DELIMITER.join(map(str, self.con.current_path))}.")
 
@@ -453,7 +456,14 @@ class RichJsonParser:
         return self.con.current_member
 
     def _try_rich_json_key_command(self):
-        return _RICH_JSON_COMMANDS.enabled[self.con.current_command](self, self.con)
+        try:
+            return _RICH_JSON_COMMANDS.enabled[self.con.current_command](self, self.con)
+        except Exception as exception:
+            self.logger.group_end_all()
+            self.logger.error(f"{exception}")
+            raise Exception(
+                f"{self.label} {_RICH_JSON_COMMAND_PREFIX}{self.con.current_command} could not be resolved at {_RICH_JSON_COMMAND_PATH_DELIMITER.join(map(str, self.con.current_path))}.")
+
 
 
 _RICH_JSON_COMMANDS = RichJsonCommandHolder()
