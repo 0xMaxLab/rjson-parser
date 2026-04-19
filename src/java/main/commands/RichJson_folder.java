@@ -21,9 +21,7 @@ public class RichJson_folder implements RichJsonCommand {
 
         Object directoryContent = RichJsonFileHelper.readDirectory(folderPath, true);
 
-        if (RichJsonConfig.debugEnabled) {
-            System.out.println("RichJson read directory: " + folderPath);
-        }
+        parser.logger.debug("RichJson read directory: " + folderPath);
 
         return directoryContent;
     }

@@ -28,7 +28,7 @@ export function mergeIntoTarget(target, ...others) {
         cache = new RichJsonCache();
         __mergeIntoTarget(cache, target, other);
         if (cache.level !== 0) {
-            console.error(`RichJson mergeIntoTarget failed!`);
+            console.error(`RichJSON: mergeIntoTarget failed!`);
         }
     }
 
@@ -93,7 +93,7 @@ export function mergeIntoWithoutRebind(target, ...others) {
         cache = new RichJsonCache();
         __mergeIntoWithoutRebind(cache, target, other);
         if (cache.level !== 0) {
-            console.error(`RichJson mergeIntoWithoutRebind failed!`);
+            console.error(`RichJSON: mergeIntoWithoutRebind failed!`);
         }
     }
 
@@ -142,7 +142,7 @@ export function cloneObject(object) {
     cache.stack[cache.resolveAddress(object)] = cache.rv;
     object = _cloneObject(cache, object);
     if (cache.level !== 0) {
-        console.error(`RichJson cloneObject failed!`);
+        console.error(`RichJSON: cloneObject failed!`);
     }
     return object;
 }

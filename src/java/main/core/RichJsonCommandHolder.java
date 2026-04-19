@@ -1,12 +1,14 @@
 package core;
 
 import commands.*;
+import helper.RichJsonLogger;
+import org.slf4j.Logger;
 import other.RichJsonConfig;
 
 import java.util.*;
 
 public class RichJsonCommandHolder {
-
+    private static final Logger LOGGER = RichJsonLogger.logger;
     public static final RichJsonCommandHolder INSTANCE = new RichJsonCommandHolder();
     public static final RichJsonCommand VOID_COMMAND = (p, c) -> null;
 
@@ -67,7 +69,7 @@ public class RichJsonCommandHolder {
         }
 
         if (RichJsonConfig.debugEnabled) {
-            System.out.println("RichJson command '" + command + "' was " + (isEnabled ? "enabled" : "disabled") + ".");
+            LOGGER.debug("RichJson command '" + command + "' was " + (isEnabled ? "enabled" : "disabled") + ".");
         }
     }
 

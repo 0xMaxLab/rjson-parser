@@ -1,7 +1,8 @@
+import logging
 import types
-
 from ..core.rich_json_cache import RichJsonCache
 
+logger = logging.getLogger("RichJSON")
 
 def has_field(obj, key):
     """Safely checks if a key (in a dict) or an attribute (in an instance) exists."""
@@ -46,7 +47,7 @@ def merge_into_target(target, *others):
         cache = RichJsonCache()
         _merge_into_target(cache, target, other)
         if cache.level != 0:
-            print("Error: RichJson merge_into_target failed!")
+            logger.error("RichJSON: merge_into_target failed!")
     return target
 
 
@@ -94,7 +95,7 @@ def merge_into_without_rebind(target, *others):
         cache = RichJsonCache()
         _merge_into_without_rebind(cache, target, other)
         if cache.level != 0:
-            print("Error: RichJson merge_into_without_rebind failed!")
+            logger.error("RichJSON: merge_into_without_rebind failed!")
     return target
 
 
@@ -140,7 +141,7 @@ def clone_object(object_to_clone):
 
     cloned = _clone_object(cache, object_to_clone)
     if cache.level != 0:
-        print("Error: RichJson clone_object failed!")
+        logger.error("RichJSON: clone_object failed!")
     return cloned
 
 

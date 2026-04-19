@@ -48,10 +48,12 @@ public class RichJson_ref implements RichJsonCommand {
                     : parser.cache.resolveAddress(prevMember) + "_" + ref;
 
             context.currentMember = parser.__parseRichJsonInMember();
+            context.currentPath.add(ref);
             prevMember = context.currentMember;
         }
 
         context.currentAddress = originalAddress;
+        context.currentPath.subList(context.currentPath.size() - refs.length, context.currentPath.size()).clear();
         return context.currentMember;
     }
 }

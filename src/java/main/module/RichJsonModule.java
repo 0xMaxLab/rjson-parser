@@ -74,7 +74,7 @@ public class RichJsonModule {
 
         this.commands.forEach((name, func) -> {
             if (holder.builtIn.containsKey(name)) {
-                throw new RuntimeException("RichJson: You cannot override built-in commands. Affected: '#" + name + "'");
+                throw new RuntimeException("RichJSON: You cannot override built-in commands. Affected: '#" + name + "'");
             }
             holder.available.put(name, func);
             holder.enabled.put(name, func);

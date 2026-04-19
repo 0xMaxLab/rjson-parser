@@ -4,29 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import core.RichJsonCache;
 import core.RichJsonConstants;
 import core.RichJsonParser;
-import other.RichJsonConfig;
+import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.*;
 
 public class RichJsonHelper {
-
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final Logger LOGGER = RichJsonLogger.logger;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public static Object parse(Object object) {
-        if (RichJsonConfig.logEnabled) {
-            System.out.println("RichJson is going to be applied...");
-        }
-
         try {
             return new RichJsonParser().parse(object, true);
         } catch (Exception exception)  {
-            if (RichJsonConfig.debugEnabled) {
-                System.out.println(exception.getStackTrace());
-            }
+            LOGGER.error(Arrays.toString(exception.getStackTrace()));
             return null;
         }
     }
@@ -143,14 +133,14 @@ public class RichJsonHelper {
     public static Object mergeIntoTarget(Object target, Object... others) {
         var targetMap = (target instanceof Map)
                 ? (Map<String, Object>) target
-                : (Map<String, Object>) mapper.convertValue(target, Map.class);
+                : (Map<String, Object>) MAPPER.convertValue(target, Map.class);
 
         for (var other : others) {
             if (other == null) continue;
 
             var otherMap = (other instanceof Map)
                     ? (Map<String, Object>) other
-                    : (Map<String, Object>) mapper.convertValue(other, Map.class);
+                    : (Map<String, Object>) MAPPER.convertValue(other, Map.class);
 
             var cache = new RichJsonCache();
             __mergeIntoTarget(cache, targetMap, otherMap, false);
@@ -179,7 +169,7 @@ public class RichJsonHelper {
                     if (!cache.stack.containsKey(cache.resolveAddress(member))) {
                         var subTargetMap = (targetMember instanceof Map)
                                 ? (Map<String, Object>) targetMember
-                                : (Map<String, Object>) mapper.convertValue(targetMember, Map.class);
+                                : (Map<String, Object>) MAPPER.convertValue(targetMember, Map.class);
 
                         __mergeIntoTarget(cache, subTargetMap, (Map<String, Object>) member, force);
                         target.put(name, subTargetMap);
@@ -230,7 +220,7 @@ public class RichJsonHelper {
         if (object instanceof Map || (isJsonObject(object) && !(object instanceof List))) {
             var sourceMap = (object instanceof Map)
                     ? (Map<String, Object>) object
-                    : (Map<String, Object>) mapper.convertValue(object, Map.class);
+                    : (Map<String, Object>) MAPPER.convertValue(object, Map.class);
             var targetMap = (Map<String, Object>) target;
 
             for (var entry : sourceMap.entrySet()) {
@@ -315,7 +305,7 @@ public class RichJsonHelper {
 
         if (isJsonObject(object)) {
             try {
-                var map = (Map<String, Object>) mapper.convertValue(object, Map.class);
+                var map = (Map<String, Object>) MAPPER.convertValue(object, Map.class);
                 return map.get(key);
             } catch (Exception e) {
                 return null;

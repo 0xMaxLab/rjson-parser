@@ -2,33 +2,62 @@ package core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import helper.RichJsonHelper;
+import helper.RichJsonLogger; // Dein neuer Logger
 import other.RichJsonClassMapping;
 import other.RichJsonConfig;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RichJsonParser {
+    private static int NEXT_ID = 0;
+    private final int id;
+    private final String label;
+    public final RichJsonLogger logger;
+
     public RichJsonCache cache = new RichJsonCache();
     private RichJsonContext con = new RichJsonContext();
     private ObjectMapper mapper = new ObjectMapper();
 
+    public RichJsonParser() {
+        NEXT_ID++;
+        this.id = NEXT_ID;
+        this.label = "RichJSON (PID " + this.id + "):";
+        this.logger = new RichJsonLogger(this.label);
+    }
+
     @SuppressWarnings("unchecked")
     public Object parse(Object current, boolean isRoot) throws Exception {
-        this.con.current = current;
-        this.cache.level++;
-
         if (isRoot) {
+            this.logger.info("is going to be applied...");
+            this.logger.groupStart();
+            this.logger.timeStart();
+
             this.con.root = current;
+            this.con.current = current;
+            this.con.currentName = "root";
             this.con.currentMember = current;
             this.con.currentAddress = this.cache.resolveAddress(current);
-            this.con.current = this.__parseRichJsonInMember();
-            this.cache.level--;
 
-            if (RichJsonConfig.logEnabled && this.cache.level == 0) {
-                System.out.println("RichJson was applied successfully.");
+            Object result = this.__parseRichJsonInMember();
+
+            this.cache.level--;
+            this.logger.groupEnd();
+
+            if (this.cache.level == -1) {
+                this.logger.info("was applied successfully.");
+            } else {
+                this.logger.error("was not applied successfully.");
             }
-            return current;
+            this.logger.timeEnd();
+            return result;
         }
+
+        this.con.current = current;
+        String pathStr = String.join("/", this.con.currentPath);
+        this.logger.debug("step into level " + this.cache.level + " at '" + pathStr + "'");
+        this.logger.groupStart();
+        this.cache.level++;
 
         var isJsonObj = current instanceof Map;
         var currentName = this.con.currentName;
@@ -42,7 +71,9 @@ public class RichJsonParser {
             for (var name : sortedKeys) {
                 var member = map.get(name);
                 this.con.currentMember = member;
-                this.con.currentAddress = (member instanceof Map || member instanceof List)
+
+                boolean isContainer = member instanceof Map || member instanceof List;
+                this.con.currentAddress = isContainer
                         ? this.cache.resolveAddress(member)
                         : currentAddress + "_" + name;
 
@@ -55,16 +86,21 @@ public class RichJsonParser {
             for (var i = 0; i < list.size(); i++) {
                 var member = list.get(i);
                 this.con.currentMember = member;
-                this.con.currentAddress = (member instanceof Map || member instanceof List)
+
+                boolean isContainer = member instanceof Map || member instanceof List;
+                this.con.currentAddress = isContainer
                         ? this.cache.resolveAddress(member)
                         : currentAddress + "_" + i;
-                this.con.currentName = currentName + "_" + i;
+
+                this.con.currentName = currentName + "[" + i + "]";
                 this.con.currentMember = this.__parseRichJsonInMember();
                 list.set(i, this.con.currentMember);
             }
         }
 
         this.cache.level--;
+        this.logger.groupEnd();
+        this.logger.debug("step out of level " + this.cache.level + " at '" + pathStr + "'");
         return current;
     }
 
@@ -133,19 +169,20 @@ public class RichJsonParser {
     }
 
     public Object __parseRichJsonInMember() throws Exception {
+        this.con.currentPath.add(this.con.currentName);
+        String pathStr = String.join("/", this.con.currentPath);
+
         if (this.cache.stack.containsKey(this.con.currentAddress)) {
-            if (RichJsonConfig.debugEnabled) {
-                System.out.println("RichJson cache <-- '" + this.con.currentAddress + "' " + this.cache.stack.get(this.con.currentAddress));
-            }
+            this.logger.debug("cache hit at '" + pathStr + "' with address '" + this.con.currentAddress + "'");
+            this.con.currentPath.remove(this.con.currentPath.size() - 1);
             return this.cache.stack.get(this.con.currentAddress);
         } else {
-            if (RichJsonConfig.debugEnabled) {
-                System.out.println("RichJson cache --> '" + this.con.currentAddress + "' " + this.con.currentMember);
-            }
+            this.logger.debug("cache add at '" + pathStr + "' with address '" + this.con.currentAddress + "'");
             this.cache.stack.put(this.con.currentAddress, this.con.currentMember);
         }
 
         if (!this.__isMemberRichJsonAble(this.con.currentMember)) {
+            this.con.currentPath.remove(this.con.currentPath.size() - 1);
             return this.con.currentMember;
         }
 
@@ -153,23 +190,25 @@ public class RichJsonParser {
             var strMember = (String) this.con.currentMember;
             if (RichJsonConfig.stringInterpolationsEnabled && RichJsonConstants.INTERPOLATION_WILDCARD.matcher(strMember).find()) {
                 var res = this.__parseInterpolations();
+                this.con.currentMember = res.result;
                 if (!res.isParsed) {
-                    return res.result;
-                } else {
-                    this.con.currentMember = res.result;
+                    this.con.currentPath.remove(this.con.currentPath.size() - 1);
+                    return this.con.currentMember;
                 }
             }
-            return this.__executeRichJsonCommandIfContainedInMember();
+            Object result = this.__executeRichJsonCommandIfContainedInMember();
+            this.con.currentPath.remove(this.con.currentPath.size() - 1);
+            return result;
         } else {
             var currentAddress = this.con.currentAddress;
             var isJsonObj = this.con.currentMember instanceof Map;
-            var kcmd_ignored = new ArrayList<String>();
+            List<String> kcmd_ignored = new ArrayList<>();
 
             if (isJsonObj) {
                 this.__executeClone();
                 this.__callConstructor();
                 this.cache.stack.put(currentAddress, this.con.currentMember);
-                kcmd_ignored = (ArrayList<String>) this.__getIgnoresForKeyCommands();
+                kcmd_ignored = this.__getIgnoresForKeyCommands();
                 for (var cmd : kcmd_ignored) RichJsonCommandHolder.setCommandEnabled(cmd, false);
                 this.__resolveInheritances();
             }
@@ -181,6 +220,8 @@ public class RichJsonParser {
                 for (var cmd : kcmd_ignored) RichJsonCommandHolder.setCommandEnabled(cmd, true);
                 this.con.currentMember = this.__executeKeyCommands();
             }
+
+            this.con.currentPath.remove(this.con.currentPath.size() - 1);
             return this.con.currentMember;
         }
     }
@@ -279,6 +320,7 @@ public class RichJsonParser {
 
     private Object __tryRichJsonCommand() {
         try {
+            this.con.currentPath.add(this.con.currentCommand);
             var unresolved_command = this.con.currentCommand;
             this.con.currentCommand = this.con.currentCommand.substring(1);
             var strMember = (String) this.con.currentMember;
@@ -321,9 +363,11 @@ public class RichJsonParser {
                 }
                 this.con.root = originalRoot;
             }
+            this.con.currentPath.remove(this.con.currentPath.size() - 1);
             return this.con.currentMember;
         } catch (Exception e) {
-            throw new RuntimeException("RichJson command error in " + this.con.currentName, e);
+            String path = String.join("/", this.con.currentPath);
+            throw new RuntimeException(this.label + " Command " + this.con.currentCommand + " could not be resolved at " + path, e);
         }
     }
 
@@ -360,8 +404,9 @@ public class RichJsonParser {
                     var instance = clazz.getDeclaredConstructor().newInstance();
                     var updatedInstance = mapper.updateValue(instance, map);
                     this.con.currentMember = mapper.convertValue(updatedInstance, Map.class);
+                    this.logger.debug("resolved construct for '" + clazz.getSimpleName() + "'");
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    this.logger.error("Constructor error: " + e.getMessage());
                 }
             }
         }

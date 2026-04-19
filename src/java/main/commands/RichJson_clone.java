@@ -12,7 +12,7 @@ public class RichJson_clone implements RichJsonCommand {
     public Object execute(RichJsonParser parser, RichJsonContext context) {
         if (parser.cache.cloneAddress != null) {
             if (RichJsonConfig.crashOnNestedCloneEnabled) {
-                throw new RuntimeException("RichJson nested clone detected in '" + context.currentAddress + "'.");
+                throw new RuntimeException("RichJSON nested clone detected in '" + context.currentAddress + "'.");
             }
             return context.currentMember;
         }
@@ -20,9 +20,7 @@ public class RichJson_clone implements RichJsonCommand {
         parser.cache.cloneAddress = context.currentAddress;
         context.currentMember = RichJsonHelper.cloneObject(context.currentMember);
 
-        if (RichJsonConfig.debugEnabled) {
-            System.out.println("RichJson resolved clone in '" + parser.cache.cloneAddress + "'.");
-        }
+        parser.logger.debug("resolved clone at '" + String.join("/", context.currentPath) + "'.");
         return context.currentMember;
     }
 }
