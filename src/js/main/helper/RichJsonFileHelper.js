@@ -8,7 +8,7 @@ import {__RICH_JSON_LATE_APPLIES, setCommandEnabled} from "../core/RichJsonComma
 const FILE_CACHE = {};
 
 /**
- * Reads a directory like a JSON file and resolves RichJson.
+ * Reads a directory like a JSON file and resolves RichJSON.
  * @param path
  * @param _executeLateApplies = false
  * @returns {{}}
@@ -38,7 +38,7 @@ export function readDirectory(path, _executeLateApplies = false) {
 }
 
 /**
- * Reads a JSON file and resolves RichJson if contained.
+ * Reads a JSON file and resolves RichJSON if contained.
  * @param path
  * @param _executeLateApplies = false
  * @returns {*|string}

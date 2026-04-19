@@ -39,6 +39,7 @@ test('Module', () => {
 
     excludeModule("test");
     unregisterModule("test");
+
     try {
         content = parse(content);
     } catch {

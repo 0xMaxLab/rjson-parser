@@ -53,33 +53,52 @@ export class RichJsonContext {
     currentMember = undefined;
     currentAddress = undefined;
     currentName = undefined;
+    currentPath = [];
 }
 
 export class RichJsonParser {
+    static NEXT_ID = 0;
+    ID = ++RichJsonParser.NEXT_ID;
+    label = `RichJSON (PID ${this.ID}):`;
+
     cache = new RichJsonCache();
     con = new RichJsonContext();
 
     constructor() {
+        if (!Number.isSafeInteger(RichJsonParser.NEXT_ID + 1)) {
+            RichJsonParser.NEXT_ID = 0;
+        }
         this.cache.inheritances = {};
         this.cache.cloneAddress = undefined;
     }
 
     parse(current, isRoot = false) {
-        this.con.current = current;
-        this.cache.level++;
-
         if (isRoot) {
             this.con.root = current;
             this.con.current = current;
+            this.con.currentName = "root";
             this.con.currentMember = current;
             this.con.currentAddress = this.cache.resolveAddress(current);
             this.con.current = this.__parseRichJsonInMember();
             this.cache.level--;
-            if (__RICH_JSON_CONFIG.logEnabled && this.cache.level === 0) {
-                console.log("RichJson was applied successfully.");
+            if (__RICH_JSON_CONFIG.logEnabled || __RICH_JSON_CONFIG.debugEnabled) {
+                this.__groupEndAll();
+                if (this.cache.level === -1) {
+                    console.log(`${this.label} was applied successfully.`);
+                } else {
+                    console.error(`${this.label} was not applied successfully!`);
+                }
+            }
+            if (__RICH_JSON_CONFIG.debugEnabled) {
+                console.timeEnd(this.label);
             }
             return current;
         }
+        this.con.current = current;
+        if (__RICH_JSON_CONFIG.debugEnabled) {
+            console.group(`${this.label} step into level ${this.cache.level} at '${this.con.currentPath.join(__RICH_JSON_COMMAND_PATH_DELIMITER)}'`);
+        }
+        this.cache.level++;
 
         let isJsonObj = isJsonObject(current);
         let currentName = this.con.currentName;
@@ -107,12 +126,16 @@ export class RichJsonParser {
                 ? this.cache.resolveAddress(this.con.currentMember)
                 : currentAddress + (isJsonObj ? `_${name}` : `_${i}`)
             ;
-            this.con.currentName = isJsonObj ? name : `"${currentName}_${i}`;
+            this.con.currentName = isJsonObj ? name : `${currentName}[${i}]`;
             this.con.currentMember = this.__parseRichJsonInMember();
             set(current, name, i, this.con.currentMember);
         }
 
         this.cache.level--;
+        if (__RICH_JSON_CONFIG.debugEnabled) {
+            console.groupEnd();
+            console.debug(`${this.label} step out of level ${this.cache.level} at '${this.con.currentPath.join(__RICH_JSON_COMMAND_PATH_DELIMITER)}'`);
+        }
         return current;
     }
 
@@ -174,19 +197,22 @@ export class RichJsonParser {
     }
 
     __parseRichJsonInMember() {
+        this.con.currentPath.push(this.con.currentName);
         if (Object.hasOwn(this.cache.stack, this.con.currentAddress)) {
             if (__RICH_JSON_CONFIG.debugEnabled) {
-                console.debug(`RichJson cache <-- '${this.con.currentAddress}' ${this.cache.stack[this.con.currentAddress]}`);
+                console.debug(`${this.label} cache hit at '${this.con.currentPath.join(__RICH_JSON_COMMAND_PATH_DELIMITER)}' with address '${this.con.currentAddress}'`);
             }
+            this.con.currentPath.pop();
             return this.cache.stack[this.con.currentAddress];
         } else {
             if (__RICH_JSON_CONFIG.debugEnabled) {
-                console.debug(`RichJson cache --> '${this.con.currentAddress}' ${this.con.currentMember}`);
+                console.debug(`${this.label} cache add at '${this.con.currentPath.join(__RICH_JSON_COMMAND_PATH_DELIMITER)}' with address '${this.con.currentAddress}'`);
             }
             this.cache.stack[this.con.currentAddress] = this.con.currentMember;
         }
 
         if (!this.__isMemberRichJsonAble(this.con.currentMember)) {
+            this.con.currentPath.pop();
             return this.con.currentMember;
         }
 
@@ -194,12 +220,15 @@ export class RichJsonParser {
             if (__RICH_JSON_CONFIG.stringInterpolationsEnabled && __RICH_JSON_INTERPOLATION_WILDCARD.test(this.con.currentMember)) {
                 this.con.currentMember = this.__parseInterpolations();
                 if (!this.con.currentMember.isParsed) {
+                    this.con.currentPath.pop();
                     return this.con.currentMember.result;
                 } else {
                     this.con.currentMember = this.con.currentMember.result;
                 }
             }
-            return this.__executeRichJsonCommandIfContainedInMember();
+            let rv = this.__executeRichJsonCommandIfContainedInMember();
+            this.con.currentPath.pop();
+            return rv;
         } else {
             let kcmd_ignored;
             let currentAddress = this.con.currentAddress;
@@ -224,6 +253,7 @@ export class RichJsonParser {
                 });
                 this.con.currentMember = this.__executeKeyCommands();
             }
+            this.con.currentPath.pop();
             return this.con.currentMember;
         }
     }
@@ -322,6 +352,7 @@ export class RichJsonParser {
 
     __tryRichJsonCommand() {
         try {
+            this.con.currentPath.push(this.con.currentCommand);
             let unresolved_command = this.con.currentCommand;
             this.con.currentCommand = this.con.currentCommand.substring(1);
             this.con.currentMember = this.con.currentMember.replace(__RICH_JSON_ARRAY_REPLACE_SUBSTRING, __RICH_JSON_ARRAY_REPLACE_NEWSTRING);
@@ -351,6 +382,7 @@ export class RichJsonParser {
             }
 
             if (pipe_commands === undefined) {
+                this.con.currentPath.pop();
                 return this.con.currentMember;
             }
 
@@ -370,10 +402,14 @@ export class RichJsonParser {
             }
             this.con.root = root;
 
+            this.con.currentPath.pop();
             return this.con.currentMember;
         } catch (exception) {
+            if (__RICH_JSON_CONFIG.logEnabled || __RICH_JSON_CONFIG.debugEnabled) {
+                this.__groupEndAll();
+            }
             console.error(exception.stack);
-            throw (`RichJson ${__RICH_JSON_COMMAND_PREFIX}${this.con.currentCommand} could not be resolved in ${this.con.currentName}.`);
+            throw (`${this.label} ${__RICH_JSON_COMMAND_PREFIX}${this.con.currentCommand} could not be resolved at '${this.con.currentPath.join(__RICH_JSON_COMMAND_PATH_DELIMITER)}'.`);
         }
     }
 
@@ -401,8 +437,9 @@ export class RichJsonParser {
             let cstr = this.con.currentMember[__RICH_JSON_LATE_CONSTRUCTOR_MEMBER];
             this.con.currentMember = __mergeIntoTarget(new cstr(), this.con.currentMember);
             delete this.con.currentMember[__RICH_JSON_LATE_CONSTRUCTOR_MEMBER];
-            if (__RICH_JSON_CONFIG.debugEnabled)
-                console.debug(`RichJson resolved construct for '${typeof cstr}'.`);
+            if (__RICH_JSON_CONFIG.debugEnabled) {
+                console.debug(`${this.label} resolved construct for '${typeof cstr}'.`);
+            }
         }
     }
 
@@ -461,8 +498,17 @@ export class RichJsonParser {
         try {
             return __RICH_JSON_COMMANDS.enabled[this.con.currentCommand](this, this.con);
         } catch (exception) {
+            if (__RICH_JSON_CONFIG.logEnabled || __RICH_JSON_CONFIG.debugEnabled) {
+                this.__groupEndAll();
+            }
             console.error(exception.stack);
-            throw (`RichJson key command ${__RICH_JSON_COMMAND_PREFIX}${this.con.currentCommand} could not be resolved in ${this.con.currentName}.`);
+            throw (`${this.label} key command ${__RICH_JSON_COMMAND_PREFIX}${this.con.currentCommand} could not be resolved at '${this.con.currentPath.join(__RICH_JSON_COMMAND_PATH_DELIMITER)}'.`);
+        }
+    }
+
+    __groupEndAll() {
+        for (let i = 0; i < this.cache.level + 2; ++i) {
+            console.groupEnd();
         }
     }
 }

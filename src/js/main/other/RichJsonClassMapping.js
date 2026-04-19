@@ -21,14 +21,14 @@ export function addClassMappings(classMappings) {
  */
 export function addClassMapping(name, classType) {
     if (Object.hasOwn(__RICH_JSON_CLASS_MAPPING, name)) {
-        throw (`RichJson has the class '${name}' already defined`);
+        throw (`RichJSON has the class '${name}' already defined`);
     }
     __RICH_JSON_CLASS_MAPPING[name] = classType;
 }
 
 export function __mapClassByName(name) {
     if (!Object.hasOwn(__RICH_JSON_CLASS_MAPPING, name)) {
-        throw (`RichJson could not find the class called '${name}'.\nMake sure its defined in RichJsonClassMapping.`);
+        throw (`RichJSON could not find the class called '${name}'.\nMake sure its defined in RichJsonClassMapping.`);
     }
     return __RICH_JSON_CLASS_MAPPING[name];
 }

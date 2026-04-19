@@ -1,12 +1,12 @@
 /**
- * Parses RichJson expressions in JSON object.
+ * Parses RichJSON expressions in JSON object.
  * @param obj
  * @returns {obj}
  */
 export function parse(obj: object): any;
 
 /**
- * Checks if the given object has unresolved RichJson expressions in it.
+ * Checks if the given object has unresolved RichJSON expressions in it.
  * @param obj
  * @returns {boolean}
  */

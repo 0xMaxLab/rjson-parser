@@ -16,6 +16,7 @@ export function __executeRefCommand(parser, context) {
 
     for (let i = 0; i < refs.length; ++i) {
         ref = refs[i];
+        context.currentName = ref;
         if (isJsonObject(prevMember)) {
             if (Object.hasOwn(prevMember, ref)) {
                 context.currentMember = prevMember[ref];
@@ -28,8 +29,10 @@ export function __executeRefCommand(parser, context) {
             : parser.cache.resolveAddress(prevMember) + "_" + ref
         ;
         context.currentMember = parser.__parseRichJsonInMember();
+        context.currentPath.push(ref);
         prevMember = context.currentMember;
     }
     context.currentAddress = currentAddress;
+    context.currentPath.splice(context.currentPath.length - refs.length, context.currentPath.length);
     return context.currentMember;
 }
