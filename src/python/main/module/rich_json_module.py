@@ -92,7 +92,7 @@ def register_module(module):
     """
     Registers a RichJson module.
     """
-    if _RICH_JSON_CONFIG["info_enabled"]:
+    if _RICH_JSON_CONFIG["infoEnabled"]:
         logger.info(f"RichJSON: registering module '{module.name}'")
     _RICH_JSON_MODULES[module.name] = module
     return module
@@ -107,7 +107,7 @@ def unregister_module(name):
         if module.is_included:
             raise RuntimeError(f"RichJSON: can not unregister module '{name}' because it is currently included")
 
-        if _RICH_JSON_CONFIG["info_enabled"]:
+        if _RICH_JSON_CONFIG["infoEnabled"]:
             logger.info(f"RichJSON: unregistering module '{name}'")
         del _RICH_JSON_MODULES[name]
 
@@ -126,7 +126,7 @@ def include_module(name):
     if is_module_registered(name):
         module = _RICH_JSON_MODULES[name]
         if not module.is_included:
-            if _RICH_JSON_CONFIG["info_enabled"]:
+            if _RICH_JSON_CONFIG["infoEnabled"]:
                 logger.info(f"RichJSON: including module '{name}'")
             module._include()
 
@@ -138,6 +138,6 @@ def exclude_module(name):
     if is_module_registered(name):
         module = _RICH_JSON_MODULES[name]
         if module.is_included:
-            if _RICH_JSON_CONFIG["info_enabled"]:
+            if _RICH_JSON_CONFIG["infoEnabled"]:
                 logger.info(f"RichJSON: excluding module '{name}'")
             module._exclude()

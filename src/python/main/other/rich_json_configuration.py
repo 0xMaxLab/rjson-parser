@@ -1,12 +1,12 @@
 from ..helper.rich_json_helper import merge_into_target
 
 _RICH_JSON_CONFIG = {
-    "info_enabled": True,
-    "debug_enabled": False,
-    "string_interpolations_enabled": True,
-    "file_cache_enabled": True,
-    "late_constructor_enabled": True,
-    "crash_on_nested_clone_enabled": False,
+    "infoEnabled": True,
+    "debugEnabled": False,
+    "stringInterpolationsEnabled": True,
+    "fileCacheEnabled": True,
+    "lateConstructorEnabled": True,
+    "crashOnNestedCloneEnabled": True,
 }
 
 
@@ -26,12 +26,12 @@ def update_configuration(config):
         return
 
     default_config = {
-        "info_enabled": True,
-        "debug_enabled": False,
-        "string_interpolations_enabled": True,
-        "file_cache_enabled": True,
-        "late_constructor_enabled": True,
-        "crash_on_nested_clone_enabled": False,
+        "infoEnabled": True,
+        "debugEnabled": False,
+        "stringInterpolationsEnabled": True,
+        "fileCacheEnabled": True,
+        "lateConstructorEnabled": True,
+        "crashOnNestedCloneEnabled": True,
     }
 
     _RICH_JSON_CONFIG = merge_into_target(default_config, config)

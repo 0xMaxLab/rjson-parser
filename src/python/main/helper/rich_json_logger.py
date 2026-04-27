@@ -21,7 +21,7 @@ class RichJsonLogger:
         self.end = None
 
     def info(self, message):
-        if _RICH_JSON_CONFIG["info_enabled"]:
+        if _RICH_JSON_CONFIG["infoEnabled"]:
             RichJsonLogger.logger.info(self._build_message(message))
 
     def _build_message(self, message):
@@ -29,14 +29,14 @@ class RichJsonLogger:
         return message
 
     def debug(self, message):
-        if _RICH_JSON_CONFIG["debug_enabled"]:
+        if _RICH_JSON_CONFIG["debugEnabled"]:
             RichJsonLogger.logger.debug(self._build_message(message))
 
     def error(self, message):
         RichJsonLogger.logger.error(self._build_message(message))
 
     def group_start(self):
-        if _RICH_JSON_CONFIG["info_enabled"] or _RICH_JSON_CONFIG["debug_enabled"]:
+        if _RICH_JSON_CONFIG["infoEnabled"] or _RICH_JSON_CONFIG["debugEnabled"]:
             self._groupLevel += 1
             RichJsonLogger._padding += "  "
             self._update_logger_config()
@@ -50,23 +50,23 @@ class RichJsonLogger:
         )
 
     def group_end_all(self):
-        if _RICH_JSON_CONFIG["info_enabled"] or _RICH_JSON_CONFIG["debug_enabled"]:
+        if _RICH_JSON_CONFIG["infoEnabled"] or _RICH_JSON_CONFIG["debugEnabled"]:
             for i in range(self._groupLevel):
                 RichJsonLogger._padding = self._padding[:-2]
             self._groupLevel = 0
             self._update_logger_config()
 
     def group_end(self):
-        if _RICH_JSON_CONFIG["info_enabled"] or _RICH_JSON_CONFIG["debug_enabled"]:
+        if _RICH_JSON_CONFIG["infoEnabled"] or _RICH_JSON_CONFIG["debugEnabled"]:
             self._groupLevel -= 1
             RichJsonLogger._padding = self._padding[:-2]
             self._update_logger_config()
 
     def time_start(self):
-        if _RICH_JSON_CONFIG["debug_enabled"]:
+        if _RICH_JSON_CONFIG["debugEnabled"]:
             self.start = time.perf_counter_ns()
 
     def time_end(self):
-        if _RICH_JSON_CONFIG["debug_enabled"]:
+        if _RICH_JSON_CONFIG["debugEnabled"]:
             self.end = time.perf_counter_ns()
             self.debug(f"{self.end - self.start} ns")

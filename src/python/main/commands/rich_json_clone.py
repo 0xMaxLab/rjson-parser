@@ -9,7 +9,7 @@ from ..other.rich_json_configuration import _RICH_JSON_CONFIG
 
 def _execute_clone_command(parser, context):
     if parser._is_clone_applying():
-        if _RICH_JSON_CONFIG["crash_on_nested_clone_enabled"]:
+        if _RICH_JSON_CONFIG["crashOnNestedCloneEnabled"]:
             raise ValueError(f"RichJson nested clone detected in '{context.current_address}'.")
         return context.current_member
 

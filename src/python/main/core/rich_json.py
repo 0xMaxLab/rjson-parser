@@ -61,7 +61,7 @@ def set_command_enabled(command, enabled):
     else:
         _RICH_JSON_COMMANDS.enabled[command] = _RICH_JSON_COMMANDS.void_command
 
-    if _RICH_JSON_CONFIG["debug_enabled"]:
+    if _RICH_JSON_CONFIG["debugEnabled"]:
         state = "enabled" if enabled else "disabled"
         logger.debug(f"RichJSON: command '{command}' was {state}.")
 
@@ -231,7 +231,7 @@ class RichJsonParser:
             return self.con.current_member
 
         if isinstance(self.con.current_member, str):
-            if (get_field(_RICH_JSON_CONFIG, "string_interpolations_enabled")
+            if (get_field(_RICH_JSON_CONFIG, "stringInterpolationsEnabled")
                     and bool(_RICH_JSON_INTERPOLATION_WILDCARD.search(self.con.current_member))):
                 interpolation_result = self._parse_interpolations()
                 self.con.current_member = interpolation_result["result"]
@@ -414,7 +414,7 @@ class RichJsonParser:
                     key_commands.remove(_RICH_JSON_COMMAND_CLONE)
 
     def _call_constructor(self):
-        if get_field(_RICH_JSON_CONFIG, "late_constructor_enabled") and has_field(self.con.current_member,
+        if get_field(_RICH_JSON_CONFIG, "lateConstructorEnabled") and has_field(self.con.current_member,
                                                                                   _RICH_JSON_LATE_CONSTRUCTOR_MEMBER):
             cstr = get_field(self.con.current_member, _RICH_JSON_LATE_CONSTRUCTOR_MEMBER)
             self.con.current_member = _merge_into_target(self.cache, cstr(), self.con.current_member)

@@ -6,7 +6,7 @@ export let __RICH_JSON_CONFIG = {
     stringInterpolationsEnabled: true,
     fileCacheEnabled: true,
     lateConstructorEnabled: true,
-    crashOnNestedCloneEnabled: false,
+    crashOnNestedCloneEnabled: true,
 }
 
 /**
@@ -35,6 +35,6 @@ export function updateConfiguration(config) {
         stringInterpolationsEnabled: true,
         fileCacheEnabled: true,
         lateConstructorEnabled: true,
-        crashOnNestedCloneEnabled: false,
+        crashOnNestedCloneEnabled: true,
     }, config);
 }
