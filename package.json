@@ -34,8 +34,8 @@
   "scripts": {
     "test": "vitest"
   },
-  "dependencies": {},
   "devDependencies": {
+    "@vitest/coverage-v8": "^4.0.18",
     "json-stable-stringify": "^1.3.0",
     "vitest": "^4.0.18"
   }
