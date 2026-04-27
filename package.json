@@ -32,11 +32,15 @@
     "src/js/main"
   ],
   "scripts": {
-    "test": "vitest"
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "make-badge": "make-coverage-badge",
+    "coverage-and-badge": "npm run test:coverage && npm run make-badge"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.18",
     "json-stable-stringify": "^1.3.0",
+    "make-coverage-badge": "^1.2.0",
     "vitest": "^4.0.18"
   }
 }

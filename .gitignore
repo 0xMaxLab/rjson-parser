@@ -14,3 +14,6 @@ target/
 target/**
 __pycache__/
 __pycache__/**
+coverage/
+coverage/**
+!coverage/badge.svg
