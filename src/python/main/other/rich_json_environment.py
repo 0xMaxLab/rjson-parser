@@ -20,9 +20,9 @@ def add_environment_variable(name, value):
 
     :param name: The name of the environment variable.
     :param value: The value to bind to the environment variable.
-    :raises ValueError: If the macro is already defined.
+    :raises ValueError: If the env variable is already defined.
     """
     if name in _RICH_JSON_ENVIRONMENT:
-        raise ValueError(f"RichJson has the macro '{name}' already defined")
+        raise ValueError(f"RichJson has the env variable '{name}' already defined")
 
     _RICH_JSON_ENVIRONMENT[name] = value

@@ -4,38 +4,6 @@ from ..core.rich_json_cache import RichJsonCache
 
 logger = logging.getLogger("RichJSON")
 
-def has_field(obj, key):
-    """Safely checks if a key (in a dict) or an attribute (in an instance) exists."""
-    if isinstance(obj, dict):
-        return key in obj
-    return hasattr(obj, key)
-
-
-def get_field(obj, key, default=None):
-    """Safely retrieves a value from a dict or an instance attribute."""
-    if isinstance(obj, dict):
-        return obj.get(key, default)
-    return getattr(obj, key, default)
-
-
-def set_field(obj, key, value):
-    """Safely sets a value in a dict or as an attribute on an instance."""
-    if isinstance(obj, dict):
-        obj[key] = value
-    else:
-        setattr(obj, key, value)
-
-
-def delete_field(obj, key):
-    """Safely removes a key from a dict or an attribute from an instance if it exists."""
-    if isinstance(obj, dict):
-        if key in obj:
-            del obj[key]
-    else:
-        if hasattr(obj, key):
-            delattr(obj, key)
-
-
 def merge_objects(*objects):
     return merge_into_target({}, *objects)
 
@@ -211,3 +179,35 @@ def get_keys_sorted(obj):
         return []
     keys.sort(key=str.lower)
     return keys
+
+
+def has_field(obj, key):
+    """Safely checks if a key (in a dict) or an attribute (in an instance) exists."""
+    if isinstance(obj, dict):
+        return key in obj
+    return hasattr(obj, key)
+
+
+def get_field(obj, key, default=None):
+    """Safely retrieves a value from a dict or an instance attribute."""
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
+
+
+def set_field(obj, key, value):
+    """Safely sets a value in a dict or as an attribute on an instance."""
+    if isinstance(obj, dict):
+        obj[key] = value
+    else:
+        setattr(obj, key, value)
+
+
+def delete_field(obj, key):
+    """Safely removes a key from a dict or an attribute from an instance if it exists."""
+    if isinstance(obj, dict):
+        if key in obj:
+            del obj[key]
+    else:
+        if hasattr(obj, key):
+            delattr(obj, key)

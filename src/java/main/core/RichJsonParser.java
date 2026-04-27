@@ -54,7 +54,7 @@ public class RichJsonParser {
         }
 
         this.con.current = current;
-        String pathStr = String.join("/", this.con.currentPath);
+        String pathStr = String.join(RichJsonConstants.COMMAND_PATH_DELIMITER, this.con.currentPath);
         this.logger.debug("step into level " + this.cache.level + " at '" + pathStr + "'");
         this.logger.groupStart();
         this.cache.level++;
@@ -170,7 +170,7 @@ public class RichJsonParser {
 
     public Object __parseRichJsonInMember() throws Exception {
         this.con.currentPath.add(this.con.currentName);
-        String pathStr = String.join("/", this.con.currentPath);
+        String pathStr = String.join(RichJsonConstants.COMMAND_PATH_DELIMITER, this.con.currentPath);
 
         if (this.cache.stack.containsKey(this.con.currentAddress)) {
             this.logger.debug("cache hit at '" + pathStr + "' with address '" + this.con.currentAddress + "'");
@@ -367,7 +367,8 @@ public class RichJsonParser {
             return this.con.currentMember;
         } catch (Exception e) {
             this.logger.groupEndAll();
-            throw new RuntimeException(this.label + " Command " + this.con.currentCommand + " could not be resolved at " + String.join("/", this.con.currentPath), e);
+            this.logger.error(e.getMessage());
+            throw new RuntimeException(this.label + " Command " + this.con.currentCommand + " could not be resolved at " + String.join(RichJsonConstants.COMMAND_PATH_DELIMITER, this.con.currentPath), e);
         }
     }
 
@@ -475,6 +476,7 @@ public class RichJsonParser {
             return RichJsonCommandHolder.executeCommand(this.con.currentCommand, this, this.con);
         } catch (Exception e) {
             this.logger.groupEndAll();
+            this.logger.error(e.getMessage());
             throw new RuntimeException("RichJson key command error: " + this.con.currentName, e);
         }
     }

@@ -35,7 +35,7 @@ public class RichJsonEnvironment {
         }
 
         if (env.containsKey(name)) {
-            throw new RuntimeException("RichJson has the macro '" + name + "' already defined");
+            throw new RuntimeException("RichJson has the env variable '" + name + "' already defined");
         }
 
         env.put(name, value);

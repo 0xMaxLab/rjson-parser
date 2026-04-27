@@ -36,8 +36,8 @@ public class RichJson_ref implements RichJsonCommand {
                 if (map.containsKey(ref)) {
                     context.currentMember = map.get(ref);
                 } else {
-                    throw new RuntimeException("Member '" + ref + "' in '" +
-                            parser.cache.resolveAddress(prevMember) + "' does not exist");
+                    throw new RuntimeException("Member '" + ref + "' at '" +
+                            String.join(RichJsonConstants.COMMAND_PATH_DELIMITER, context.currentPath) + "' does not exist");
                 }
             } else {
                 throw new RuntimeException("Cannot resolve member '" + ref + "' because parent is not an object.");

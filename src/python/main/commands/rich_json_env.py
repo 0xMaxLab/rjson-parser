@@ -29,4 +29,4 @@ def _execute_env_command(parser, context):
 
         return context.current_member
     else:
-        raise ValueError(f"Environment variable '{first_ref}' does not exist.")
+        raise ValueError(f"Environment variable or path '{context.current_member}' does not exist.")

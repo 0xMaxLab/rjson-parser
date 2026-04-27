@@ -19,7 +19,7 @@ def _execute_ref_command(parser, context):
             if ref in prev_member:
                 context.current_member = prev_member[ref]
             else:
-                raise ValueError(f"Member '{ref}' in '{parser.cache.resolve_address(prev_member)}' does not exist")
+                raise ValueError(f"Member '{ref}' at '{_RICH_JSON_COMMAND_PATH_DELIMITER.join(map(str, context.current_path))}' does not exist")
 
         if is_json_object(context.current_member) or isinstance(context.current_member, list):
             context.current_address = parser.cache.resolve_address(context.current_member)

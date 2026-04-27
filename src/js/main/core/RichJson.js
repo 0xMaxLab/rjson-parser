@@ -398,7 +398,7 @@ export class RichJsonParser {
             return this.con.currentMember;
         } catch (exception) {
             this.logger.groupEndAll();
-            console.error(exception.stack);
+            this.logger.error(exception);
             throw (`${this.label} ${__RICH_JSON_COMMAND_PREFIX}${this.con.currentCommand} could not be resolved at '${this.con.currentPath.join(__RICH_JSON_COMMAND_PATH_DELIMITER)}'.`);
         }
     }
@@ -487,7 +487,7 @@ export class RichJsonParser {
             return __RICH_JSON_COMMANDS.enabled[this.con.currentCommand](this, this.con);
         } catch (exception) {
             this.logger.groupEndAll();
-            console.error(exception.stack);
+            this.logger.error(exception.stack);
             throw (`${this.label} key command ${__RICH_JSON_COMMAND_PREFIX}${this.con.currentCommand} could not be resolved at '${this.con.currentPath.join(__RICH_JSON_COMMAND_PATH_DELIMITER)}'.`);
         }
     }

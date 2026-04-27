@@ -29,7 +29,7 @@ export function __executeEnvCommand(parser, context) {
         }
         return context.currentMember;
     } else {
-        throw (`Environment variable '{_member}' does not exist.`);
+        throw (`Environment variable or path '${context.currentMember}' does not exist.`);
     }
 }
 

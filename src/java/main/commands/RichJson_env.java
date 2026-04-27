@@ -34,7 +34,7 @@ public class RichJson_env implements RichJsonCommand {
             }
             return context.currentMember;
         } else {
-            throw new RuntimeException("Environment variable '" + memberStr + "' does not exist.");
+            throw new RuntimeException("Environment variable or path '" + memberStr + "' does not exist.");
         }
     }
 }

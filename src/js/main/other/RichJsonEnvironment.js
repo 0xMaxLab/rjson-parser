@@ -26,7 +26,7 @@ export function addEnvironmentVariable(name, value) {
         return;
     }
     if (Object.hasOwn(__RICH_JSON_ENVIRONMENT, name)) {
-        throw (`RichJson has the macro '${name}' already defined`);
+        throw (`RichJson has the evn variable '${name}' already defined`);
     }
 
     __RICH_JSON_ENVIRONMENT[name] = value;

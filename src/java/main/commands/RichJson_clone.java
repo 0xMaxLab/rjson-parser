@@ -1,6 +1,7 @@
 package commands;
 
 import core.RichJsonCommand;
+import core.RichJsonConstants;
 import other.RichJsonConfig;
 import core.RichJsonContext;
 import helper.RichJsonHelper;
@@ -12,7 +13,7 @@ public class RichJson_clone implements RichJsonCommand {
     public Object execute(RichJsonParser parser, RichJsonContext context) {
         if (parser.cache.cloneAddress != null) {
             if (RichJsonConfig.crashOnNestedCloneEnabled) {
-                throw new RuntimeException("RichJSON nested clone detected in '" + context.currentAddress + "'.");
+                throw new RuntimeException("RichJSON nested clone detected at '" + String.join(RichJsonConstants.COMMAND_PATH_DELIMITER, context.currentPath) + "'.");
             }
             return context.currentMember;
         }
@@ -20,7 +21,7 @@ public class RichJson_clone implements RichJsonCommand {
         parser.cache.cloneAddress = context.currentAddress;
         context.currentMember = RichJsonHelper.cloneObject(context.currentMember);
 
-        parser.logger.debug("resolved clone at '" + String.join("/", context.currentPath) + "'.");
+        parser.logger.debug("resolved clone at '" + String.join(RichJsonConstants.COMMAND_PATH_DELIMITER, context.currentPath) + "'.");
         return context.currentMember;
     }
 }

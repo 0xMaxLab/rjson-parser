@@ -21,7 +21,7 @@ export function __executeRefCommand(parser, context) {
             if (Object.hasOwn(prevMember, ref)) {
                 context.currentMember = prevMember[ref];
             } else {
-                throw (`Member '${ref}' in '${parser.cache.resolveAddress(prevMember)}' does not exist`);
+                throw (`Member '${ref}' at '${context.currentPath.join(__RICH_JSON_COMMAND_PATH_DELIMITER)}' does not exist`);
             }
         }
         context.currentAddress = isJsonObject(context.currentMember) || Array.isArray(context.currentMember)
