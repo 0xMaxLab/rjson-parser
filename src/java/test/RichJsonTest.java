@@ -6,6 +6,7 @@ import helper.RichJsonHelper;
 import module.RichJsonModule;
 import module.RichJsonModuleManager;
 import org.junit.jupiter.api.Test;
+import other.RichJsonClassMapping;
 import other.RichJsonEnvironment;
 
 import java.util.ArrayList;
@@ -97,6 +98,8 @@ public class RichJsonTest {
     @Test
     @SuppressWarnings("unchecked")
     void testConstructor() throws Exception {
+        RichJsonClassMapping.addClassMapping("RichJsonTestClass", RichJsonTestClass.class);
+
         Map<String, Object> content = parseJson("""
                     {
                         "first=RichJsonTestClass": {

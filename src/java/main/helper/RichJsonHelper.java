@@ -274,7 +274,7 @@ public class RichJsonHelper {
         if (object instanceof List || object instanceof String || object instanceof Number || object instanceof Boolean)
             return false;
 
-        return true; // TODO other.RichJsonClassMapping.isMapped(object.getClass().getSimpleName());
+        return true;
     }
 
     /**
