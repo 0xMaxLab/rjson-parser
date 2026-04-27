@@ -424,8 +424,10 @@ export class RichJsonParser {
 
     __callConstructor() {
         if (__RICH_JSON_CONFIG.lateConstructorEnabled && Object.hasOwn(this.con.currentMember, __RICH_JSON_LATE_CONSTRUCTOR_MEMBER)) {
+            let cache = new RichJsonCache();
+            cache.stack = [];
             let cstr = this.con.currentMember[__RICH_JSON_LATE_CONSTRUCTOR_MEMBER];
-            this.con.currentMember = __mergeIntoTarget(new cstr(), this.con.currentMember);
+            this.con.currentMember = __mergeIntoTarget(cache, new cstr(), this.con.currentMember, true);
             delete this.con.currentMember[__RICH_JSON_LATE_CONSTRUCTOR_MEMBER];
             this.logger.debug(`resolved construct for '${typeof cstr}'.`);
         }

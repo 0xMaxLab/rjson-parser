@@ -60,7 +60,7 @@ test('Constructor', () => {
                 "fourth": "fourth"
             }
         },
-        "second=RichJsonTestClass::first": {
+        "second==RichJsonTestClass::first": {
             "third": "third"
         }
     };

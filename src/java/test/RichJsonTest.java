@@ -90,6 +90,7 @@ public class RichJsonTest {
     public static class RichJsonTestClass {
         public int value;
         public Map<String, Object> second;
+        public String third;
 
         public RichJsonTestClass() {
         }
@@ -103,9 +104,13 @@ public class RichJsonTest {
         Map<String, Object> content = parseJson("""
                     {
                         "first=RichJsonTestClass": {
-                            "value": 100
+                            "value": 100,
+                            "second": {
+                                "fourth": "fourth"
+                            }
                         },
-                        "second==RichJsonTestClass::first": {
+                        "second=RichJsonTestClass::first": {
+                            "third": "third"
                         }
                     }
                 """);
@@ -113,6 +118,7 @@ public class RichJsonTest {
         getParser().parse(content, true);
 
         RichJsonTestClass first = mapper.convertValue(content.get("first"), RichJsonTestClass.class);
+        System.out.println(content.get("first"));
         RichJsonTestClass second = mapper.convertValue(content.get("second"), RichJsonTestClass.class);
 
         assertEquals(100, first.value);
@@ -432,6 +438,22 @@ public class RichJsonTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void testInvoke() throws Exception {
+        Map<String, Object> content = parseJson("""
+            {
+                "function_result": "$env$invoke:test_function"
+            }
+        """);
+
+        RichJsonEnvironment.addEnvironmentVariable("test_function", (Supplier<Object>) () -> { return 3 + 2; });
+
+        getParser().parse(content, true);
+
+        assertEquals(5, content.get("function_result"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void testFile() throws Exception {
         Map<String, Object> content = parseJson("""
             {
@@ -489,20 +511,5 @@ public class RichJsonTest {
         } catch (Exception e) {
             System.err.println("Skipping testMergeFolder because test directory might not exist locally: " + e.getMessage());
         }
-    }
-    @Test
-    @SuppressWarnings("unchecked")
-    void testInvoke() throws Exception {
-        Map<String, Object> content = parseJson("""
-            {
-                "function_result": "$env$invoke:test_function"
-            }
-        """);
-
-        RichJsonEnvironment.addEnvironmentVariable("test_function", (Supplier<Object>) () -> { return 3 + 2; });
-
-        getParser().parse(content, true);
-
-        assertEquals(5, content.get("function_result"));
     }
 }

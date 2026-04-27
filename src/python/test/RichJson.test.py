@@ -36,18 +36,19 @@ class TestRichJsonSuite(unittest.TestCase):
 
         register_module(module)
         include_module("test")
+
         parse_rich_json(content)
 
         self.assertEqual(content["first"], "success")
 
         exclude_module("test")
         unregister_module("test")
-        content_reset = {"first": "$ilog:Hello World!"}
+        content = {"first": "$ilog:Hello World!"}
         try:
-            parse_rich_json(content_reset, is_root=True)
+            parse_rich_json(content, is_root=True)
         except:
             pass
-        self.assertEqual(content_reset["first"], "$ilog:Hello World!")
+        self.assertEqual(content["first"], "$ilog:Hello World!")
 
     def test_constructor(self):
         add_class_mapping("RichJsonTestClass", RichJsonTestClass)
@@ -56,7 +57,7 @@ class TestRichJsonSuite(unittest.TestCase):
                 "value": 100,
                 "second": {"fourth": "fourth"}
             },
-            "second=RichJsonTestClass::first": {
+            "second==RichJsonTestClass::first": {
                 "third": "third"
             }
         }
@@ -193,6 +194,7 @@ class TestRichJsonSuite(unittest.TestCase):
         tenth.extend(content["eight"])
         tenth.extend(content["eight"])
         self.assertEqual(content["tenth"], tenth)
+
     def test_copy(self):
         content = {
             "first": {"second": "second", "test": "$copy:first"},
@@ -202,7 +204,7 @@ class TestRichJsonSuite(unittest.TestCase):
         self.assertIsNot(content["first"], content["third"])
         self.assertEqual(stringify(content["first"]), stringify(content["third"]))
 
-    def test_clone_key(self):
+    def test_clone(self):
         content = {"$clone:first": {"second": "second"}}
         clone_container = {"$clone:first": content["$clone:first"]}
         parse_rich_json(clone_container)
@@ -217,8 +219,34 @@ class TestRichJsonSuite(unittest.TestCase):
         self.assertEqual(content["function"](), 6)
         self.assertEqual(content["function_result"], 6)
 
-    def test_file_folder_mocked(self):
-        pass
+    def test_file(self):
+        content = {
+            "file": "$file:resources/json/test0"
+        }
+
+        parse_rich_json(content)
+
+        assert content["file"]["root0"] is True
+
+    def test_folder(self):
+        content = {
+            "folder": "$folder:resources/json"
+        }
+
+        parse_rich_json(content)
+
+        assert content["folder"]["test0"]["root0"] is True
+        assert content["folder"]["test1"]["root0"] is True
+
+    def test_merge_folder(self):
+        content = {
+            "folder": "$merge_folder:resources/json"
+        }
+
+        parse_rich_json(content)
+
+        assert content["folder"]["root0"] is True
+        assert content["folder"]["root1"]["prop1"] == "Hello World!"
 
 
 if __name__ == '__main__':
