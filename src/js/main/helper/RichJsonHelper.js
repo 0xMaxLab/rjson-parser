@@ -48,7 +48,7 @@ export function __mergeIntoTarget(cache, target, other, force = false) {
         member = other[name];
 
         if (typeof member === "function") {
-            if (!force && !Object.hasOwn(target, name)) {
+            if (force || !Object.hasOwn(target, name)) {
                 target[name] = member.bind(target);
             }
         } else {
@@ -56,7 +56,7 @@ export function __mergeIntoTarget(cache, target, other, force = false) {
                 if (!Object.hasOwn(cache.stack, cache.resolveAddress(member))) {
                     __mergeIntoTarget(cache, target[name], member);
                 }
-            } else if (!force && !Object.hasOwn(target, name)) {
+            } else if (force || !Object.hasOwn(target, name)) {
                 target[name] = member;
             }
         }
@@ -112,14 +112,14 @@ function __mergeIntoWithoutRebind(cache, target, other, force = false) {
         name = names[j];
         member = other[name];
         if (typeof member === "function") {
-            if (!force && !Object.hasOwn(target, name)) target[name] = member;
+            if (force || !Object.hasOwn(target, name)) target[name] = member;
         } else {
             if (member !== undefined && isJsonObject(member) && isJsonObject(target[name])) {
                 if (!Object.hasOwn(cache.stack, cache.resolveAddress(member))) {
                     __mergeIntoWithoutRebind(cache, target[name], member);
                 }
             } else {
-                if (!force && !Object.hasOwn(target, name)) target[name] = member;
+                if (force || !Object.hasOwn(target, name)) target[name] = member;
             }
         }
     }

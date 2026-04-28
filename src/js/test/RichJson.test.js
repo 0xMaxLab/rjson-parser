@@ -10,20 +10,26 @@ import {mergeObjects} from "../main/helper/RichJsonHelper.js";
 import {parse} from "../main/core/RichJson_parse.js";
 import stringify from "json-stable-stringify";
 import {isResolved} from "../main/helper/RichJson_isResolved.js";
-import {RichJsonTestClass} from "./RichJsonTestClass";
-import {addEnvironmentVariable} from "../main/other/RichJsonEnvironment.js";
-import {addClassMapping} from "../main/index.js";
+import {addClassMappings, addEnvironmentVariables, keepKeyCommands, updateConfiguration} from "../main/index.js";
+import {RichJsonTestClass} from "./RichJsonTestClass.js";
+import {__RICH_JSON_KEY_COMMAND_MEMBER} from "../main/core/RichJson.js";
+
+updateConfiguration({infoEnabled: true });
 
 test('Module', () => {
     let content = {
-        "first": "$ilog:Hello World!",
+        "$ilog:keepKeyCommand": {
+            "first": "Hello World!",
+        }
     };
 
     registerModule(
         new RichJsonModule("test")
-            .addCommand("ilog", function (_cryptkey, _add_to_cache, _root, _command, _message, _address, _name) {
-                console.log("file_struct_plain_rich_json_module_ok: " + _message);
-                return "success";
+            .addCommand("ilog", function (parser, context) {
+                keepKeyCommands(context.currentMember);
+                console.log("file_struct_plain_rich_json_module_ok: " + context.currentMember.first);
+                context.currentMember.first = "success";
+                return context.currentMember;
             })
     );
     includeModule("test");
@@ -31,10 +37,13 @@ test('Module', () => {
     parse(content);
 
     expect(content).toBeDefined();
-    expect(content.first).toBe("success");
+    expect(Object.hasOwn(content.keepKeyCommand, __RICH_JSON_KEY_COMMAND_MEMBER)).toBe(true);
+    expect(content.keepKeyCommand.first).toBe("success");
 
     content = {
-        "first": "$ilog:Hello World!",
+        "$ilog:keepKeyCommand": {
+            "first": "Hello World!",
+        }
     };
 
     excludeModule("test");
@@ -46,13 +55,14 @@ test('Module', () => {
         // ignore
     }
 
-    expect(content.first).toBe("$ilog:Hello World!");
+    expect(content.keepKeyCommand.first).toBe("Hello World!");
 });
 
-class RichJsonTestClass {}
-
 test('Constructor', () => {
-    addClassMapping("RichJsonTestClass", RichJsonTestClass);
+    addClassMappings({
+        "RichJsonTestClass": RichJsonTestClass
+    });
+
     let content = {
         "first=RichJsonTestClass": {
             "value": 100,
@@ -67,6 +77,7 @@ test('Constructor', () => {
 
     parse(content);
 
+    expect(content.first.value).toBe(100);
     expect(content.second.value).toBe(0);
     expect(stringify(content.first.second)).toBe(stringify(content.second.second));
     expect(content.first.constructor).toBe(RichJsonTestClass);
@@ -235,7 +246,9 @@ test('$env', () => {
         "env": "$env:RichJsonTestEnv"
     };
 
-    addEnvironmentVariable("RichJsonTestEnv", "Hello World!");
+    addEnvironmentVariables({
+        "RichJsonTestEnv": "Hello World!"
+    });
     parse(content);
 
     expect(content.env).toBe("Hello World!");

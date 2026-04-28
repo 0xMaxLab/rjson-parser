@@ -1,4 +1,5 @@
 import {__RICH_JSON_KEY_COMMAND_MEMBER} from "../core/RichJson.js";
+import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
 
 export const __RICH_JSON_ENVIRONMENT = {}
 
@@ -26,8 +27,10 @@ export function addEnvironmentVariable(name, value) {
         return;
     }
     if (Object.hasOwn(__RICH_JSON_ENVIRONMENT, name)) {
-        throw (`RichJson has the evn variable '${name}' already defined`);
+        if (__RICH_JSON_CONFIG.infoEnabled) {
+            console.warn(`RichJson has the evn variable '${name}' already defined`);
+        }
+    } else {
+        __RICH_JSON_ENVIRONMENT[name] = value;
     }
-
-    __RICH_JSON_ENVIRONMENT[name] = value;
 }

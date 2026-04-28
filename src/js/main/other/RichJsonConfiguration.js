@@ -29,12 +29,12 @@ export function updateConfiguration(config) {
         return;
     }
 
-    __RICH_JSON_CONFIG = mergeIntoTarget({
+    __RICH_JSON_CONFIG = mergeIntoTarget(config, {
         infoEnabled: true,
         debugEnabled: false,
         stringInterpolationsEnabled: true,
         fileCacheEnabled: true,
         lateConstructorEnabled: true,
         crashOnNestedCloneEnabled: true,
-    }, config);
+    });
 }

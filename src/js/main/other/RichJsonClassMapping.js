@@ -1,3 +1,5 @@
+import {__RICH_JSON_CONFIG} from "./RichJsonConfiguration.js";
+
 export const __RICH_JSON_CLASS_MAPPING = {}
 
 /**
@@ -5,7 +7,6 @@ export const __RICH_JSON_CLASS_MAPPING = {}
  * @param classMappings
  */
 export function addClassMappings(classMappings) {
-    r
     let names = Object.keys(classMappings);
     let name = undefined;
     for (let i = 0; i < names.length; ++i) {
@@ -21,9 +22,12 @@ export function addClassMappings(classMappings) {
  */
 export function addClassMapping(name, classType) {
     if (Object.hasOwn(__RICH_JSON_CLASS_MAPPING, name)) {
-        throw (`RichJSON has the class '${name}' already defined`);
+        if (__RICH_JSON_CONFIG.infoEnabled) {
+            console.warn(`RichJSON has the class '${name}' already defined`);
+        }
+    } else {
+        __RICH_JSON_CLASS_MAPPING[name] = classType;
     }
-    __RICH_JSON_CLASS_MAPPING[name] = classType;
 }
 
 export function __mapClassByName(name) {
