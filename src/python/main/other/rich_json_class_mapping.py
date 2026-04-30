@@ -1,4 +1,7 @@
+from main.helper.rich_json_logger import RichJsonLogger
+
 _RICH_JSON_CLASS_MAPPING = {}
+logger = RichJsonLogger.logger
 
 
 def add_class_mappings(class_mappings):
@@ -23,7 +26,7 @@ def add_class_mapping(name, class_type):
     :raises ValueError: If the class is already defined.
     """
     if name in _RICH_JSON_CLASS_MAPPING:
-        raise ValueError(f"RichJson has the class '{name}' already defined")
+        logger.warning(f"RichJSON has the class '{name}' already defined")
 
     _RICH_JSON_CLASS_MAPPING[name] = class_type
 

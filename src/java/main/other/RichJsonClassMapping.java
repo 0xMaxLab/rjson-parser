@@ -1,5 +1,7 @@
 package other;
 
+import helper.RichJsonLogger;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,9 +26,10 @@ public class RichJsonClassMapping {
      */
     public static void addClassMapping(String name, Class<?> classType) {
         if (RICH_JSON_CLASS_MAPPING.containsKey(name)) {
-            throw new IllegalArgumentException("RichJSON has the class '" + name + "' already defined");
+            RichJsonLogger.logger.warn("has the class '" + name + "' already defined");
+        } else {
+            RICH_JSON_CLASS_MAPPING.put(name, classType);
         }
-        RICH_JSON_CLASS_MAPPING.put(name, classType);
     }
 
     /**

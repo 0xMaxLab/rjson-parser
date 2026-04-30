@@ -7,9 +7,11 @@ import module.RichJsonModule;
 import module.RichJsonModuleManager;
 import org.junit.jupiter.api.Test;
 import other.RichJsonClassMapping;
+import other.RichJsonConfig;
 import other.RichJsonEnvironment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -20,6 +22,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RichJsonTest {
 
     private final ObjectMapper mapper = new ObjectMapper();
+
+    {
+        RichJsonConfig.infoEnabled = true;
+        RichJsonConfig.debugEnabled = true;
+    }
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> parseJson(String json) {
@@ -45,7 +52,20 @@ public class RichJsonTest {
     class RichJson_ilog implements RichJsonCommand {
         @Override
         public Object execute(RichJsonParser parser, RichJsonContext context) throws Exception {
-            return "success";
+            var currentMember = (Map<String, Object>) context.currentMember;
+            RichJsonHelper.keepKeyCommands(currentMember);
+            parser.logger.info("rich_json_module_ilog_ok:" + currentMember.get("first"));
+            currentMember.put("first", "success");
+            return context.currentMember;
+        }
+    }
+    class RichJson_dlog implements RichJsonCommand {
+        @Override
+        public Object execute(RichJsonParser parser, RichJsonContext context) throws Exception {
+            var currentMember = (Map<String, Object>) context.currentMember;
+            parser.logger.debug("rich_json_module_dlog_ok:" + currentMember.get("first"));
+            currentMember.put("first", "success");
+            return context.currentMember;
         }
     }
 
@@ -54,12 +74,18 @@ public class RichJsonTest {
     void testModule() throws Exception {
         Map<String, Object> content = parseJson("""
                     {
-                        "first": "$ilog:Hello World!"
+                        "$ilog:keepKeyCommand": {
+                            "first": "Hello World!"
+                        },
+                        "$dlog:debug": {
+                            "first": "Hello World!"
+                        }
                     }
                 """);
 
         RichJsonModule module = new RichJsonModule("test")
-                .addCommand("ilog", new RichJsonTest.RichJson_ilog(), null);
+                .addCommand("ilog", new RichJsonTest.RichJson_ilog(), null)
+                .addLateApply("dlog", new RichJsonTest.RichJson_dlog(), null);
 
         RichJsonModuleManager.registerModule(module);
         RichJsonModuleManager.includeModule("test");
@@ -67,11 +93,16 @@ public class RichJsonTest {
         getParser().parse(content, true);
 
         assertNotNull(content);
-        assertEquals("success", content.get("first"));
+        var keepKeyCommand = (Map<String, Object>) content.get("keepKeyCommand");
+        assertEquals("success",  keepKeyCommand.get("first"));
+        var debug = (Map<String, Object>) content.get("debug");
+        assertEquals("success",  debug.get("first"));
 
-        Map<String, Object> content2 = parseJson("""
+        content = parseJson("""
                     {
-                        "first": "$ilog:Hello World!"
+                        "$ilog:keepKeyCommand": {
+                            "first": "Hello World!"
+                        }
                     }
                 """);
 
@@ -79,12 +110,13 @@ public class RichJsonTest {
         RichJsonModuleManager.unregisterModule("test");
 
         try {
-            getParser().parse(content2, true);
+            getParser().parse(content, true);
         } catch (Exception e) {
             // ignore
         }
 
-        assertEquals("$ilog:Hello World!", content2.get("first"));
+        keepKeyCommand = (Map<String, Object>) content.get("keepKeyCommand");
+        assertEquals("Hello World!",  keepKeyCommand.get("first"));
     }
 
     public static class RichJsonTestClass {
@@ -99,7 +131,10 @@ public class RichJsonTest {
     @Test
     @SuppressWarnings("unchecked")
     void testConstructor() throws Exception {
-        RichJsonClassMapping.addClassMapping("RichJsonTestClass", RichJsonTestClass.class);
+        var mappings = new HashMap<String, Class<?>>();
+        mappings.put("RichJsonTestClass", RichJsonTestClass.class);
+        RichJsonClassMapping.addClassMappings(mappings);
+        RichJsonClassMapping.addClassMappings(mappings);
 
         Map<String, Object> content = parseJson("""
                     {
@@ -276,7 +311,11 @@ public class RichJsonTest {
         Map<String, Object> content1 = parseJson("""
             {
                 "first": "$ref:second",
-                "second": "second"
+                "second": "second",
+                "third": false,
+                "fifth": {
+                    "idk": "$ref:second"
+                }
             }
         """);
         assertFalse(RichJsonHelper.isResolved(content1));
@@ -284,7 +323,11 @@ public class RichJsonTest {
         Map<String, Object> content2 = parseJson("""
             {
                 "first": "{$ref:second}",
-                "second": "second"
+                "second": "second",
+                "third": false,
+                "fifth": {
+                    "idk": "{$ref:second}"
+                }
             }
         """);
         assertFalse(RichJsonHelper.isResolved(content2));

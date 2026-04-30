@@ -5,7 +5,9 @@ from main.core.rich_json import parse_rich_json
 from main.helper.rich_json_helper import (
     merge_objects,
 )
+from main.core.rich_json_constants import _RICH_JSON_KEY_COMMAND_MEMBER
 from main.helper.rich_json_is_resolved import is_resolved
+from main.helper.rich_json_keep_key_commands import keep_key_commands
 from main.module.rich_json_module import (
     RichJsonModule,
     register_module,
@@ -13,7 +15,8 @@ from main.module.rich_json_module import (
     exclude_module,
     unregister_module
 )
-from main.other.rich_json_class_mapping import add_class_mapping
+from main.other.rich_json_class_mapping import add_class_mappings
+from main.other.rich_json_configuration import update_configuration
 from main.other.rich_json_environment import add_environment_variable
 
 
@@ -26,32 +29,66 @@ def stringify(obj):
     return json.dumps(obj, sort_keys=True, default=lambda o: o.__dict__ if hasattr(o, '__dict__') else str(o))
 
 
+update_configuration({"infoEnabled": True, "debugEnabled": True})
+
 class TestRichJsonSuite(unittest.TestCase):
 
-    def test_module(self):
-        content = {"first": "$ilog:Hello World!"}
+    def test_module_extended(self):
+        content = {
+            "$ilog:keepKeyCommand": {
+                "first": "Hello World!",
+            },
+            "$dlog:debug": {
+                "first": "Hello World!",
+            }
+        }
 
         module = RichJsonModule("test")
-        module.add_command("ilog", lambda p, c: "success")
+
+        def ilog_command(parser, context):
+            keep_key_commands(context.current_member)
+            print(f"rich_json_module_ilog_ok: {context.current_member['first']}")
+            context.current_member["first"] = "success"
+            return context.current_member
+
+        def dlog_late_apply(parser, context):
+            print(f"rich_json_module_dlog_ok: {context.current_member['first']}")
+            context.current_member["first"] = "success"
+            return context.current_member
+
+        module.add_command("ilog", ilog_command)
+        module.add_late_apply("dlog", dlog_late_apply)
 
         register_module(module)
         include_module("test")
 
         parse_rich_json(content)
 
-        self.assertEqual(content["first"], "success")
+        self.assertIsNotNone(content)
+        self.assertTrue(_RICH_JSON_KEY_COMMAND_MEMBER in content["keepKeyCommand"])
+        self.assertEqual(content["keepKeyCommand"]["first"], "success")
+        self.assertEqual(content["debug"]["first"], "success")
+
+        content = {
+            "$ilog:keepKeyCommand": {
+                "first": "Hello World!",
+            }
+        }
 
         exclude_module("test")
         unregister_module("test")
-        content = {"first": "$ilog:Hello World!"}
+
         try:
             parse_rich_json(content, is_root=True)
-        except:
+        except Exception:
+            # Ignore parser errors for unregistered commands
             pass
-        self.assertEqual(content["first"], "$ilog:Hello World!")
+
+        self.assertEqual(content["$ilog:keepKeyCommand"]["first"], "Hello World!")
 
     def test_constructor(self):
-        add_class_mapping("RichJsonTestClass", RichJsonTestClass)
+        add_class_mappings({"RichJsonTestClass": RichJsonTestClass})
+        add_class_mappings({"RichJsonTestClass": RichJsonTestClass})
         content = {
             "first=RichJsonTestClass": {
                 "value": 100,
@@ -141,9 +178,23 @@ class TestRichJsonSuite(unittest.TestCase):
         self.assertEqual(content["eigth"], "third")
 
     def test_is_resolved(self):
-        content = {"first": "$ref:second", "second": "second"}
+        content = {
+            "first": "$ref:second",
+            "second": "second",
+            "third": False,
+            "fifth": {
+                "idk": "$ref:second"
+            }
+        }
         self.assertFalse(is_resolved(content))
-        content = {"first": "{$ref:second}", "second": "second"}
+        content = {
+            "first": "$ref:second",
+            "second": "second",
+            "third": False,
+            "fifth": {
+                "idk": "$ref:second"
+            }
+        }
         self.assertFalse(is_resolved(content))
 
     def test_ref(self):

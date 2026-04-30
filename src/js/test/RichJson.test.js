@@ -53,6 +53,7 @@ test('Module', () => {
     expect(content).toBeDefined();
     expect(Object.hasOwn(content.keepKeyCommand, __RICH_JSON_KEY_COMMAND_MEMBER)).toBe(true);
     expect(content.keepKeyCommand.first).toBe("success");
+    expect(content.debug.first).toBe("success");
 
     content = {
         "$ilog:keepKeyCommand": {

@@ -451,11 +451,13 @@ class RichJsonParser:
         if is_json_object(self.con.current_member) and has_field(self.con.current_member,
                                                                  _RICH_JSON_KEY_COMMAND_MEMBER):
             key_commands = list(get_field(self.con.current_member, _RICH_JSON_KEY_COMMAND_MEMBER))
-            for kcmd in key_commands:
+            for kcmd in key_commands[:]:
                 if self._is_rich_json_command_enabled(kcmd):
                     self.con.current_command = kcmd
                     self.con.current_member = self._try_rich_json_key_command()
-            delete_field(self.con.current_member, _RICH_JSON_KEY_COMMAND_MEMBER)
+                    key_commands.remove(kcmd)
+            if len(list(get_field(self.con.current_member, _RICH_JSON_KEY_COMMAND_MEMBER))) == 0:
+                delete_field(self.con.current_member, _RICH_JSON_KEY_COMMAND_MEMBER)
         return self.con.current_member
 
     def _try_rich_json_key_command(self):
