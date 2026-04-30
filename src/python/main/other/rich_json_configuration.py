@@ -34,4 +34,4 @@ def update_configuration(config):
         "crashOnNestedCloneEnabled": True,
     }
 
-    _RICH_JSON_CONFIG = merge_into_target(default_config, config)
+    _RICH_JSON_CONFIG = merge_into_target(config, default_config)
