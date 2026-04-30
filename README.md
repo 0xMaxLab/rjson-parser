@@ -1,6 +1,7 @@
 [![npm Package Version](https://img.shields.io/npm/v/@rjson/parser.svg)](https://www.npmjs.com/package/@rjson/parser)
 [![Minified Package Size](https://img.shields.io/bundlephobia/min/@rjson/parser)](https://bundlephobia.com/package/@rjson/parser)
 [![npm Package Downloads](https://img.shields.io/npm/dm/@rjson/parser)](https://www.npmtrends.com/@rjson/parser)
+![JS Test Coverage](./coverage/badge.svg)
 
 # Welcome to RichJSON -- JSON with inheritances, references and commands
 
