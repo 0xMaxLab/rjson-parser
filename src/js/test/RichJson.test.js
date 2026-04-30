@@ -20,11 +20,14 @@ import {
 import {RichJsonTestClass} from "./RichJsonTestClass.js";
 import {__RICH_JSON_KEY_COMMAND_MEMBER} from "../main/core/RichJson.js";
 
-updateConfiguration({infoEnabled: true });
+updateConfiguration({infoEnabled: true, debugEnabled: true });
 
 test('Module', () => {
     let content = {
         "$ilog:keepKeyCommand": {
+            "first": "Hello World!",
+        },
+        "$dlog:debug": {
             "first": "Hello World!",
         }
     };
@@ -33,7 +36,12 @@ test('Module', () => {
         new RichJsonModule("test")
             .addCommand("ilog", function (parser, context) {
                 keepKeyCommands(context.currentMember);
-                console.log("file_struct_plain_rich_json_module_ok: " + context.currentMember.first);
+                console.log("rich_json_module_ilog_ok: " + context.currentMember.first);
+                context.currentMember.first = "success";
+                return context.currentMember;
+            })
+            .addLateApply("dlog", function (parser, context) {
+                console.debug("rich_json_module_dlog_ok: " + context.currentMember.first);
                 context.currentMember.first = "success";
                 return context.currentMember;
             })
@@ -65,6 +73,9 @@ test('Module', () => {
 });
 
 test('Constructor', () => {
+    addClassMappings({
+        "RichJsonTestClass": RichJsonTestClass
+    });
     addClassMappings({
         "RichJsonTestClass": RichJsonTestClass
     });
@@ -207,17 +218,19 @@ test('Interpolation', () => {
 test('isResolved', () => {
     let content = {
         "first": "$ref:second",
-        "second": "second"
+        "second": "second",
+        "third": false,
+        "fifth": {
+            "idk": "$ref:second"
+        }
     };
+    content["fourth"] = content;
 
     let res = isResolved(content);
 
     expect(res).toBeFalsy();
 
-    content = {
-        "first": "{$ref:second}",
-        "second": "second"
-    };
+    content["first"] = "{$ref:second}";
 
     res = isResolved(content);
 
@@ -360,6 +373,7 @@ test('$clone', () => {
 
 test('$clone_crash_on_nested', () => {
     updateConfiguration({crashOnNestedCloneEnabled: true});
+    updateConfiguration(undefined);
 
     let content = {
         "$clone:first": {

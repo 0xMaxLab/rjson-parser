@@ -22,6 +22,7 @@ public class RichJson_env implements RichJsonCommand {
             Object envVal = RichJsonEnvironment.env.get(firstRef);
             context.currentMember = envVal;
 
+            var prevRoot = context.root;
             context.root = (envVal instanceof Map) ? envVal : Map.of();
             context.currentAddress = parser.cache.resolveAddress(context.root);
 
@@ -32,6 +33,7 @@ public class RichJson_env implements RichJsonCommand {
                 context.currentMember = ref[1];
                 return RichJsonCommandHolder.executeCommand("ref", parser, context);
             }
+            context.root = prevRoot;
             return context.currentMember;
         } else {
             throw new RuntimeException("Environment variable or path '" + memberStr + "' does not exist.");

@@ -17,6 +17,7 @@ def _execute_env_command(parser, context):
 
     if first_ref in _RICH_JSON_ENVIRONMENT:
         context.current_member = _RICH_JSON_ENVIRONMENT[first_ref]
+        prevRoot = context.root
         context.root = context.current_member if is_json_object(context.current_member) else {}
         context.current_address = parser.cache.resolve_address(context.root)
 
@@ -26,7 +27,7 @@ def _execute_env_command(parser, context):
         if len(ref) == 2:
             context.current_member = ref[1]
             context.current_member = _execute_ref_command(parser, context)
-
+        context.root = prevRoot
         return context.current_member
     else:
         raise ValueError(f"Environment variable or path '{context.current_member}' does not exist.")
