@@ -64,6 +64,13 @@ export function setCommandEnabled(command, enabled) {
     }
 }
 
+export function isCommandEnabled(command) {
+    if (!Object.hasOwn(__RICH_JSON_COMMANDS.available, command)) {
+        __throwCommandNotFound(command);
+    }
+    return __RICH_JSON_COMMANDS.enabled[command] !== __RICH_JSON_COMMANDS.void;
+}
+
 export function __throwCommandNotFound(command) {
     throw (`RichJSON: Command '${command}' not found`);
 }

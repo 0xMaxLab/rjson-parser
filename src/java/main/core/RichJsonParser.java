@@ -174,7 +174,7 @@ public class RichJsonParser {
 
         if (this.cache.stack.containsKey(this.con.currentAddress)) {
             this.logger.debug("cache hit at '" + pathStr + "' with address '" + this.con.currentAddress + "'");
-            this.con.currentPath.remove(this.con.currentPath.size() - 1);
+            this.con.currentPath.pop();
             return this.cache.stack.get(this.con.currentAddress);
         } else {
             this.logger.debug("cache add at '" + pathStr + "' with address '" + this.con.currentAddress + "'");
@@ -182,7 +182,7 @@ public class RichJsonParser {
         }
 
         if (!this.__isMemberRichJsonAble(this.con.currentMember)) {
-            this.con.currentPath.remove(this.con.currentPath.size() - 1);
+            this.con.currentPath.pop();
             return this.con.currentMember;
         }
 
@@ -192,12 +192,12 @@ public class RichJsonParser {
                 var res = this.__parseInterpolations();
                 this.con.currentMember = res.result;
                 if (!res.isParsed) {
-                    this.con.currentPath.remove(this.con.currentPath.size() - 1);
+                    this.con.currentPath.pop();
                     return this.con.currentMember;
                 }
             }
             Object result = this.__executeRichJsonCommandIfContainedInMember();
-            this.con.currentPath.remove(this.con.currentPath.size() - 1);
+            this.con.currentPath.pop();
             return result;
         } else {
             var currentAddress = this.con.currentAddress;
@@ -221,7 +221,7 @@ public class RichJsonParser {
                 this.con.currentMember = this.__executeKeyCommands();
             }
 
-            this.con.currentPath.remove(this.con.currentPath.size() - 1);
+            this.con.currentPath.pop();
             return this.con.currentMember;
         }
     }
@@ -363,7 +363,7 @@ public class RichJsonParser {
                 }
                 this.con.root = originalRoot;
             }
-            this.con.currentPath.remove(this.con.currentPath.size() - 1);
+            this.con.currentPath.pop();
             return this.con.currentMember;
         } catch (Exception e) {
             this.logger.groupEndAll();
@@ -373,7 +373,12 @@ public class RichJsonParser {
     }
 
     private boolean __isRichJsonCommandEnabled(String command) {
-        return RichJsonCommandHolder.isCommandEnabled(command);
+        try {
+            return RichJsonCommandHolder.isCommandEnabled(command);
+        } catch (Exception e) {
+            this.logger.groupEndAll();
+            throw e;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -421,6 +426,7 @@ public class RichJsonParser {
         var chain = iteStr.split(RichJsonConstants.COMMAND_DELIMITER);
         var member = (Map<String, Object>) this.con.currentMember;
 
+        this.con.currentPath.add(RichJsonConstants.INHERITANCE_SIGN);
         for (var entry : chain) {
             var currentEntry = entry.trim();
             if (RichJsonConstants.COMMAND_WILDCARD.matcher(currentEntry).find()) {
@@ -434,6 +440,7 @@ public class RichJsonParser {
             var result = RichJsonHelper.cloneObject(this.__tryRichJsonCommand());
             this.con.currentMember = RichJsonHelper.mergeIntoTarget(member, result);
         }
+        this.con.currentPath.pop();
     }
 
     private void __resetCloneIfPossible(String address) {

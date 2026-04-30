@@ -7,7 +7,12 @@ import {
     isJsonObject,
     mergeIntoTarget
 } from "../helper/RichJsonHelper.js";
-import {__RICH_JSON_COMMANDS, setCommandEnabled, __throwCommandNotFound} from "./RichJsonCommandHolder.js";
+import {
+    __RICH_JSON_COMMANDS,
+    setCommandEnabled,
+    __throwCommandNotFound,
+    isCommandEnabled
+} from "./RichJsonCommandHolder.js";
 import {__mapClassByName} from "../other/RichJsonClassMapping.js";
 import {__RICH_JSON_CONFIG} from "../other/RichJsonConfiguration.js";
 import {RichJsonCache} from "./RichJsonCache.js";
@@ -404,10 +409,13 @@ export class RichJsonParser {
     }
 
     __isRichJsonCommandEnabled(command) {
-        if (!Object.hasOwn(__RICH_JSON_COMMANDS.available, command)) {
-            __throwCommandNotFound(command);
+        try {
+            return isCommandEnabled(command);
+        } catch (e) {
+            this.logger.groupEndAll();
+            throw e;
         }
-        return __RICH_JSON_COMMANDS.enabled[command] !== __RICH_JSON_COMMANDS.void;
+
     }
 
     __executeClone() {
@@ -441,6 +449,7 @@ export class RichJsonParser {
         let inheritance_chain = this.cache.inheritances[this.con.currentAddress].split(__RICH_JSON_COMMAND_DELIMITER);
         let member = this.con.currentMember;
 
+        this.con.currentPath.push(__RICH_JSON_INHERITANCE_SIGN);
         for (let i = 0; i < inheritance_chain.length; ++i) {
             this.con.currentMember = inheritance_chain[i].trim();
             if (__RICH_JSON_COMMAND_WILDCARD.test(this.con.currentMember)) {
@@ -452,6 +461,7 @@ export class RichJsonParser {
             }
             this.con.currentMember = mergeIntoTarget(member, cloneObject(this.__tryRichJsonCommand()));
         }
+        this.con.currentPath.pop();
     }
 
     __resetCloneIfPossible(_address) {

@@ -398,6 +398,7 @@ class RichJsonParser:
 
     def _is_rich_json_command_enabled(self, command):
         if command not in _RICH_JSON_COMMANDS.available:
+            self.logger.group_end_all()
             _throw_command_not_found(command)
         return _RICH_JSON_COMMANDS.enabled[command] != _RICH_JSON_COMMANDS.void_command
 
@@ -427,6 +428,7 @@ class RichJsonParser:
             return
         chain = inheritance_val.split(_RICH_JSON_COMMAND_DELIMITER)
         member = self.con.current_member
+        self.con.current_path.append(_RICH_JSON_INHERITANCE_SIGN)
         for ite in chain:
             self.con.current_member = ite.strip()
             if bool(_RICH_JSON_COMMAND_WILDCARD.search(self.con.current_member)):
@@ -436,6 +438,7 @@ class RichJsonParser:
             else:
                 self.con.current_command = _RICH_JSON_COMMAND_REF
             self.con.current_member = merge_into_target(member, clone_object(self._try_rich_json_command()))
+        self.con.current_path.pop()
 
     def _reset_clone_if_possible(self, address):
         if self.cache.clone_address == address:
