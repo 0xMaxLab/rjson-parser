@@ -19,14 +19,16 @@ export function __executeEnvCommand(parser, context) {
 
     if (Object.hasOwn(__RICH_JSON_ENVIRONMENT, firstRef)) {
         context.currentMember = __RICH_JSON_ENVIRONMENT[firstRef];
+        let prevRoot = context.root;
         context.root = isJsonObject(context.currentMember) ? context.currentMember : {};
         context.currentAddress = parser.cache.resolveAddress(context.root);
         context.currentMember = parser.__parseRichJsonInMember();
         __RICH_JSON_ENVIRONMENT[firstRef] = context.currentMember;
         if (ref.length === 2) {
             context.currentMember = ref[1];
-            context.currentMember = __executeRefCommand();
+            context.currentMember = __executeRefCommand(parser, context);
         }
+        context.root = prevRoot;
         return context.currentMember;
     } else {
         throw (`Environment variable or path '${context.currentMember}' does not exist.`);

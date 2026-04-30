@@ -10,7 +10,13 @@ import {mergeObjects} from "../main/helper/RichJsonHelper.js";
 import {parse} from "../main/core/RichJson_parse.js";
 import stringify from "json-stable-stringify";
 import {isResolved} from "../main/helper/RichJson_isResolved.js";
-import {addClassMappings, addEnvironmentVariables, keepKeyCommands, updateConfiguration} from "../main/index.js";
+import {
+    addClassMappings,
+    addEnvironmentVariables,
+    keepKeyCommands,
+    setCommandEnabled,
+    updateConfiguration
+} from "../main/index.js";
 import {RichJsonTestClass} from "./RichJsonTestClass.js";
 import {__RICH_JSON_KEY_COMMAND_MEMBER} from "../main/core/RichJson.js";
 
@@ -218,6 +224,27 @@ test('isResolved', () => {
     expect(res).toBeFalsy();
 });
 
+test('setCommandEnabled', () => {
+    let content = {
+        "first": {
+            "second": "second"
+        },
+        "third": "#ref:first/second",
+    }
+
+    setCommandEnabled("ref", false);
+
+    try {
+        parse(content);
+    } catch (e) {
+        //ignore
+    }
+
+    setCommandEnabled("ref", true);
+
+    expect(content.third).toBe("#ref:first/second");
+})
+
 test('$ref', () => {
     let content = {
         "first": {
@@ -243,7 +270,13 @@ test('$ref', () => {
 
 test('$env', () => {
     let content = {
-        "env": "$env:RichJsonTestEnv"
+        "$env:a": {
+            "RichJsonTestEnv2": {
+                "message": "Hello World!!"
+            }
+        },
+        "env1": "$env:RichJsonTestEnv",
+        "env2": "$env:RichJsonTestEnv2/message",
     };
 
     addEnvironmentVariables({
@@ -251,7 +284,8 @@ test('$env', () => {
     });
     parse(content);
 
-    expect(content.env).toBe("Hello World!");
+    expect(content.env1).toBe("Hello World!");
+    expect(content.env2).toBe("Hello World!!");
 })
 
 test('$this', () => {
@@ -322,6 +356,30 @@ test('$clone', () => {
     parse(clone);
 
     expect(content["$clone:first"] === clone.first).toBeFalsy();
+});
+
+test('$clone_crash_on_nested', () => {
+    updateConfiguration({crashOnNestedCloneEnabled: true});
+
+    let content = {
+        "$clone:first": {
+            "$clone:first": {
+                "third": "third",
+                "fourth": "fourth"
+            },
+            "second": "second"
+        }
+    };
+
+    updateConfiguration({crashOnNestedCloneEnabled: false});
+
+    let hadException = false;
+    try {
+        parse(content);
+    } catch (exception) {
+        hadException = true;
+    }
+    expect(hadException).toBe(true);
 });
 
 test('$invoke', () => {
