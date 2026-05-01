@@ -335,6 +335,27 @@ public class RichJsonTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void testSetCommandEnabled() throws Exception {
+        Map<String, Object> content = parseJson("""
+            {
+                "first": {
+                    "second": "second"
+                },
+                "third": "#ref:first/second"
+            }
+        """);
+
+        RichJsonCommandHolder.setCommandEnabled("ref", false);
+
+        getParser().parse(content, true);
+
+        RichJsonCommandHolder.setCommandEnabled("ref", true);
+
+        assertEquals("#ref:first/second", content.get("third"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void testRef() throws Exception {
         Map<String, Object> content = parseJson("""
             {
@@ -369,14 +390,21 @@ public class RichJsonTest {
     void testEnv() throws Exception {
         Map<String, Object> content = parseJson("""
             {
-                "env": "$env:RichJsonTestEnv"
+                "$env:a": {
+                    "RichJsonTestEnv2": {
+                        "message": "Hello World!!"
+                    }
+                },
+                "env1": "$env:RichJsonTestEnv",
+                "env2": "$env:RichJsonTestEnv2/message"
             }
         """);
 
         RichJsonEnvironment.addEnvironmentVariable("RichJsonTestEnv", "Hello World!");
         getParser().parse(content, true);
 
-        assertEquals("Hello World!", content.get("env"));
+        assertEquals("Hello World!", content.get("env1"));
+        assertEquals("Hello World!!", content.get("env2"));
     }
 
     @Test
@@ -477,6 +505,35 @@ public class RichJsonTest {
         getParser().parse(clone, true);
 
         assertNotSame(content.get("$clone:first"), clone.get("first"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testCloneCrashOnNested() throws Exception {
+        Map<String, Object> content = parseJson("""
+            {
+                "$clone:first": {
+                    "$clone:first": {
+                        "third": "third",
+                        "fourth": "fourth"
+                    },
+                    "second": "second"
+                }
+            }
+        """);
+
+        RichJsonConfig.crashOnNestedCloneEnabled = true;
+
+        var hadException = false;
+        try {
+            getParser().parse(content, true);
+        } catch (Exception e) {
+            hadException = true;
+        }
+
+        RichJsonConfig.crashOnNestedCloneEnabled = false;
+
+        assertTrue(hadException);
     }
 
     @Test
