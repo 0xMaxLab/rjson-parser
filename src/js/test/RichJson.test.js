@@ -20,7 +20,7 @@ import {
 import {RichJsonTestClass} from "./RichJsonTestClass.js";
 import {__RICH_JSON_KEY_COMMAND_MEMBER} from "../main/core/RichJson.js";
 
-updateConfiguration({infoEnabled: true, debugEnabled: true });
+updateConfiguration({infoEnabled: true, debugEnabled: true});
 
 test('Module', () => {
     let content = {

@@ -29,12 +29,5 @@ export function updateConfiguration(config) {
         return;
     }
 
-    __RICH_JSON_CONFIG = mergeIntoTarget(config, {
-        infoEnabled: true,
-        debugEnabled: false,
-        stringInterpolationsEnabled: true,
-        fileCacheEnabled: true,
-        lateConstructorEnabled: true,
-        crashOnNestedCloneEnabled: true,
-    });
+    __RICH_JSON_CONFIG = mergeIntoTarget(config, __RICH_JSON_CONFIG);
 }

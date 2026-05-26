@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from main.core.rich_json import parse_rich_json
+from main.core.rich_json import parse_rich_json, set_command_enabled
 from main.helper.rich_json_helper import (
     merge_objects,
 )
@@ -27,7 +27,6 @@ class RichJsonTestClass:
 
 def stringify(obj):
     return json.dumps(obj, sort_keys=True, default=lambda o: o.__dict__ if hasattr(o, '__dict__') else str(o))
-
 
 update_configuration({"infoEnabled": True, "debugEnabled": True})
 
@@ -197,6 +196,27 @@ class TestRichJsonSuite(unittest.TestCase):
         }
         self.assertFalse(is_resolved(content))
 
+    def test_set_command_enabled(self):
+        content = {
+            "first": {
+                "second": "second"
+            },
+            "third": "#ref:first/second",
+        }
+
+        set_command_enabled("ref", False)
+
+        try:
+            parse_rich_json(content)
+        except:
+            #ignore
+            pass
+
+        set_command_enabled("ref", True)
+
+        self.assertEqual("#ref:first/second", content["third"])
+
+
     def test_ref(self):
         content = {
             "first": {
@@ -215,9 +235,18 @@ class TestRichJsonSuite(unittest.TestCase):
 
     def test_env(self):
         add_environment_variable("RichJsonTestEnv", "Hello World!")
-        content = {"env": "$env:RichJsonTestEnv"}
+        content = {
+            "$env:a": {
+                "RichJsonTestEnv2": {
+                    "message": "Hello World!!"
+                }
+            },
+            "env1": "$env:RichJsonTestEnv",
+            "env2": "$env:RichJsonTestEnv2/message"
+        }
         parse_rich_json(content)
-        self.assertEqual(content["env"], "Hello World!")
+        self.assertEqual(content["env1"], "Hello World!")
+        self.assertEqual(content["env2"], "Hello World!!")
 
     def test_this(self):
         content = {"this": "$this:"}
@@ -260,6 +289,29 @@ class TestRichJsonSuite(unittest.TestCase):
         clone_container = {"$clone:first": content["$clone:first"]}
         parse_rich_json(clone_container)
         self.assertIsNot(content["$clone:first"], clone_container["first"])
+
+    def test_clone_crash_on_nested(self):
+        content = {
+            "$clone:first": {
+                "$clone:first": {
+                    "third": "third",
+                    "fourth": "fourth"
+                },
+                "second": "second"
+            }
+        }
+
+        update_configuration({"crashOnNestedClone": True})
+
+        had_exception = False
+        try:
+            parse_rich_json(content)
+        except:
+            had_exception = True
+
+        update_configuration({"crashOnNestedClone": False})
+
+        self.assertTrue(had_exception)
 
     def test_invoke(self):
         content = {

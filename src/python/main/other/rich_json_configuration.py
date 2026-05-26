@@ -25,13 +25,8 @@ def update_configuration(config):
     if not config or not isinstance(config, dict):
         return
 
-    default_config = {
-        "infoEnabled": True,
-        "debugEnabled": False,
-        "stringInterpolationsEnabled": True,
-        "fileCacheEnabled": True,
-        "lateConstructorEnabled": True,
-        "crashOnNestedCloneEnabled": True,
-    }
+    default_config = _RICH_JSON_CONFIG.copy()
 
-    _RICH_JSON_CONFIG = merge_into_target(config, default_config)
+    _RICH_JSON_CONFIG.clear()
+    merge_into_target(_RICH_JSON_CONFIG, config, default_config)
+    _RICH_JSON_CONFIG.update()
