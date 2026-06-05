@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "B9aXTCJKO6E=",
+  "dgSpecHash": "CptBoDUdwl4=",
   "success": true,
   "projectFilePath": "/home/ms/work/hawk/rjson-parser/src/c#/main/main.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/home/ms/.nuget/packages/newtonsoft.json/13.0.4/newtonsoft.json.13.0.4.nupkg.sha512"
+  ],
   "logs": []
 }

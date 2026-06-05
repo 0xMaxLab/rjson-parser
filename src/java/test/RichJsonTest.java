@@ -144,7 +144,7 @@ public class RichJsonTest {
                                 "fourth": "fourth"
                             }
                         },
-                        "second=RichJsonTestClass::first": {
+                        "second==RichJsonTestClass::first": {
                             "third": "third"
                         }
                     }
