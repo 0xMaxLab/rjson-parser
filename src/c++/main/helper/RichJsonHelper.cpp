@@ -1,114 +1,87 @@
 #include "RichJsonHelper.hpp"
+#include "../core/RichJsonConstants.hpp"
+#include "../core/RichJsonParser.hpp"
+#include <algorithm>
+#include <cctype>
+#include <iostream>
+#include <regex>
 
-class RichJsonParser;
+namespace RichJson {
 
-Dynamic RichJsonHelper::parse(Dynamic object) {
-    try {
-        RichJsonParser parser;
-        return parser.parse(object, true);
-    } catch (const std::exception& exception) {
-        std::cerr << "[ERROR] " << exception.what() << "\n";
-        return Dynamic{};
-    }
-}
-
-Dynamic RichJsonHelper::keepKeyCommands(Dynamic jsonObject) {
-    if (!jsonObject.isMap()) {
-        return jsonObject;
-    }
-
-    auto& map = jsonObject.asMap();
-    if (map.find(RichJsonConstants::KEY_COMMAND_MEMBER) != map.end()) {
-        Dynamic commands = map[RichJsonConstants::KEY_COMMAND_MEMBER];
-        Dynamic clonedCommands = RichJsonHelper::cloneObject(commands);
-        map[RichJsonConstants::KEY_COMMAND_MEMBER] = clonedCommands;
-    }
-
-    return jsonObject;
-}
-
-bool RichJsonHelper::isResolved(Dynamic object) {
+json RichJsonHelper::parse(json& object) {
+    // Intentionally does not catch exceptions - matches the original JS
+    // reference (core/RichJson_parse.js), not Java's port which added its
+    // own swallow-and-log try/catch.
     RichJsonParser parser;
-    return isResolvedRecursive(parser, object, parser.cache.resolveAddress(object));
+    return parser.parse(object, true);
 }
 
-bool RichJsonHelper::isResolvedRecursive(RichJsonParser& parser, Dynamic object, const std::string& address) {
-    if (!object.value.has_value()) {
-        return true;
+void RichJsonHelper::keepKeyCommands(json& jsonObject) {
+    if (!jsonObject.is_object()) return;
+    auto it = jsonObject.find(RichJsonConstants::KEY_COMMAND_MEMBER);
+    if (it != jsonObject.end()) {
+        jsonObject[RichJsonConstants::KEY_COMMAND_MEMBER] = cloneObject(*it);
+        jsonObject[RichJsonConstants::KEEP_KEY_COMMANDS_MARKER] = true;
     }
+}
 
-    if (parser.cache.stack.find(address) != parser.cache.stack.end()) {
-        return true;
+bool RichJsonHelper::isResolved(const json& object) {
+    RichJsonCache cache;
+    return isResolvedRecursive(cache, object, RichJsonCache::resolveAddress(object));
+}
+
+bool RichJsonHelper::isResolvedRecursive(RichJsonCache& cache, const json& object, const std::string& address) {
+    if (object.is_null()) return true;
+
+    if (cache.stack.find(address) != cache.stack.end()) return true;
+    cache.stack[address] = object;
+
+    bool isJsonObj = object.is_object();
+    if (isJsonObj && (object.contains(RichJsonConstants::KEY_COMMAND_MEMBER) ||
+                      object.contains(RichJsonConstants::LATE_CONSTRUCTOR_MEMBER))) {
+        return false;
     }
-    parser.cache.stack[address] = object;
-
-    bool isJsonObj = object.isMap();
 
     if (isJsonObj) {
-        auto& map = object.asMap();
-        if (map.find(RichJsonConstants::KEY_COMMAND_MEMBER) != map.end() ||
-            map.find(RichJsonConstants::LATE_CONSTRUCTOR_MEMBER) != map.end()) {
-            return false;
+        for (auto it = object.begin(); it != object.end(); ++it) {
+            if (!checkMember(cache, it.value(), address)) return false;
+        }
+    } else if (object.is_array()) {
+        for (const auto& member : object) {
+            if (!checkMember(cache, member, address)) return false;
         }
     }
-
-    if (isJsonObj) {
-        auto& map = object.asMap();
-        for (const auto& [key, value] : map) {
-            if (!checkMember(parser, value, key, address)) {
-                return false;
-            }
-        }
-    } else if (object.isList()) {
-        auto& list = object.asList();
-        for (size_t i = 0; i < list.size(); i++) {
-            if (!checkMember(parser, list[i], std::to_string(i), address)) {
-                return false;
-            }
-        }
-    }
-
     return true;
 }
 
-bool RichJsonHelper::checkMember(RichJsonParser& parser, Dynamic member, const std::string& keyOrIndex, const std::string& parentAddress) {
-    if (!parser.__isMemberRichJsonAble(member)) {
-        return true;
-    }
+bool RichJsonHelper::checkMember(RichJsonCache& cache, const json& member, const std::string& /*parentAddress*/) {
+    if (!isMemberRichJsonAble(member)) return true;
 
-    if (member.isString()) {
-        std::string str = member.asString();
+    if (member.is_string()) {
+        std::string str = member.get<std::string>();
         if (std::regex_search(str, RichJsonConstants::COMMAND_WILDCARD) ||
             std::regex_search(str, RichJsonConstants::INTERPOLATION_WILDCARD)) {
             return false;
         }
     } else {
-        std::string memberAddress = parser.cache.resolveAddress(member);
-        if (!isResolvedRecursive(parser, member, memberAddress)) {
-            return false;
-        }
+        std::string memberAddress = RichJsonCache::resolveAddress(member);
+        if (!isResolvedRecursive(cache, member, memberAddress)) return false;
     }
     return true;
 }
 
-Dynamic RichJsonHelper::mergeObjects(const std::vector<Dynamic>& objects) {
-    Dynamic target{DynamicMap{}};
-    return mergeIntoTarget(target, objects);
+json RichJsonHelper::mergeObjects(const std::vector<json>& objects) {
+    return mergeIntoTarget(json::object(), objects);
 }
 
-Dynamic RichJsonHelper::mergeIntoTarget(Dynamic& target, const std::vector<Dynamic>& others) {
-    if (!target.isMap()) {
-        target = Dynamic{DynamicMap{}};
-    }
-
-    auto& targetMap = target.asMap();
+json RichJsonHelper::mergeIntoTarget(json target, const std::vector<json>& others) {
+    if (!target.is_object()) target = json::object();
 
     for (const auto& other : others) {
-        if (!other.value.has_value() || !other.isMap()) continue;
+        if (other.is_null() || !other.is_object()) continue;
 
-        const auto& otherMap = other.asMap();
         RichJsonCache cache;
-        __mergeIntoTarget(cache, targetMap, otherMap, false);
+        mergeIntoTargetInternal(cache, target, other, false);
 
         if (cache.level != 0) {
             std::cerr << "RichJson mergeIntoTarget failed!\n";
@@ -118,23 +91,43 @@ Dynamic RichJsonHelper::mergeIntoTarget(Dynamic& target, const std::vector<Dynam
     return target;
 }
 
-DynamicMap& RichJsonHelper::__mergeIntoTarget(RichJsonCache& cache, DynamicMap& target, const DynamicMap& other, bool force) {
-    Dynamic wrapper{other};
-    cache.stack[cache.resolveAddress(wrapper)] = wrapper;
+json RichJsonHelper::mergeIntoTarget(json target, const json& other) {
+    return mergeIntoTarget(std::move(target), std::vector<json>{other});
+}
+
+json RichJsonHelper::mergeIntoTargetForce(json target, const json& other) {
+    if (!target.is_object()) target = json::object();
+
+    RichJsonCache cache;
+    mergeIntoTargetInternal(cache, target, other, true);
+    return target;
+}
+
+json& RichJsonHelper::mergeIntoTargetInternal(RichJsonCache& cache, json& target, const json& other, bool force) {
+    cache.stack[RichJsonCache::resolveAddress(other)] = other;
     cache.level++;
 
-    for (const auto& [name, member] : other) {
-        if (member.value.has_value() && isJsonObject(member)) {
-            if (target.find(name) != target.end() && isJsonObject(target[name])) {
-                Dynamic memberWrapper{member};
-                if (cache.stack.find(cache.resolveAddress(memberWrapper)) == cache.stack.end()) {
-                    auto& subTargetMap = target[name].asMap();
-                    __mergeIntoTarget(cache, subTargetMap, member.asMap(), force);
+    std::vector<std::string> names;
+    names.reserve(other.size());
+    for (auto it = other.begin(); it != other.end(); ++it) names.push_back(it.key());
+
+    for (const auto& name : names) {
+        const json& member = other.at(name);
+
+        if (isJsonObject(member)) {
+            auto targetIt = target.find(name);
+            bool targetHasObj = targetIt != target.end() && isJsonObject(*targetIt);
+
+            if (targetHasObj) {
+                std::string memberAddr = RichJsonCache::resolveAddress(member);
+                if (cache.stack.find(memberAddr) == cache.stack.end()) {
+                    json& subTarget = target[name];
+                    mergeIntoTargetInternal(cache, subTarget, member, force);
                 }
-            } else if (force || target.find(name) == target.end()) {
+            } else if (force || targetIt == target.end()) {
                 target[name] = member;
             }
-        } else if (force || target.find(name) == target.end()) {
+        } else if (force || !target.contains(name)) {
             target[name] = member;
         }
     }
@@ -143,22 +136,13 @@ DynamicMap& RichJsonHelper::__mergeIntoTarget(RichJsonCache& cache, DynamicMap& 
     return target;
 }
 
-Dynamic RichJsonHelper::cloneObject(Dynamic object) {
-    if (!object.value.has_value()) return object;
+json RichJsonHelper::cloneObject(const json& object) {
+    if (object.is_null()) return object;
+    if (!object.is_object() && !object.is_array()) return object;
 
     RichJsonCache cache;
-    Dynamic rootClone;
-
-    if (object.isList()) {
-        rootClone = Dynamic{DynamicList{}};
-    } else if (isJsonObject(object)) {
-        rootClone = Dynamic{DynamicMap{}};
-    } else {
-        return object;
-    }
-
-    cache.stack[cache.resolveAddress(object)] = rootClone;
-    Dynamic result = _cloneObject(cache, object, rootClone);
+    cache.stack[RichJsonCache::resolveAddress(object)] = object.is_array() ? json::array() : json::object();
+    json result = cloneObjectRecursive(cache, object);
 
     if (cache.level != 0) {
         std::cerr << "RichJson cloneObject failed!\n";
@@ -166,32 +150,39 @@ Dynamic RichJsonHelper::cloneObject(Dynamic object) {
     return result;
 }
 
-Dynamic RichJsonHelper::_cloneObject(RichJsonCache& cache, Dynamic object, Dynamic target) {
+json RichJsonHelper::cloneObjectRecursive(RichJsonCache& cache, const json& object) {
     cache.level++;
+    json target = object.is_array() ? json::array() : json::object();
 
-    if (object.isMap()) {
-        auto& sourceMap = object.asMap();
-        auto& targetMap = target.asMap();
-
-        for (const auto& [name, member] : sourceMap) {
-            processCloneMember(cache, targetMap, name, member);
-        }
-    } else if (object.isList()) {
-        auto& sourceList = object.asList();
-        auto& targetList = target.asList();
-
-        for (const auto& member : sourceList) {
-            if (isJsonObject(member) || member.isList()) {
-                std::string addr = cache.resolveAddress(member);
-                if (cache.stack.find(addr) == cache.stack.end()) {
-                    Dynamic newObj = member.isList() ? Dynamic{DynamicList{}} : Dynamic{DynamicMap{}};
-                    cache.stack[addr] = newObj;
-                    targetList.push_back(_cloneObject(cache, member, newObj));
+    if (object.is_object()) {
+        for (auto it = object.begin(); it != object.end(); ++it) {
+            const json& member = it.value();
+            if (member.is_object() || member.is_array()) {
+                std::string addr = RichJsonCache::resolveAddress(member);
+                auto cacheIt = cache.stack.find(addr);
+                if (cacheIt == cache.stack.end()) {
+                    cache.stack[addr] = member.is_array() ? json::array() : json::object();
+                    target[it.key()] = cloneObjectRecursive(cache, member);
                 } else {
-                    targetList.push_back(cache.stack[addr]);
+                    target[it.key()] = cacheIt->second;
                 }
             } else {
-                targetList.push_back(member);
+                target[it.key()] = member;
+            }
+        }
+    } else {
+        for (const auto& member : object) {
+            if (member.is_object() || member.is_array()) {
+                std::string addr = RichJsonCache::resolveAddress(member);
+                auto cacheIt = cache.stack.find(addr);
+                if (cacheIt == cache.stack.end()) {
+                    cache.stack[addr] = member.is_array() ? json::array() : json::object();
+                    target.push_back(cloneObjectRecursive(cache, member));
+                } else {
+                    target.push_back(cacheIt->second);
+                }
+            } else {
+                target.push_back(member);
             }
         }
     }
@@ -200,68 +191,40 @@ Dynamic RichJsonHelper::_cloneObject(RichJsonCache& cache, Dynamic object, Dynam
     return target;
 }
 
-void RichJsonHelper::processCloneMember(RichJsonCache& cache, DynamicMap& targetMap, const std::string& name, Dynamic member) {
-    if (isJsonObject(member) || member.isList()) {
-        std::string addr = cache.resolveAddress(member);
-        if (cache.stack.find(addr) == cache.stack.end()) {
-            Dynamic newObj = member.isList() ? Dynamic{DynamicList{}} : Dynamic{DynamicMap{}};
-            cache.stack[addr] = newObj;
-            targetMap[name] = _cloneObject(cache, member, newObj);
-        } else {
-            targetMap[name] = cache.stack[addr];
-        }
-    } else {
-        targetMap[name] = member;
-    }
-}
+json RichJsonHelper::getFieldByKey(const json& object, const std::string& key) {
+    if (object.is_null() || key.empty()) return json();
 
-bool RichJsonHelper::isJsonObject(const Dynamic& object) {
-    if (!object.value.has_value()) return false;
-    return object.isMap();
-}
-
-Dynamic RichJsonHelper::getFieldByKey(const Dynamic& object, const std::string& key) {
-    if (!object.value.has_value() || key.empty()) {
-        return Dynamic{};
+    if (object.is_object()) {
+        auto it = object.find(key);
+        return it != object.end() ? *it : json();
     }
 
-    if (object.isMap()) {
-        const auto& map = object.asMap();
-        if (map.find(key) != map.end()) {
-            return map.at(key);
-        }
-    }
-
-    if (object.isList()) {
-        const auto& list = object.asList();
+    if (object.is_array()) {
         try {
-            size_t index = std::stoul(key);
-            if (index < list.size()) {
-                return list[index];
-            }
+            size_t pos = 0;
+            unsigned long idx = std::stoul(key, &pos);
+            if (pos == key.size() && idx < object.size()) return object[idx];
         } catch (...) {
-            return Dynamic{};
+            return json();
         }
     }
 
-    return Dynamic{};
+    return json();
 }
 
-std::vector<std::string> RichJsonHelper::getKeysSorted(const Dynamic& object) {
+std::vector<std::string> RichJsonHelper::getKeysSorted(const json& object) {
     std::vector<std::string> keys;
-    if (object.isMap()) {
-        const auto& map = object.asMap();
-        for (const auto& [k, v] : map) {
-            keys.push_back(k);
-        }
-        std::sort(keys.begin(), keys.end(), [](const std::string& a, const std::string& b) {
-            return std::lexicographical_compare(
-                a.begin(), a.end(), b.begin(), b.end(),
-                [](char c1, char c2) {
-                    return std::tolower(c1) < std::tolower(c2);
-                }
-            );
-        });
-    }
+    if (!object.is_object()) return keys;
+
+    for (auto it = object.begin(); it != object.end(); ++it) keys.push_back(it.key());
+
+    std::sort(keys.begin(), keys.end(), [](const std::string& a, const std::string& b) {
+        return std::lexicographical_compare(
+            a.begin(), a.end(), b.begin(), b.end(),
+            [](unsigned char c1, unsigned char c2) { return std::tolower(c1) < std::tolower(c2); });
+    });
+
     return keys;
 }
+
+} // namespace RichJson

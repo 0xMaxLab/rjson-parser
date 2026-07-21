@@ -321,10 +321,11 @@ TEST(RichJson, CloneCrashOnNested) {
         }}
     };
 
-    __RICH_JSON_CONFIG.crashOnNestedCloneEnabled = false;
-
     bool hadException = false;
     try { parse(content); } catch (...) { hadException = true; }
+
+    __RICH_JSON_CONFIG.crashOnNestedCloneEnabled = false;
+
     EXPECT_TRUE(hadException);
 }
 
