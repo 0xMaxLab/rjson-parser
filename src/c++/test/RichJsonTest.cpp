@@ -97,7 +97,18 @@ TEST(RichJson, Inheritance) {
 
     EXPECT_EQ(content["third"]["x"],     10);
     EXPECT_EQ(content["third"]["y"],     5);
-    EXPECT_EQ(content["third"]["other"], content["first"]);
+
+    // third::first / first::second,third / second::third form a genuine
+    // 3-way inheritance cycle, so "first" ends up self-referential through
+    // it. As with $this (see that test), value-typed JSON can't replicate
+    // Java's live, infinitely-consistent object reference here: third.other
+    // is a snapshot of "first" taken mid-cycle, not an exact alias to the
+    // fully-unfolded "first" - see RichJsonContext's rootAddress/
+    // containerAddress comment. Check the part that *is* well-defined
+    // (the directly-inherited fields) rather than the unbounded chain.
+    EXPECT_TRUE(content["third"]["other"].is_object());
+    EXPECT_EQ(content["third"]["other"]["x"], 10);
+    EXPECT_EQ(content["third"]["other"]["y"], 5);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -219,7 +230,19 @@ TEST(RichJson, Ref) {
     parse(content);
 
     EXPECT_EQ(content["first"]["third"]["fourth"], content["fourth"]["fifth"]);
-    EXPECT_EQ(content["fourth"]["seventh"]["eigth"], content["fourth"]);
+
+    // fourth.seventh.eigth = "$ref:fourth" is a genuine self-reference
+    // (fourth contains seventh contains eigth which points back at fourth
+    // itself). As with $this (see that test), value-typed JSON can't
+    // replicate Java's live, infinitely-consistent object reference here,
+    // so this resolves to a bounded snapshot of "fourth" rather than an
+    // exact alias - see RichJsonContext's rootAddress/containerAddress
+    // comment. Check that the cycle broke sensibly (an object with
+    // "fourth"'s shape) rather than crashing or leaving a raw string.
+    EXPECT_TRUE(content["fourth"]["seventh"]["eigth"].is_object());
+    EXPECT_TRUE(content["fourth"]["seventh"]["eigth"].contains("fifth"));
+    EXPECT_TRUE(content["fourth"]["seventh"]["eigth"].contains("sixth"));
+    EXPECT_TRUE(content["fourth"]["seventh"]["eigth"].contains("seventh"));
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -244,12 +267,19 @@ TEST(RichJson, Env) {
 //  $this
 // ─────────────────────────────────────────────────────────────
 TEST(RichJson, This) {
+    // $this: here is a genuine self-reference: the root object contains a
+    // key that points back at the root itself. Java/JS represent this with
+    // a live, mutable object reference, so content.this literally *is*
+    // content and stays consistent no matter how deep you index. There is
+    // no finite nlohmann::json value V with V == {"this": V}, so this port
+    // instead resolves self-reference to a bounded, deterministic snapshot
+    // (one level) rather than an infinitely-unfolding alias - see the
+    // rootAddress/containerAddress comment on RichJsonContext for why.
     json content = {{"this", "$this:"}};
     parse(content);
 
-    EXPECT_EQ(content,              content["this"]);
-    EXPECT_EQ(content["this"],      content["this"]["this"]);
-    EXPECT_EQ(content["this"]["this"], content["this"]["this"]["this"]);
+    EXPECT_TRUE(content["this"].is_object());
+    EXPECT_EQ(content["this"]["this"], "$this:");
 }
 
 // ─────────────────────────────────────────────────────────────

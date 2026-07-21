@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(nlohmann_json REQUIRED)
 find_package(GTest REQUIRED)
+enable_testing()
 
 file(GLOB_RECURSE RJSON_MAIN_SOURCES CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/src/c++/main/*.cpp)

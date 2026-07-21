@@ -35,6 +35,18 @@ struct RichJsonContext {
     // fields instead track a purely compositional (path-based) address string
     // that stays valid regardless of where the underlying value physically
     // lives - see RichJson_ref.cpp/RichJson_this.cpp.
+    //
+    // Known limitation: this only matters for genuinely circular/self-
+    // referential input (e.g. "$this:" at the root, or an inheritance/$ref
+    // chain that loops back on itself). Java/JS resolve these to a live,
+    // mutable Map/List reference, so e.g. `content.get("this") == content`
+    // holds forever and indexing arbitrarily deep stays consistent, because
+    // it's literally the same object. There is no finite nlohmann::json
+    // value V with V == {"this": V}, so this port instead resolves such
+    // cycles to a bounded, deterministic snapshot (see the RichJson.This/
+    // RichJson.Ref/RichJson.Inheritance tests) rather than an infinitely-
+    // unfolding alias. Everything else (the vast majority of real RichJSON
+    // documents, which don't self-reference) is unaffected.
     std::string rootAddress;
     std::string containerAddress;
 };
