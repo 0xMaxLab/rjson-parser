@@ -16,3 +16,5 @@ __pycache__/
 __pycache__/**
 coverage/**
 !coverage/badge.svg
+build/
+build/**
