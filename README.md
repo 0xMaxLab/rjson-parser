@@ -13,13 +13,26 @@
 ```
 npm install @rjson/parser
 ```
-
+* 👉 [maven/gradle (java)](https://central.sonatype.com/artifact/io.github.0xmaxlab/rjson-parser/overview)
+```
+<dependency>
+    <groupId>io.github.0xmaxlab</groupId>
+    <artifactId>rjson-parser</artifactId>
+    <version>1.3.0</version>
+</dependency>
+```
+```
+dependencies {
+    implementation 'io.github.0xmaxlab:rjson-parser:1.3.0'
+}
+```
+* 👉 [pip (python)](https://pypi.org/project/rjson-parser/)
+```
+pip install rjson-parser
+```
 **TODOs:**
-* 👉 [maven (java)]()
-* 👉 [gradle (java)]()
-* 👉 [conan (c++)]()
 * 👉 [nuget (c#)]()
-* 👉 [pip (python)]() 
+* 👉 [conan (c++)]()
 
 ---
 
