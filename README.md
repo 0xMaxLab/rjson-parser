@@ -26,8 +26,11 @@ dependencies {
     implementation 'io.github.0xmaxlab:rjson-parser:1.3.0'
 }
 ```
+* 👉 [pip (python)](https://pypi.org/project/rjson-parser/)
+```
+pip install rjson-parser
+```
 **TODOs:**
-* 👉 [pip (python)]() 
 * 👉 [nuget (c#)]()
 * 👉 [conan (c++)]()
 
