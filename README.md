@@ -30,8 +30,11 @@ dependencies {
 ```
 pip install rjson-parser
 ```
+* 👉 [nuget (c#)](https://www.nuget.org/packages/rjson-parser/)
+```
+dotnet add package rjson-parser
+```
 **TODOs:**
-* 👉 [nuget (c#)]()
 * 👉 [conan (c++)]()
 
 ---
