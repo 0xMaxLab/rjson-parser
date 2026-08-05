@@ -20,3 +20,7 @@ build/
 build/**
 dist/
 dist/**
+bin/
+bin/**
+obj/
+obj/**
