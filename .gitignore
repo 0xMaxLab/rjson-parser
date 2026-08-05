@@ -18,3 +18,5 @@ coverage/**
 !coverage/badge.svg
 build/
 build/**
+dist/
+dist/**
