@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rjson-parser"
+version = "1.3.0"
+description = "RJSON -- JSON with multiple inheritances, references and commands"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [{ name = "Maximilian Schwarz" }]
+keywords = ["JSON", "EJSON", "JSON Extension", "RJSON", "JSON Inheritance", "JSON References", "JSON Commands"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/0xMaxLab/rjson-parser"
+Repository = "https://github.com/0xMaxLab/rjson-parser"
+Issues = "https://github.com/0xMaxLab/rjson-parser/issues"
+Documentation = "https://github.com/0xMaxLab/rjson-parser/wiki"
+
+[tool.setuptools.packages.find]
+where = ["src/python"]
