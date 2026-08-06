@@ -66,4 +66,4 @@ json richJson_merge(RichJsonParser& parser, RichJsonContext& context) {
     return target;
 }
 
-} // namespace RichJson
+}

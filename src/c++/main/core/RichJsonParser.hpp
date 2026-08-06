@@ -13,16 +13,8 @@ namespace RichJson {
 
 using json = nlohmann::json;
 
-// Ported from core/RichJsonParser.java. Operates on the live json tree via
-// references (matching Java's Map/List reference semantics for the duration
-// of a single parse() call) so that lazily-triggered resolution (via $ref,
-// $this, inheritance, ...) mutates the actual node being built rather than a
-// disconnected copy.
 class RichJsonParser {
 private:
-    // Declared first so they're initialized before `logger` below (members
-    // initialize in declaration order regardless of access-specifier
-    // grouping, and RichJsonLogger's constructor requires `label_` already set).
     static inline int NEXT_ID = 0;
     int id_;
     std::string label_;
@@ -30,14 +22,8 @@ private:
 public:
     RichJsonParser();
 
-    // Entry point. isRoot=true starts a fresh top-level parse; the recursive
-    // descent calls itself with isRoot=false for each container node.
     json parse(json& current, bool isRoot);
 
-    // Resolves whatever `con.currentMember` currently holds (string command,
-    // nested object/array, or plain scalar). Public because commands
-    // (RichJson_ref, RichJson_this, RichJson_env) trigger it directly to
-    // force lazy resolution of a referenced node.
     json parseRichJsonInMember();
 
     RichJsonCache cache;
@@ -51,7 +37,7 @@ private:
         bool isParsed = true;
     };
     struct InterpolationResult {
-        std::string result;
+        std::string result;e
         bool isParsed;
     };
 
@@ -72,6 +58,6 @@ private:
     static std::string joinPath(const std::vector<std::string>& path, const std::string& delimiter);
 };
 
-} // namespace RichJson
+}
 
 #endif

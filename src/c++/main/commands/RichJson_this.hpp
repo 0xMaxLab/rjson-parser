@@ -10,9 +10,8 @@ using json = nlohmann::json;
 class RichJsonParser;
 struct RichJsonContext;
 
-// Ported from commands/RichJson_this.java.
 json richJson_this(RichJsonParser& parser, RichJsonContext& context);
 
-} // namespace RichJson
+}
 
 #endif

@@ -10,11 +10,6 @@ namespace RichJson {
 
 using json = nlohmann::json;
 
-// Ported from other/RichJsonEnvironment.java. JSON values can't hold
-// executable code (unlike Java's Object env map, which can hold a Supplier),
-// so native C++ callables are registered in a separate `functions` table.
-// When $env resolves a name found there, it returns a sentinel object that
-// $invoke recognizes and calls; on any plain value, $invoke is a no-op.
 class RichJsonEnvironment {
 public:
     static inline const std::string NATIVE_FUNCTION_MEMBER = "__$_rich_json_native_function_$__";
@@ -37,6 +32,6 @@ public:
     static bool hasFunction(const std::string& name) { return functions().find(name) != functions().end(); }
 };
 
-} // namespace RichJson
+}
 
 #endif

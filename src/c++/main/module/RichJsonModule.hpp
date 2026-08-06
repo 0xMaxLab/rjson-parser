@@ -8,10 +8,6 @@
 
 namespace RichJson {
 
-// Ported from module/RichJsonModule.java. Groups related commands and
-// late-apply rules for inclusion/exclusion as a unit. `ignores` defaults to
-// empty (Java requires it explicitly; the C++ test file calls addCommand/
-// addLateApply with just a name and a function).
 class RichJsonModule {
 public:
     explicit RichJsonModule(std::string moduleName) : name(std::move(moduleName)) {}
@@ -29,6 +25,6 @@ public:
     void exclude();
 };
 
-} // namespace RichJson
+}
 
 #endif

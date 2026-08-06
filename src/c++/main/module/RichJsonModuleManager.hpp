@@ -8,7 +8,6 @@
 
 namespace RichJson {
 
-// Ported from module/RichJsonModuleManager.java.
 class RichJsonModuleManager {
 public:
     static std::shared_ptr<RichJsonModule> registerModule(std::shared_ptr<RichJsonModule> module);
@@ -24,6 +23,6 @@ private:
     }
 };
 
-} // namespace RichJson
+}
 
 #endif

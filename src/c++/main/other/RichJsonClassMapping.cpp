@@ -27,4 +27,4 @@ const RichJsonClassMapping::Factory& RichJsonClassMapping::mapClassByName(const 
     return it->second;
 }
 
-} // namespace RichJson
+}

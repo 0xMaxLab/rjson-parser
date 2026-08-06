@@ -12,11 +12,6 @@ namespace RichJson {
 
 using json = nlohmann::json;
 
-// Ported from core/RichJsonCache.java. `stack` memoizes already-resolved
-// values by address to avoid re-resolving the same node twice and to break
-// cycles (e.g. a key that (indirectly) references itself). `resolveAddress`
-// mirrors Java's System.identityHashCode(obj): a pointer-based identity for
-// container nodes, valid for the duration of a single parse() call.
 class RichJsonCache {
 public:
     int level = 0;
@@ -29,6 +24,6 @@ public:
     }
 };
 
-} // namespace RichJson
+}
 
 #endif

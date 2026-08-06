@@ -34,4 +34,4 @@ json richJson_clone(RichJsonParser& parser, RichJsonContext& context) {
     return context.currentMember;
 }
 
-} // namespace RichJson
+}

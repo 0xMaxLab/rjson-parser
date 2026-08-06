@@ -15,9 +15,7 @@ json richJson_invoke(RichJsonParser&, RichJsonContext& context) {
         }
     }
 
-    // Plain value (the common case): JSON can't hold executable code, so
-    // there's nothing to invoke - pass the member through unchanged.
     return context.currentMember;
 }
 
-} // namespace RichJson
+}

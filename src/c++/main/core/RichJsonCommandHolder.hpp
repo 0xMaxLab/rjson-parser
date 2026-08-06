@@ -8,10 +8,6 @@
 
 namespace RichJson {
 
-// Ported from core/RichJsonCommandHolder.java. Registers the built-in
-// commands and tracks which are currently enabled (a disabled command
-// resolves to a VOID_COMMAND that echoes the raw "$cmd:member" text back,
-// same as Java).
 class RichJsonCommandHolder {
 public:
     static RichJsonCommandHolder& instance() {
@@ -35,6 +31,6 @@ private:
     void registerBuiltInCommands();
 };
 
-} // namespace RichJson
+}
 
 #endif

@@ -89,4 +89,4 @@ json RichJsonFileHelper::readDirectory(const std::string& pathStr, bool executeL
     return rv;
 }
 
-} // namespace RichJson
+}

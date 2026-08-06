@@ -9,4 +9,4 @@ json richJson_folder(RichJsonParser&, RichJsonContext& context) {
     return RichJsonFileHelper::readDirectory(folderPath, true);
 }
 
-} // namespace RichJson
+}

@@ -14,4 +14,4 @@ json richJson_this(RichJsonParser& parser, RichJsonContext& context) {
     return richJson_resolvePathFrom(context.current, context.containerAddress, parser, context);
 }
 
-} // namespace RichJson
+}

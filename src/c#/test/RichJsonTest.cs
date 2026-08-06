@@ -25,10 +25,8 @@ namespace main.tests
         {
             try
             {
-                // Liest das JSON als generisches JObject ein
                 var rawToken = JsonConvert.DeserializeObject<Newtonsoft.Json.Linq.JToken>(json);
-        
-                // Wandelt das gesamte Konstrukt tiefenrein in Dictionary und List um
+
                 return RichJsonHelper.CleanJToken(rawToken) as IDictionary<string, object>;
             }
             catch (Exception e)

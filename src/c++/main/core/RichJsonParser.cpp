@@ -17,9 +17,6 @@ std::string trim(const std::string& s) {
     return s.substr(start, end - start + 1);
 }
 
-// Mirrors Java's String.split(regex) default behavior: splits on every
-// occurrence of `delim`, then drops trailing empty tokens (but always
-// leaves at least one, possibly empty, token).
 std::vector<std::string> splitAll(const std::string& s, char delim) {
     std::vector<std::string> parts;
     std::string cur;
@@ -69,13 +66,6 @@ json RichJsonParser::parse(json& current, bool isRoot) {
         try {
             current = parseRichJsonInMember();
         } catch (...) {
-            // Preserve whatever partial progress (e.g. key-command/constructor/
-            // inheritance preprocessing renames) had already been committed to
-            // con.currentMember before propagating the failure - Java/JS get
-            // this for free via in-place reference mutation; this parser
-            // instead threads defensive value copies through the recursion
-            // (see parseRichJsonInMember's isJsonObj branch below), so it has
-            // to explicitly write back before rethrowing.
             current = con.currentMember;
             cache.level--;
             logger.groupEndAll();
@@ -105,13 +95,6 @@ json RichJsonParser::parse(json& current, bool isRoot) {
     std::string currentAddress = con.currentAddress;
     con.containerAddress = currentAddress;
 
-    // NOTE: addresses are always composed from the parent's address rather
-    // than derived from the child's own memory location (contrast Java's
-    // System.identityHashCode on the child Map/List itself). See the
-    // RichJsonContext::rootAddress/containerAddress comment for why: this
-    // parser works on defensive value copies at each recursion level, so a
-    // raw pointer address computed from a transient copy could otherwise be
-    // silently reused by an unrelated later copy.
     if (isJsonObj) {
         preprocessKcommandsConstructorsInheritances();
         auto sortedKeys = RichJsonHelper::getKeysSorted(current);
@@ -203,9 +186,6 @@ void RichJsonParser::preprocessKcommandsConstructorsInheritances() {
         json& stored = currentMap[processedName];
 
         if (isite && stored.is_object()) {
-            // con.currentAddress still holds the *container's* address here
-            // (the per-key loop hasn't started yet), matching the address it
-            // will later compute for this same key: currentAddress + "_" + name.
             cache.inheritances[con.currentAddress + "_" + processedName] = ite;
         }
 
@@ -262,29 +242,11 @@ json RichJsonParser::parseRichJsonInMember() {
         kcmd_ignored = getIgnoresForKeyCommands();
         for (const auto& cmd : kcmd_ignored) RichJsonCommandHolder::setCommandEnabled(cmd, false);
         resolveInheritances();
-        // Re-sync: cache.stack holds a value copy, not a live reference like
-        // Java's Map, so resolveInheritances's merge (which just mutated
-        // con.currentMember) wouldn't otherwise be visible to any reentrant
-        // lookup of this same address (e.g. the 3-way circular inheritance
-        // case, where resolving "second" needs "third" needs "first" needs
-        // "second" again).
         cache.stack[currentAddress] = con.currentMember;
     }
 
     {
-        // Must copy out first: parse()'s per-key loop reassigns
-        // con.currentMember as it walks each child, so passing
-        // con.currentMember itself by reference here would alias the very
-        // object being iterated over and corrupt it mid-loop.
         json memberCopy = con.currentMember;
-
-        // If this is the root node itself, con.root (still pointing at the
-        // caller's original, pre-preprocessing object - see parse()'s root
-        // branch) must be repointed at this live copy for the duration of
-        // processing its children: preprocessing/inheritance/etc. mutate
-        // memberCopy directly, and $ref navigates from con.root, so without
-        // this it would see stale, unprocessed data (e.g. "second==Foo::first"
-        // instead of the preprocessed "first"/"second" keys).
         bool isRootMember = (con.currentAddress == con.rootAddress);
         json* prevRoot = con.root;
         if (isRootMember) con.root = &memberCopy;
@@ -292,9 +254,6 @@ json RichJsonParser::parseRichJsonInMember() {
         try {
             con.currentMember = parse(memberCopy, false);
         } catch (...) {
-            // See the matching catch in parse()'s root branch: preserve
-            // whatever partial progress parse() already committed to
-            // memberCopy before propagating the failure.
             con.currentMember = memberCopy;
             if (isRootMember) con.root = prevRoot;
             throw;
@@ -307,10 +266,6 @@ json RichJsonParser::parseRichJsonInMember() {
         resetCloneIfPossible(currentAddress);
         for (const auto& cmd : kcmd_ignored) RichJsonCommandHolder::setCommandEnabled(cmd, true);
         con.currentMember = executeKeyCommands();
-        // Re-sync (see the comment after resolveInheritances() above): the
-        // fully-resolved value (children recursed, key-commands applied)
-        // must be visible to any later reentrant/cache-hit lookup of this
-        // same address.
         cache.stack[currentAddress] = con.currentMember;
     }
 
@@ -449,11 +404,6 @@ json RichJsonParser::tryRichJsonCommand() {
                 }
             } else {
                 con.currentPath.pop_back();
-                // NOTE: unlike the reference Java port (which drops the ':'
-                // separator here - a latent bug in that path since it's never
-                // actually exercised by its own test suite), we reconstruct
-                // the full "$cmd:member" text so a disabled command is a
-                // faithful no-op on the original string.
                 json rv = json(unresolved_command + RichJsonConstants::COMMAND_SUFFIX + con.currentMember.get<std::string>());
                 return rv;
             }
@@ -597,4 +547,4 @@ json RichJsonParser::tryRichJsonKeyCommand() {
     }
 }
 
-} // namespace RichJson
+}

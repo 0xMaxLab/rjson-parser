@@ -9,9 +9,6 @@
 namespace RichJson {
 
 json RichJsonHelper::parse(json& object) {
-    // Intentionally does not catch exceptions - matches the original JS
-    // reference (core/RichJson_parse.js), not Java's port which added its
-    // own swallow-and-log try/catch.
     RichJsonParser parser;
     return parser.parse(object, true);
 }
@@ -227,4 +224,4 @@ std::vector<std::string> RichJsonHelper::getKeysSorted(const json& object) {
     return keys;
 }
 
-} // namespace RichJson
+}

@@ -8,13 +8,12 @@ namespace RichJson {
 
 using json = nlohmann::json;
 
-// Ported from helper/RichJsonFileHelper.java.
 class RichJsonFileHelper {
 public:
     static json readFile(const std::string& pathStr, bool executeLateApplies);
     static json readDirectory(const std::string& pathStr, bool executeLateApplies);
 };
 
-} // namespace RichJson
+}
 
 #endif

@@ -2,7 +2,7 @@ package io.github._0xmaxlab.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github._0xmaxlab.helper.RichJsonHelper;
-import io.github._0xmaxlab.helper.RichJsonLogger; // Dein neuer Logger
+import io.github._0xmaxlab.helper.RichJsonLogger;
 import io.github._0xmaxlab.other.RichJsonClassMapping;
 import io.github._0xmaxlab.other.RichJsonConfig;
 

@@ -9,4 +9,4 @@ json richJson_copy(RichJsonParser& parser, RichJsonContext& context) {
     return RichJsonHelper::cloneObject(referencedValue);
 }
 
-} // namespace RichJson
+}

@@ -8,8 +8,6 @@
 
 namespace RichJson {
 
-// Ported from helper/RichJsonLogger.java. Writes to stdout/stderr instead of
-// slf4j; behavior (indentation groups, gated by RichJsonConfig) is preserved.
 class RichJsonLogger {
 public:
     explicit RichJsonLogger(std::string label) : label_(std::move(label)) {}
@@ -72,6 +70,6 @@ private:
     std::chrono::steady_clock::time_point startTime_;
 };
 
-} // namespace RichJson
+}
 
 #endif

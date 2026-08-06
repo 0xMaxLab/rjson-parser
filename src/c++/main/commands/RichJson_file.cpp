@@ -9,4 +9,4 @@ json richJson_file(RichJsonParser&, RichJsonContext& context) {
     return RichJsonFileHelper::readFile(fileName, true);
 }
 
-} // namespace RichJson
+}

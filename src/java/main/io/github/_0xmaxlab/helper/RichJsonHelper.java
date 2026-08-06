@@ -38,7 +38,6 @@ public class RichJsonHelper {
         if (jsonObject.containsKey(RichJsonConstants.KEY_COMMAND_MEMBER)) {
             Object commands = jsonObject.get(RichJsonConstants.KEY_COMMAND_MEMBER);
 
-            // Create a deep copy of the command list to isolate it.
             Object clonedCommands = RichJsonHelper.cloneObject(commands);
 
             jsonObject.put(RichJsonConstants.KEY_COMMAND_MEMBER, clonedCommands);
@@ -47,9 +46,6 @@ public class RichJsonHelper {
         return jsonObject;
     }
 
-    /**
-     * Prüft, ob das gegebene Objekt noch ungelöste RichJson-Ausdrücke enthält.
-     */
     public static boolean isResolved(Object object) {
         RichJsonParser parser = new RichJsonParser();
         return isResolvedRecursive(parser, object, parser.cache.resolveAddress(object));

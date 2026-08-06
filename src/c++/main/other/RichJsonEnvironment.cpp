@@ -30,4 +30,4 @@ void RichJsonEnvironment::registerFunction(const std::string& name, std::functio
     functions()[name] = std::move(fn);
 }
 
-} // namespace RichJson
+}

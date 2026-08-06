@@ -19,7 +19,7 @@ public class RichJsonFileHelper {
     private static final Map<String, Object> FILE_CACHE = new HashMap<>();
 
     /**
-     * Liest ein Verzeichnis wie eine JSON-Datei und löst RichJson auf.
+     * Reads a directory in a json like structure.
      */
     public static Map<String, Object> readDirectory(String pathStr, boolean executeLateApplies) {
         File folder = new File(pathStr);
@@ -50,10 +50,9 @@ public class RichJsonFileHelper {
     }
 
     /**
-     * Liest eine JSON-Datei und führt den RichJsonParser darauf aus.
+     * Reads a json file and applies rich json.
      */
     public static Object readFile(String pathStr, boolean executeLateApplies) {
-        // 1. Cache Check
         if (RichJsonConfig.fileCacheEnabled && FILE_CACHE.containsKey(pathStr)) {
             return FILE_CACHE.get(pathStr);
         }
@@ -62,7 +61,6 @@ public class RichJsonFileHelper {
             FILE_CACHE.put(pathStr, new HashMap<String, Object>());
         }
 
-        // 2. Late Applies Management
         if (!executeLateApplies) {
             RichJsonCommandHolder.lateApplies.forEach(cmd -> RichJsonCommandHolder.setCommandEnabled(cmd, false));
         }
@@ -81,12 +79,10 @@ public class RichJsonFileHelper {
             throw new RuntimeException("Error reading RichJson file: " + pathStr, e);
         }
 
-        // 3. Reaktivierung
         if (!executeLateApplies) {
             RichJsonCommandHolder.lateApplies.forEach(cmd -> RichJsonCommandHolder.setCommandEnabled(cmd, true));
         }
 
-        // 4. Cache Update
         if (RichJsonConfig.fileCacheEnabled) {
             Object cached = FILE_CACHE.get(pathStr);
             if (cached instanceof Map && rv instanceof Map) {

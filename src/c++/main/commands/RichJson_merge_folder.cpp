@@ -19,4 +19,4 @@ json richJson_merge_folder(RichJsonParser& parser, RichJsonContext& context) {
     return result;
 }
 
-} // namespace RichJson
+}

@@ -73,4 +73,4 @@ void RichJsonCommandHolder::throwCommandNotFound(const std::string& command) {
     throw std::runtime_error("RichJson Command '" + command + "' not found");
 }
 
-} // namespace RichJson
+}

@@ -58,4 +58,4 @@ void RichJsonModule::exclude() {
     }
 }
 
-} // namespace RichJson
+}

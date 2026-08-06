@@ -20,10 +20,6 @@ json richJson_env(RichJsonParser& parser, RichJsonContext& context) {
     std::string firstRef = hasRemainder ? memberStr.substr(0, slashPos) : memberStr;
     std::string remainder = hasRemainder ? memberStr.substr(slashPos + RichJsonConstants::COMMAND_PATH_DELIMITER.size()) : "";
 
-    // JSON can't hold executable code (unlike Java's env map, which may hold
-    // a Supplier). Native C++ functions live in a separate registry and
-    // resolve to a sentinel object that $invoke recognizes; they don't
-    // support path navigation.
     if (RichJsonEnvironment::hasFunction(firstRef)) {
         if (hasRemainder) {
             throw std::runtime_error("RichJson native function '" + firstRef + "' does not support path navigation.");
@@ -44,9 +40,6 @@ json richJson_env(RichJsonParser& parser, RichJsonContext& context) {
     std::string prevRootAddress = context.rootAddress;
     json emptyRoot = json::object();
     context.root = envVal.is_object() ? &envVal : &emptyRoot;
-    // Compositional anchor (see RichJsonContext comment) rather than a
-    // pointer-derived address: env storage is long-lived, but a plain
-    // string keeps this consistent with the rest of the addressing scheme.
     context.rootAddress = "env_" + firstRef;
     context.currentAddress = context.rootAddress;
 
@@ -64,4 +57,4 @@ json richJson_env(RichJsonParser& parser, RichJsonContext& context) {
     return result;
 }
 
-} // namespace RichJson
+}

@@ -5,7 +5,6 @@
 
 namespace RichJson {
 
-// Ported from other/RichJsonConfig.java (global toggles for the library).
 struct RichJsonConfig {
     bool infoEnabled = true;
     bool debugEnabled = false;
@@ -35,6 +34,6 @@ inline void updateConfiguration(const RichJsonConfigUpdate& update) {
     if (update.fileCacheEnabled) __RICH_JSON_CONFIG.fileCacheEnabled = *update.fileCacheEnabled;
 }
 
-} // namespace RichJson
+}
 
 #endif

@@ -18,11 +18,6 @@
 
 namespace RichJson {
 
-// Public facade mirroring src/js/main/index.js / index.d.ts (the original
-// JS/Java public API), adapted for C++'s static typing - see
-// other/RichJsonClassMapping.hpp and other/RichJsonEnvironment.hpp for the
-// reflection/callable adaptations this required.
-
 inline const std::string KEY_COMMAND_MEMBER = RichJsonConstants::KEY_COMMAND_MEMBER;
 
 inline json parse(json& object) {
@@ -94,6 +89,6 @@ inline void setCommandEnabled(const std::string& cmd, bool enabled) {
     RichJsonCommandHolder::setCommandEnabled(cmd, enabled);
 }
 
-} // namespace RichJson
+}
 
 #endif

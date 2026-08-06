@@ -59,7 +59,7 @@ json richJson_resolvePathFrom(json* startNode, const std::string& startAddress, 
         context.currentAddress = runningAddress;
 
         context.currentMember = parser.parseRichJsonInMember();
-        memberRef = context.currentMember; // persist resolution into the actual tree slot
+        memberRef = context.currentMember;
 
         context.currentPath.push_back(ref);
         prevMember = &memberRef;
@@ -79,4 +79,4 @@ json richJson_ref(RichJsonParser& parser, RichJsonContext& context) {
     return richJson_resolvePathFrom(context.root, context.rootAddress, parser, context);
 }
 
-} // namespace RichJson
+}

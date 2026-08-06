@@ -51,4 +51,4 @@ void RichJsonModuleManager::excludeModule(const std::string& name) {
     }
 }
 
-} // namespace RichJson
+}
