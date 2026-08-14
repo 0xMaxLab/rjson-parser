@@ -7,6 +7,9 @@
 
 **RichJSON** is a powerful extension of the standard JSON format, meticulously designed to make your data highly modular, reusable, and significantly more compressed. By eliminating redundancy through intelligent referencing, it bridges the gap between human-readable configuration and machine-efficient data structures.
 
+## AI Disclaimer
+**RichJSON** was originally written without LLMs in GML (Game Maker Language) before it was then migrated to Java Script without using LLMs, however it was translated to Java, Python, C# and C++ by using LLMs, so keep that in mind when using these languages that there might occur bugs due to the used LLMs or limitation due to the language itself.
+
 ## 📦 Get Started ([You can find the Wiki here.](https://github.com/0xMaxLab/rjson-parser/wiki))
 
 * 👉 [npm (javascript/typescript)](https://www.npmjs.com/package/@rjson/parser)
