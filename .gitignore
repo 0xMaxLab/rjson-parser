@@ -24,3 +24,7 @@ bin/
 bin/**
 obj/
 obj/**
+
+# Conan
+test_package/build/
+test_package/CMakeUserPresets.json

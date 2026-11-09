@@ -37,7 +37,7 @@ private:
         bool isParsed = true;
     };
     struct InterpolationResult {
-        std::string result;e
+        std::string result;
         bool isParsed;
     };
 

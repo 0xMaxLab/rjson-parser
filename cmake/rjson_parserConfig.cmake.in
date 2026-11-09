@@ -1,0 +1,7 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(nlohmann_json 3.11)
+
+include("${CMAKE_CURRENT_LIST_DIR}/rjson_parserTargets.cmake")
+check_required_components(rjson_parser)
